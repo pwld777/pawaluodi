@@ -1,0 +1,114 @@
+import { getNotationCard } from "../data/notation-cards.js";
+
+const meterCapacity = {
+  "2/4": 2,
+  "3/4": 3
+};
+
+export function createDefaultComposition({ meter = "2/4", bars = 2 } = {}) {
+  return {
+    mode: meter === "2/4" ? "欢快段" : "悠扬段",
+    meter,
+    instrument: "hand-drum",
+    feedbackMessage: null,
+    bars: Array.from({ length: bars }, (_, index) => ({
+      id: `bar-${index + 1}`,
+      blocks: [],
+      filledBeats: 0,
+      capacity: meterCapacity[meter],
+      status: "empty"
+    }))
+  };
+}
+
+function withBarStatus(bar) {
+  if (bar.filledBeats === 0) {
+    return { ...bar, status: "empty" };
+  }
+
+  if (bar.filledBeats === bar.capacity) {
+    return { ...bar, status: "complete" };
+  }
+
+  return { ...bar, status: "partial" };
+}
+
+export function addBlockToBar(composition, barIndex, blockId) {
+  const card = getNotationCard(blockId);
+  const bar = composition.bars[barIndex];
+
+  if (!bar) {
+    throw new Error("找不到这个小节");
+  }
+
+  if (bar.filledBeats + card.beats > bar.capacity) {
+    throw new Error(`${card.name} 这小节放不下`);
+  }
+
+  const nextBars = composition.bars.map((item, index) => {
+    if (index !== barIndex) {
+      return item;
+    }
+
+    return withBarStatus({
+      ...item,
+      blocks: [...item.blocks, blockId],
+      filledBeats: item.filledBeats + card.beats
+    });
+  });
+
+  return {
+    ...composition,
+    bars: nextBars
+  };
+}
+
+export function resetComposition({ meter = "2/4", instrument = "hand-drum", mode } = {}) {
+  return {
+    ...createDefaultComposition({ meter, bars: 2 }),
+    mode: mode ?? (meter === "2/4" ? "欢快段" : "悠扬段"),
+    instrument
+  };
+}
+
+export function serializeState(state) {
+  return JSON.stringify(state);
+}
+
+export function restoreState(serialized) {
+  if (!serialized) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(serialized);
+  } catch {
+    return null;
+  }
+}
+
+export function createInitialState() {
+  return {
+    currentView: "home",
+    stars: 0,
+    beatGame: {
+      currentStep: "intro",
+      currentMeter: "2/4",
+      score: 0,
+      streak: 0,
+      lastResult: null
+    },
+    rhythmGame: {
+      currentQuestionIndex: 0,
+      correctCount: 0,
+      completedAnswers: {}
+    },
+    composition: createDefaultComposition({ meter: "2/4", bars: 2 }),
+    settings: {
+      soundEnabled: true,
+      volume: 0.55,
+      reducedMotion: false,
+      classroomMode: true
+    }
+  };
+}

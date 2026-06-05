@@ -1,0 +1,86 @@
+@keyframes enterView {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes drumHit {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  45% {
+    transform: scale(0.94);
+    filter: brightness(1.16);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes burst {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.05) rotate(-1deg);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes barPlay {
+  from {
+    box-shadow: 0 0 0 rgba(255, 212, 90, 0);
+  }
+  to {
+    box-shadow: 0 0 0 9px rgba(255, 212, 90, 0.32);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(-9px) rotate(-2deg);
+  }
+  70% {
+    transform: translateX(9px) rotate(2deg);
+  }
+}
+
+.enter-view {
+  animation: enterView 420ms cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.burst {
+  animation: burst 360ms ease;
+}
+
+.pop {
+  animation: burst 420ms ease;
+}
+
+.shake {
+  animation: shake 340ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}
+
