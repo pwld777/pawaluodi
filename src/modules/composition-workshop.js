@@ -35,7 +35,8 @@ export function renderCompositionWorkshop({ state }) {
         <div class="instrument-grid">
           ${instruments.map((instrument) => `
             <button class="${composition.instrument === instrument.id ? "active" : ""}" data-instrument="${instrument.id}" type="button" style="--instrument:${instrument.color}">
-              <span>${instrument.symbol}</span>${instrument.name}
+              <span class="instrument-photo" style="background-image:url('${instrument.image}'); background-position:${instrument.imagePosition}" aria-hidden="true"></span>
+              <strong>${instrument.name}</strong>
             </button>
           `).join("")}
         </div>

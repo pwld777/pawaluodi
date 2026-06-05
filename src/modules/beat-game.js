@@ -42,8 +42,9 @@ export function renderBeatGame({ state, setState, onReward }) {
           ${patternConfig.pattern.map((beat, index) => `<span class="beat-dot ${beat}" data-beat-dot="${index}">${beat === "strong" ? "强" : "弱"}</span>`).join("")}
         </div>
         <div class="huagu" role="group" aria-label="可点击花鼓">
-          <button class="drum-zone drum-center" data-drum-zone="center" type="button">鼓心<br><small>强拍</small></button>
-          <button class="drum-zone drum-rim" data-drum-zone="rim" type="button">鼓边<br><small>弱拍</small></button>
+          <img class="huagu-image" src="./assets/images/flower-drum-real.png" alt="红色大花鼓，鼓面贴有牡丹花图案">
+          <button class="drum-zone drum-rim" data-drum-zone="rim" type="button"><span>鼓边<br><small>弱拍</small></span></button>
+          <button class="drum-zone drum-center" data-drum-zone="center" type="button"><span>鼓心<br><small>强拍</small></span></button>
         </div>
         <div class="control-row">
           <button class="primary-action" data-start-beat type="button">开始练习</button>
@@ -231,4 +232,3 @@ function tickBeat(root, pattern) {
   dots[activeIndex]?.classList.add("is-now");
   session.beatIndex += 1;
 }
-

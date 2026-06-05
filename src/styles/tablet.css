@@ -18,6 +18,10 @@
     padding: 26px;
   }
 
+  .hero-scene {
+    min-height: 260px;
+  }
+
   .level-grid,
   .card-tray,
   .block-tray {
@@ -61,8 +65,8 @@
     font-size: 2rem;
   }
 
-  .hero-band {
-    min-height: 240px;
+  .hero-scene {
+    min-height: 220px;
   }
 
   .score-board {

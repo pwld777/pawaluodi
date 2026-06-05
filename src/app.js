@@ -38,11 +38,7 @@ function renderHome() {
           <p>网页不替代教师播放主音乐，只帮助学生听、拍、选、创。</p>
           <button class="primary-action" data-go-view="beat" type="button">开始闯关</button>
         </div>
-        <div class="hero-band" aria-hidden="true">
-          <span class="kid kid-one">鼓</span>
-          <span class="hero-drum"></span>
-          <span class="kid kid-two">花</span>
-        </div>
+        <img class="hero-scene" src="./assets/images/home-hero-scene.png" alt="青海草原舞台上，学生们演奏花鼓和打击乐器">
       </div>
       <div class="level-grid">
         ${[

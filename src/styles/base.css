@@ -218,11 +218,14 @@ h3 {
 
 .hero-card {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.9fr);
+  grid-template-columns: minmax(320px, 0.82fr) minmax(360px, 1.18fr);
   gap: 20px;
-  min-height: 340px;
+  min-height: 420px;
   padding: 38px;
   overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(255, 247, 211, 0.97) 0 37%, rgba(255, 247, 211, 0.58) 52%, rgba(255, 247, 211, 0.2) 100%),
+    linear-gradient(145deg, rgba(255, 253, 229, 0.94), rgba(255, 230, 151, 0.92));
 }
 
 .hero-copy {
@@ -248,44 +251,17 @@ h3 {
   background: linear-gradient(180deg, #ffe981, #f29b28);
 }
 
-.hero-band {
+.hero-scene {
   position: relative;
-  display: grid;
-  place-items: center;
-}
-
-.hero-drum {
-  width: min(290px, 68vw);
-  aspect-ratio: 1;
-  border: 22px solid #a54a28;
-  border-radius: 50%;
-  background: radial-gradient(circle, #ffe2a4 0 35%, #e4442d 36% 39%, #ffd980 40% 72%, #7a3d25 73%);
-  box-shadow: inset 0 0 0 10px #f7bc50, 0 28px 45px rgba(92, 52, 15, 0.28);
-}
-
-.kid {
-  position: absolute;
-  display: grid;
-  place-items: center;
-  width: 82px;
-  height: 82px;
-  border-radius: 31px 31px 50% 50%;
-  background: linear-gradient(180deg, #fff6c0, #ef7f34);
-  color: #8b241b;
-  font-weight: 900;
-  box-shadow: 0 18px 30px rgba(77, 47, 21, 0.22);
-}
-
-.kid-one {
-  left: 4%;
-  bottom: 20%;
-  transform: rotate(-8deg);
-}
-
-.kid-two {
-  right: 1%;
-  top: 20%;
-  transform: rotate(10deg);
+  z-index: 0;
+  align-self: stretch;
+  width: 100%;
+  min-height: 320px;
+  border: 4px solid rgba(134, 67, 24, 0.28);
+  border-radius: 28px;
+  object-fit: cover;
+  object-position: center;
+  box-shadow: 0 24px 48px rgba(79, 48, 20, 0.24);
 }
 
 .level-grid {
@@ -446,28 +422,68 @@ h3 {
   place-items: center;
   width: min(390px, 72vw);
   aspect-ratio: 1;
+  border-radius: 50%;
+  filter: drop-shadow(0 34px 44px rgba(72, 41, 19, 0.26));
 }
 
 .drum-zone {
   position: absolute;
+  display: grid;
+  place-items: center;
   font-weight: 900;
+}
+
+.huagu-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
 }
 
 .drum-rim {
   inset: 0;
   border-radius: 50%;
   color: #fff7cc;
-  background: radial-gradient(circle, transparent 0 45%, #bd4e2b 46% 62%, #6f321f 63% 100%);
-  box-shadow: inset 0 0 0 16px #f1b547, 0 30px 48px rgba(89, 49, 13, 0.28);
+  background: radial-gradient(circle, transparent 0 48%, rgba(126, 47, 25, 0.24) 49% 100%);
+  box-shadow: none;
 }
 
 .drum-center {
   z-index: 1;
-  width: 48%;
+  width: 45%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle, #fff0b9, #f0a33a);
-  box-shadow: inset 0 0 0 8px #e8492f, 0 0 0 18px rgba(255, 230, 133, 0.45);
+  color: #6f2b13;
+  background: rgba(255, 244, 196, 0.08);
+  box-shadow: inset 0 0 0 3px rgba(255, 245, 202, 0.76), 0 0 0 12px rgba(255, 216, 81, 0.22);
+  backdrop-filter: blur(1px);
+}
+
+.drum-zone span {
+  position: absolute;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(108, 46, 21, 0.76);
+  color: #fff8d5;
+  text-shadow: 0 1px 0 rgba(52, 20, 8, 0.35);
+}
+
+.drum-rim span {
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.drum-center span {
+  bottom: -22px;
+  left: 50%;
+  background: rgba(255, 246, 203, 0.82);
+  color: #7f2d16;
+  transform: translateX(-50%);
 }
 
 .drum-zone.is-hit {
@@ -668,14 +684,31 @@ h3 {
 .instrument-grid button {
   display: grid;
   place-items: center;
-  gap: 3px;
-  min-height: 74px;
+  gap: 6px;
+  min-height: 122px;
+  padding: 9px;
   border-radius: 20px;
   background: linear-gradient(180deg, color-mix(in srgb, var(--instrument) 38%, #fff), #fff2b6);
 }
 
 .instrument-grid button.active {
   outline: 4px solid #e8492f;
+}
+
+.instrument-grid button strong {
+  font-size: 0.92rem;
+}
+
+.instrument-photo {
+  width: 100%;
+  max-width: 98px;
+  aspect-ratio: 1;
+  border: 2px solid rgba(122, 69, 31, 0.24);
+  border-radius: 18px;
+  background-color: #fff7e7;
+  background-repeat: no-repeat;
+  background-size: 200% 200%;
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.52), 0 10px 18px rgba(82, 50, 18, 0.16);
 }
 
 .bar-row {
