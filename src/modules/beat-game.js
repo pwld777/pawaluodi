@@ -43,8 +43,8 @@ export function renderBeatGame({ state, setState, onReward }) {
         </div>
         <div class="huagu" role="group" aria-label="可点击花鼓">
           <img class="huagu-image" src="./assets/images/flower-drum-real.png" alt="红色大花鼓，鼓面贴有牡丹花图案">
-          <button class="drum-zone drum-rim" data-drum-zone="rim" type="button"><span>鼓边<br><small>弱拍</small></span></button>
-          <button class="drum-zone drum-center" data-drum-zone="center" type="button"><span>鼓心<br><small>强拍</small></span></button>
+          <button class="drum-zone drum-rim" data-drum-zone="rim" type="button" aria-label="敲鼓面弱拍"><span>鼓面弱拍</span></button>
+          <button class="drum-zone drum-center" data-drum-zone="center" type="button" aria-label="敲鼓心强拍"><span>鼓心强拍</span></button>
         </div>
         <div class="control-row">
           <button class="primary-action" data-start-beat type="button">开始练习</button>
@@ -139,8 +139,13 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
 
   root.querySelectorAll("[data-drum-zone]").forEach((button) => {
     button.addEventListener("pointerdown", () => {
+      const drum = button.closest(".huagu");
       button.classList.add("is-hit");
-      setTimeout(() => button.classList.remove("is-hit"), 180);
+      drum?.classList.add("is-hit");
+      setTimeout(() => {
+        button.classList.remove("is-hit");
+        drum?.classList.remove("is-hit");
+      }, 180);
 
       if (!session) {
         const expectedZone = state.get().beatGame.currentStep === "intro" && button.dataset.drumZone === "center";

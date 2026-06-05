@@ -453,7 +453,7 @@ h3 {
 .drum-stage {
   display: grid;
   justify-items: center;
-  gap: 16px;
+  gap: 14px;
   padding: 28px;
 }
 
@@ -492,74 +492,83 @@ h3 {
   position: relative;
   display: grid;
   place-items: center;
-  width: min(390px, 72vw);
+  width: min(520px, 74vw);
   aspect-ratio: 1;
   border-radius: 50%;
-  filter: drop-shadow(0 34px 44px rgba(72, 41, 19, 0.26));
+  transform: perspective(900px) rotateX(7deg);
+  filter: drop-shadow(0 38px 34px rgba(72, 41, 19, 0.34));
 }
 
 .drum-zone {
   position: absolute;
   display: grid;
   place-items: center;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
   font-weight: 900;
+  touch-action: manipulation;
 }
 
 .huagu-image {
   position: absolute;
-  inset: 0;
+  inset: -2%;
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  object-fit: cover;
+  object-fit: contain;
   user-select: none;
   pointer-events: none;
 }
 
 .drum-rim {
-  inset: 0;
+  inset: 3%;
   border-radius: 50%;
-  color: #fff7cc;
-  background: radial-gradient(circle, transparent 0 48%, rgba(126, 47, 25, 0.24) 49% 100%);
+  color: transparent;
+  background: transparent;
   box-shadow: none;
 }
 
 .drum-center {
   z-index: 1;
-  width: 45%;
+  width: 38%;
   aspect-ratio: 1;
   border-radius: 50%;
-  color: #6f2b13;
-  background: rgba(255, 244, 196, 0.08);
-  box-shadow: inset 0 0 0 3px rgba(255, 245, 202, 0.76), 0 0 0 12px rgba(255, 216, 81, 0.22);
-  backdrop-filter: blur(1px);
+  color: transparent;
+  background: transparent;
+  box-shadow: none;
 }
 
 .drum-zone span {
   position: absolute;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(108, 46, 21, 0.76);
-  color: #fff8d5;
-  text-shadow: 0 1px 0 rgba(52, 20, 8, 0.35);
-}
-
-.drum-rim span {
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.drum-center span {
-  bottom: -22px;
-  left: 50%;
-  background: rgba(255, 246, 203, 0.82);
-  color: #7f2d16;
-  transform: translateX(-50%);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .drum-zone.is-hit {
   animation: drumHit 220ms ease;
+}
+
+.huagu.is-hit .huagu-image {
+  animation: drumHit 220ms ease;
+}
+
+.drum-zone.is-hit::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border: 5px solid rgba(255, 216, 84, 0.82);
+  border-radius: inherit;
+  animation: beatRipple 360ms ease-out;
+}
+
+.drum-rim.is-hit::after {
+  border-color: rgba(71, 193, 180, 0.76);
 }
 
 .hint-panel {
