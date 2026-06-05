@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 
 import { beatGame, evaluateBeatHit, evaluateMeterSwitch } from "../src/data/beat-patterns.js";
 import { instruments } from "../src/data/instrument-sounds.js";
@@ -83,6 +84,13 @@ test("composition block filtering keeps oversized 3-beat blocks out of 2/4", () 
 
 test("composition workshop exposes four classroom percussion instruments", () => {
   assert.deepEqual(instruments.map((instrument) => instrument.id), ["hand-drum", "woodblock", "tambourine", "shaker"]);
+});
+
+test("instrument sample files exist for classroom playback", () => {
+  for (const instrument of instruments) {
+    assert.equal(existsSync(instrument.sample.strong.replace("./", "")), true, `${instrument.id} strong sample missing`);
+    assert.equal(existsSync(instrument.sample.weak.replace("./", "")), true, `${instrument.id} weak sample missing`);
+  }
 });
 
 test("state serialization round-trips current view and composition", () => {

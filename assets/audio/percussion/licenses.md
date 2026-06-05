@@ -1,16 +1,24 @@
 # Percussion Sample Licenses
 
-The current real percussion samples were copied from the local VSCO-2-CE assets in:
+## FreePats World Percussion
 
-`/Users/shishangbo/codex/音乐闯关/assets/audio/percussion/`
+The current classroom percussion one-shots were selected from FreePats World Percussion `WorldPercussion-SFZ+WAV-20200905`.
 
-The source folder includes `VSCO-2-CE-CC0-LICENSE.txt`, so these temporary classroom samples are treated as CC0 assets.
+Source page: https://freepats.zenvoid.org/Percussion/world-and-rare-percussion.html
+
+Release archive: https://github.com/freepats/world-percussion/releases/download/2020-09-05/WorldPercussion-SFZ%2BWAV-20200905.7z
+
+The included `README.txt` states the sound bank is published under Creative Commons CC0 public domain dedication:
+
+https://creativecommons.org/publicdomain/zero/1.0/
 
 Current mappings:
 
-- `hand-drum-strong.wav`: derived from `timpani-hit.wav`.
-- `hand-drum-rim.wav`: derived from `timpani-hit.wav`.
-- `tambourine.wav`: derived from `orchestral-cymbal-crash.wav`.
-- `shaker.wav`: derived from `orchestral-cymbal-crash.wav`.
+- `hand-drum-strong.wav`: `samples/Conga/v3_01_01.wav`, used as the closest available hand-drum-like center hit.
+- `hand-drum-rim.wav`: `samples/Claves/01.wav`, used as a crisp rim/wood hit.
+- `woodblock.wav`: `samples/Claves/01.wav`, used for the woodblock / wooden-fish classroom timbre.
+- `tambourine.wav`: `samples/Tambourine/01_01.wav`.
+- `shaker.wav`: `samples/EggShaker/fast_01.wav`.
+- `maracas.wav`: `samples/Maracas/01_01.wav`.
 
-These are real recorded percussion samples, but they are interim mappings. Replace them with more exact hand drum, woodblock, tambourine, and shaker one-shot samples when a licensed local or Hugging Face source is selected.
+The hand drum mapping is still a classroom approximation rather than an actual Chinese flower-drum recording. If a licensed flower-drum one-shot is later available, replace `hand-drum-strong.wav` and `hand-drum-rim.wav` while keeping the same filenames.
