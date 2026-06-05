@@ -14,7 +14,7 @@ npm run serve
 ## 验证
 
 ```bash
-find src tests -name '*.js' -print0 | xargs -0 -n1 node --check
+find src tests scripts \( -name '*.js' -o -name '*.mjs' \) -print0 | xargs -0 -n1 node --check
 npm test
 npm run verify
 npm run check:url -- https://example.github.io/huaer-yu-shaonian/
@@ -43,4 +43,4 @@ npm run package:classroom
 
 课堂二维码应指向 GitHub Pages、Vercel 或学校可访问的 HTTPS 静态站点。不要把二维码指向 `file://`、本机绝对路径或只在开发电脑可访问的地址。
 
-部署步骤和扫码验收清单见 [DEPLOYMENT.md](/Users/shishangbo/花儿与少年/DEPLOYMENT.md)。
+部署步骤和扫码验收清单见 [DEPLOYMENT.md](DEPLOYMENT.md)。
