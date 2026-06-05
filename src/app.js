@@ -4,6 +4,7 @@ import { renderCompositionWorkshop, bindCompositionWorkshop } from "./modules/co
 import { bindNavigation, updateNavigation } from "./modules/navigation.js";
 import { addStar } from "./modules/feedback.js";
 import { createInitialState, restoreState, serializeState } from "./modules/game-logic.js";
+import { rhythmQuestions } from "./data/rhythm-questions.js";
 
 const storageKey = "huaer-yu-shaonian-state";
 const viewRoot = document.querySelector("#viewRoot");
@@ -29,28 +30,54 @@ function reward(amount) {
 }
 
 function renderHome() {
+  const completeBars = appState.composition.bars.filter((bar) => bar.status === "complete").length;
+  const levels = [
+    {
+      view: "beat",
+      number: "01",
+      title: "花鼓节奏台",
+      desc: "听清 2/4 强弱、3/4 强弱弱",
+      status: appState.beatGame.score > 0 ? "继续挑战" : "开始挑战",
+      badge: `连击 ${appState.beatGame.streak}`
+    },
+    {
+      view: "rhythm",
+      number: "02",
+      title: "节奏采花路",
+      desc: "把正确节奏花拖进答案槽",
+      status: appState.rhythmGame.correctCount > 0 ? "继续采花" : "开始采花",
+      badge: `${appState.rhythmGame.correctCount}/${rhythmQuestions.length}`
+    },
+    {
+      view: "compose",
+      number: "03",
+      title: "小乐队拼图台",
+      desc: "拼 4 小节，再播放自己的节奏",
+      status: completeBars > 0 ? "继续创编" : "开始创编",
+      badge: `${completeBars}/${appState.composition.bars.length} 小节`
+    }
+  ];
+
   return `
     <section class="home-view enter-view">
-      <div class="hero-card stage-card">
+      <div class="hero-card stage-card game-lobby">
+        <img class="hero-scene" src="./assets/images/game-lobby-scene.png" alt="青海花儿会小舞台上，学生小乐队准备闯关">
         <div class="hero-copy">
-          <p class="eyebrow">一个链接 · 三个游戏 · 一次扫码</p>
-          <h2>跟着花鼓，听见两段音乐的不同。</h2>
-          <p>网页不替代教师播放主音乐，只帮助学生听、拍、选、创。</p>
-          <button class="primary-action" data-go-view="beat" type="button">开始闯关</button>
+          <p class="eyebrow">青海花儿会 · 小花鼓队</p>
+          <h2>闯三关，组一支会打节奏的小乐队。</h2>
+          <p>先打花鼓识别强弱，再采节奏花，最后拼出自己的 4 小节节奏。</p>
+          <button class="primary-action" data-go-view="beat" type="button">进入第一关</button>
         </div>
-        <img class="hero-scene" src="./assets/images/home-hero-scene.png" alt="青海草原舞台上，学生们演奏花鼓和打击乐器">
       </div>
       <div class="level-grid">
-        ${[
-          ["beat", "01", "花鼓节拍挑战", "鼓心强拍，鼓边弱拍"],
-          ["rhythm", "02", "节奏拖拽选择", "找出跳动与舒展"],
-          ["compose", "03", "拼图创编工坊", "拼出自己的小谱子"]
-        ].map(([view, number, title, desc]) => `
-          <button class="level-card" data-go-view="${view}" type="button">
-            <span>${number}</span>
-            <strong>${title}</strong>
-            <small>${desc}</small>
-            <i>☆☆☆</i>
+        ${levels.map((level) => `
+          <button class="level-card level-${level.view}" data-go-view="${level.view}" type="button">
+            <span class="level-art" aria-hidden="true"></span>
+            <span>${level.number}</span>
+            <strong>${level.title}</strong>
+            <small>${level.desc}</small>
+            <i>${level.badge}</i>
+            <em>${level.status}</em>
           </button>
         `).join("")}
       </div>
@@ -67,7 +94,7 @@ function renderShowcase() {
         <h2>今天的小小花鼓队</h2>
         <div class="badge-wall">
           <span>星星 ${appState.stars}</span>
-          <span>节奏题 ${appState.rhythmGame.correctCount}/${4}</span>
+          <span>节奏题 ${appState.rhythmGame.correctCount}/${rhythmQuestions.length}</span>
           <span>创编 ${completeBars}/${appState.composition.bars.length} 小节</span>
         </div>
         <p>互评时可以问：节拍稳吗？两段有对比吗？音色合适吗？有没有自己的创意？</p>

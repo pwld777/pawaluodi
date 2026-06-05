@@ -228,9 +228,24 @@ h3 {
     linear-gradient(145deg, rgba(255, 253, 229, 0.94), rgba(255, 230, 151, 0.92));
 }
 
+.game-lobby {
+  min-height: 470px;
+  isolation: isolate;
+  background: #f9d788;
+}
+
+.game-lobby::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(90deg, rgba(255, 245, 199, 0.97) 0 38%, rgba(255, 237, 174, 0.72) 52%, rgba(255, 237, 174, 0.05) 100%);
+  pointer-events: none;
+}
+
 .hero-copy {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   align-content: center;
   justify-items: start;
@@ -252,16 +267,17 @@ h3 {
 }
 
 .hero-scene {
-  position: relative;
+  position: absolute;
   z-index: 0;
-  align-self: stretch;
+  inset: 0;
   width: 100%;
-  min-height: 320px;
-  border: 4px solid rgba(134, 67, 24, 0.28);
-  border-radius: 28px;
+  height: 100%;
+  min-height: 100%;
+  border: 0;
+  border-radius: 30px;
   object-fit: cover;
-  object-position: center;
-  box-shadow: 0 24px 48px rgba(79, 48, 20, 0.24);
+  object-position: center right;
+  box-shadow: none;
 }
 
 .level-grid {
@@ -271,16 +287,62 @@ h3 {
 }
 
 .level-card {
+  position: relative;
+  overflow: hidden;
   display: grid;
   justify-items: start;
-  min-height: 178px;
-  padding: 22px;
+  min-height: 282px;
+  padding: 148px 22px 22px;
   border-radius: 30px;
   text-align: left;
   background: linear-gradient(160deg, #fff6c4, #f5b746);
 }
 
-.level-card span {
+.level-card::before {
+  content: "";
+  position: absolute;
+  right: -20px;
+  bottom: -34px;
+  width: 150px;
+  aspect-ratio: 1;
+  border-radius: 42px;
+  background: rgba(255, 255, 255, 0.28);
+  transform: rotate(18deg);
+}
+
+.level-beat {
+  background: linear-gradient(160deg, #ffe8bc, #ee663b);
+}
+
+.level-rhythm {
+  background: linear-gradient(160deg, #e6ffe5, #48b46c);
+}
+
+.level-compose {
+  background: linear-gradient(160deg, #fff1b9, #d9932f);
+}
+
+.level-art {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 132px;
+  border-radius: 24px 24px 18px 18px;
+  background-image: linear-gradient(180deg, transparent 58%, rgba(63, 31, 10, 0.38)), url("../../assets/images/level-cards-sheet.png");
+  background-size: 300% 100%;
+  background-position: 0 0;
+}
+
+.level-rhythm .level-art {
+  background-position: 50% 0;
+}
+
+.level-compose .level-art {
+  background-position: 100% 0;
+}
+
+.level-card > span:not(.level-art) {
   display: grid;
   place-items: center;
   width: 52px;
@@ -294,6 +356,16 @@ h3 {
 .level-card strong {
   margin-top: 14px;
   font-size: 1.3rem;
+}
+
+.level-card em {
+  align-self: end;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #743313;
+  font-style: normal;
+  font-weight: 900;
 }
 
 .level-card small,
@@ -661,6 +733,25 @@ h3 {
   gap: 14px;
 }
 
+.mission-ticket {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+  border: 2px solid rgba(137, 75, 28, 0.22);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.mission-ticket strong {
+  color: #9b321e;
+}
+
+.mission-ticket span,
+.mission-ticket small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
 .toolbox label {
   display: grid;
   gap: 6px;
@@ -722,7 +813,7 @@ h3 {
   position: relative;
   display: grid;
   gap: 12px;
-  min-height: 136px;
+  min-height: 168px;
   padding: 14px;
   border: 3px solid rgba(90, 55, 20, 0.34);
   border-radius: 24px;
@@ -742,6 +833,29 @@ h3 {
   font-weight: 900;
 }
 
+.puzzle-board {
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.62), transparent 36%),
+    linear-gradient(145deg, rgba(255, 249, 218, 0.96), rgba(246, 208, 126, 0.92));
+}
+
+.beat-slots {
+  display: grid;
+  grid-template-columns: repeat(var(--bar-beats, 2), minmax(0, 1fr));
+  gap: 8px;
+}
+
+.beat-slots i {
+  display: grid;
+  place-items: center;
+  min-height: 30px;
+  border-radius: 999px;
+  background: rgba(255, 212, 90, 0.28);
+  color: #8b4a19;
+  font-style: normal;
+  font-weight: 900;
+}
+
 .staff-lines {
   display: grid;
   gap: 11px;
@@ -751,6 +865,36 @@ h3 {
   min-height: 42px;
   font-size: 2rem;
   letter-spacing: 0.3em;
+}
+
+.rhythm-pieces {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 8px;
+  min-height: 58px;
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
+.rhythm-piece {
+  display: grid;
+  place-items: center;
+  min-width: calc(var(--piece-beats) * 58px);
+  padding: 8px 10px;
+  border: 2px solid rgba(118, 63, 25, 0.2);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fff8d0, #ffd66d);
+  box-shadow: 0 8px 0 rgba(174, 101, 28, 0.24);
+}
+
+.rhythm-piece b {
+  font-size: 1.35rem;
+}
+
+.rhythm-piece small {
+  color: #7b4a18;
+  font-weight: 900;
 }
 
 .block-tray {
@@ -785,6 +929,11 @@ h3 {
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.62);
   font-weight: 900;
+}
+
+.review-card span.is-earned {
+  background: #d9ffb6;
+  color: #286b23;
 }
 
 .showcase-view {

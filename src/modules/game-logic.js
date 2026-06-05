@@ -5,7 +5,7 @@ const meterCapacity = {
   "3/4": 3
 };
 
-export function createDefaultComposition({ meter = "2/4", bars = 2 } = {}) {
+export function createDefaultComposition({ meter = "2/4", bars = 4 } = {}) {
   return {
     mode: meter === "2/4" ? "欢快段" : "悠扬段",
     meter,
@@ -65,9 +65,25 @@ export function addBlockToBar(composition, barIndex, blockId) {
 
 export function resetComposition({ meter = "2/4", instrument = "hand-drum", mode } = {}) {
   return {
-    ...createDefaultComposition({ meter, bars: 2 }),
+    ...createDefaultComposition({ meter, bars: 4 }),
     mode: mode ?? (meter === "2/4" ? "欢快段" : "悠扬段"),
     instrument
+  };
+}
+
+function normalizeComposition(composition) {
+  if (!composition?.bars) {
+    return createDefaultComposition();
+  }
+
+  if (composition.bars.length >= 4) {
+    return composition;
+  }
+
+  const fresh = createDefaultComposition({ meter: composition.meter ?? "2/4", bars: 4 });
+  return {
+    ...composition,
+    bars: fresh.bars.map((bar, index) => composition.bars[index] ?? bar)
   };
 }
 
@@ -81,7 +97,11 @@ export function restoreState(serialized) {
   }
 
   try {
-    return JSON.parse(serialized);
+    const parsed = JSON.parse(serialized);
+    return {
+      ...parsed,
+      composition: normalizeComposition(parsed.composition)
+    };
   } catch {
     return null;
   }
@@ -103,7 +123,7 @@ export function createInitialState() {
       correctCount: 0,
       completedAnswers: {}
     },
-    composition: createDefaultComposition({ meter: "2/4", bars: 2 }),
+    composition: createDefaultComposition({ meter: "2/4" }),
     settings: {
       soundEnabled: true,
       volume: 0.55,

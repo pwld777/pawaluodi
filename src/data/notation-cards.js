@@ -7,8 +7,10 @@ export const notationCards = [
     density: "dense",
     mood: "欢快、跳动",
     glyph: "♬♬",
-    staffMarks: ["note fast", "note fast", "note fast", "note fast"],
-    tag: "更密"
+    syllables: "ta-ka-di-mi",
+    hits: [0, 0.25, 0.5, 0.75],
+    sustainBeats: 0.12,
+    tag: "四下"
   },
   {
     id: "eighth-pair",
@@ -18,8 +20,10 @@ export const notationCards = [
     density: "medium",
     mood: "流动",
     glyph: "♪♪",
-    staffMarks: ["note", "note"],
-    tag: "跳动"
+    syllables: "ta-ti",
+    hits: [0, 0.5],
+    sustainBeats: 0.18,
+    tag: "两下"
   },
   {
     id: "quarter-note",
@@ -29,8 +33,10 @@ export const notationCards = [
     density: "open",
     mood: "平稳",
     glyph: "♩",
-    staffMarks: ["note"],
-    tag: "稳定"
+    syllables: "ta",
+    hits: [0],
+    sustainBeats: 0.28,
+    tag: "一拍"
   },
   {
     id: "half-note",
@@ -40,8 +46,10 @@ export const notationCards = [
     density: "open",
     mood: "舒展、歌唱",
     glyph: "𝅗𝅥",
-    staffMarks: ["note long"],
-    tag: "更舒展"
+    syllables: "ta-a",
+    hits: [0],
+    sustainBeats: 1.5,
+    tag: "两拍"
   },
   {
     id: "dotted-half-note",
@@ -51,8 +59,10 @@ export const notationCards = [
     density: "long",
     mood: "悠扬、停连",
     glyph: "𝅗𝅥.",
-    staffMarks: ["note longer"],
-    tag: "长音"
+    syllables: "ta-a-a",
+    hits: [0],
+    sustainBeats: 2.4,
+    tag: "三拍"
   },
   {
     id: "two-quarters",
@@ -62,7 +72,9 @@ export const notationCards = [
     density: "medium",
     mood: "稳稳前进",
     glyph: "♩♩",
-    staffMarks: ["note", "note"],
+    syllables: "ta ta",
+    hits: [0, 1],
+    sustainBeats: 0.28,
     tag: "整齐"
   },
   {
@@ -73,8 +85,23 @@ export const notationCards = [
     density: "open",
     mood: "三拍舒展",
     glyph: "♩♩♩",
-    staffMarks: ["note", "note", "note"],
+    syllables: "ta ta ta",
+    hits: [0, 1, 2],
+    sustainBeats: 0.28,
     tag: "三拍"
+  },
+  {
+    id: "quarter-rest",
+    name: "四分休止符",
+    beats: 1,
+    section: "B",
+    density: "rest",
+    mood: "留白、呼吸",
+    glyph: "休",
+    syllables: "休",
+    hits: [],
+    sustainBeats: 0,
+    tag: "停一拍"
   }
 ];
 
@@ -91,3 +118,10 @@ export function getAllowedBlocksForMeter(meter) {
   return notationCards.filter((card) => card.beats <= capacity);
 }
 
+export function getPlaybackEvents(cardId, startBeat = 0) {
+  const card = getNotationCard(cardId);
+  return card.hits.map((hitOffset, index) => ({
+    beat: startBeat + hitOffset,
+    accent: index === 0
+  }));
+}

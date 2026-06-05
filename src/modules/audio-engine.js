@@ -1,6 +1,7 @@
 import { getInstrument } from "../data/instrument-sounds.js";
 
 let audioContext;
+const sampleBuffers = new Map();
 
 function getContext() {
   if (!audioContext) {
@@ -16,10 +17,70 @@ export async function unlockAudio() {
   }
 }
 
+async function loadSample(url) {
+  const context = getContext();
+
+  if (!sampleBuffers.has(url)) {
+    const bufferPromise = fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`无法加载音色：${url}`);
+        }
+        return response.arrayBuffer();
+      })
+      .then((arrayBuffer) => context.decodeAudioData(arrayBuffer));
+    sampleBuffers.set(url, bufferPromise);
+  }
+
+  return sampleBuffers.get(url);
+}
+
+export async function preloadInstrument(instrumentId) {
+  const instrument = getInstrument(instrumentId);
+  const urls = [instrument.sample?.strong, instrument.sample?.weak].filter(Boolean);
+  await Promise.all([...new Set(urls)].map((url) => loadSample(url)));
+}
+
+function playSample(context, instrument, { volume, start, accent }) {
+  const sampleUrl = accent ? instrument.sample?.strong : instrument.sample?.weak;
+  if (!sampleUrl) {
+    return false;
+  }
+
+  loadSample(sampleUrl)
+    .then((buffer) => {
+      const safeStart = Math.max(start, context.currentTime + 0.005);
+      const source = context.createBufferSource();
+      const gain = context.createGain();
+      source.buffer = buffer;
+      source.playbackRate.setValueAtTime(instrument.sample.playbackRate ?? 1, safeStart);
+      gain.gain.setValueAtTime(volume * (accent ? 0.95 : 0.62), safeStart);
+      gain.gain.exponentialRampToValueAtTime(0.001, safeStart + (instrument.sample.trimSeconds ?? 0.35));
+      source.connect(gain);
+      gain.connect(context.destination);
+      source.start(safeStart);
+      source.stop(safeStart + (instrument.sample.trimSeconds ?? 0.35));
+    })
+    .catch(() => {
+      playSynth(context, instrument, { volume, start, accent });
+    });
+
+  return true;
+}
+
 export function playInstrument(instrumentId, { volume = 0.55, atTime, accent = false } = {}) {
   const context = getContext();
   const instrument = getInstrument(instrumentId);
   const start = atTime ?? context.currentTime;
+
+  if (playSample(context, instrument, { volume, start, accent })) {
+    return;
+  }
+
+  playSynth(context, instrument, { volume, start, accent });
+}
+
+function playSynth(context, instrument, { volume, start, accent }) {
   const duration = instrument.tone.decay * (accent ? 1.2 : 1);
   const gain = context.createGain();
   const oscillator = context.createOscillator();
@@ -58,4 +119,3 @@ function playNoise(context, start, duration, volume) {
   source.start(start);
   source.stop(start + duration);
 }
-

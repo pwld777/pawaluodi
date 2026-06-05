@@ -8,7 +8,11 @@ const customOptionLabels = {
   "open-a": "更疏 → 第一段",
   "joyful-a": "欢快跳动 → 第一段",
   "lyrical-b": "悠扬舒展 → 第二段",
-  "joyful-b": "欢快跳动 → 第二段"
+  "joyful-b": "欢快跳动 → 第二段",
+  "strong-weak": "强 弱",
+  "strong-weak-weak": "强 弱 弱",
+  "weak-strong": "弱 强",
+  "strong-strong-weak": "强 强 弱"
 };
 
 export function renderRhythmGame({ state }) {
@@ -21,13 +25,13 @@ export function renderRhythmGame({ state }) {
         <p class="eyebrow">游戏二</p>
         <h2>${question.title}</h2>
         <p class="large-prompt">${question.prompt}</p>
-        <div class="answer-zone" data-answer-zone>
-          <span>把谱例卡拖到这里</span>
+        <div class="answer-zone flower-road" data-answer-zone>
+          <span>把节奏花拖到这里</span>
         </div>
         <div class="control-row">
           <button type="button" data-reset-rhythm>重做节奏题</button>
         </div>
-        <p class="feedback-pill" id="rhythmFeedback" data-tone="info">第 ${rhythmState.currentQuestionIndex + 1} / ${rhythmQuestions.length} 题</p>
+        <p class="feedback-pill" id="rhythmFeedback" data-tone="info">节奏采花：第 ${rhythmState.currentQuestionIndex + 1} / ${rhythmQuestions.length} 题</p>
       </div>
 
       <div class="card-tray" aria-label="谱例卡">
@@ -51,17 +55,10 @@ function renderRhythmOption(optionId) {
   return `
     <button class="notation-card" data-rhythm-option="${card.id}" type="button">
       <span class="card-tag">${card.tag}</span>
-      <span class="mini-staff">${renderStaffMarks(card.staffMarks)}</span>
+      <span class="mini-staff rhythm-symbol"><b>${card.glyph}</b><small>${card.syllables}</small></span>
       <strong>${card.name}</strong>
       <small>${card.mood}</small>
     </button>
-  `;
-}
-
-function renderStaffMarks(marks) {
-  return `
-    <i></i><i></i><i></i><i></i><i></i>
-    <b class="${marks.join(" ")}">${marks.length > 2 ? "♬" : "♪"}</b>
   `;
 }
 
@@ -120,7 +117,7 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
           announceFeedback(feedback, result.summary, "warn");
           selected.clear();
           zone.classList.remove("has-card");
-          zone.innerHTML = "<span>把谱例卡拖到这里</span>";
+          zone.innerHTML = "<span>把节奏花拖到这里</span>";
           card.classList.add("shake");
           setTimeout(() => card.classList.remove("shake"), 350);
         }
@@ -162,7 +159,7 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
             announceFeedback(feedback, result.summary, "warn");
             selected.clear();
             zone.classList.remove("has-card");
-            zone.innerHTML = "<span>把谱例卡拖到这里</span>";
+            zone.innerHTML = "<span>把节奏花拖到这里</span>";
           }
         }
       });
@@ -198,7 +195,7 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
           announceFeedback(feedback, result.summary, "warn");
           selected.clear();
           zone.classList.remove("has-card");
-          zone.innerHTML = "<span>把谱例卡拖到这里</span>";
+          zone.innerHTML = "<span>把节奏花拖到这里</span>";
         }
       }
     });

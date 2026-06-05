@@ -16,7 +16,7 @@ function stopTicker() {
 export function renderBeatGame({ state, setState, onReward }) {
   const beatState = state.beatGame;
   const patternConfig = beatState.currentMeter === "3/4" ? beatGame.sectionB : beatGame.sectionA;
-  const stepLabel = beatState.currentStep === "switch" ? "变拍挑战" : patternConfig.name;
+  const stepLabel = beatState.currentStep === "switch" ? "A-B-A 强弱切换" : `${patternConfig.name} · ${patternConfig.pattern.join(" ").replaceAll("strong", "强").replaceAll("weak", "弱")}`;
 
   return `
     <section class="game-layout beat-layout enter-view">
@@ -25,14 +25,14 @@ export function renderBeatGame({ state, setState, onReward }) {
         <h2>花鼓节拍挑战</h2>
         <ol class="step-list">
           <li class="${beatState.currentStep === "intro" ? "active" : ""}">认识强弱</li>
-          <li class="${beatState.currentMeter === "2/4" && beatState.currentStep !== "intro" ? "active" : ""}">第一段 2/4</li>
-          <li class="${beatState.currentMeter === "3/4" ? "active" : ""}">第二段 3/4</li>
-          <li class="${beatState.currentStep === "switch" ? "active" : ""}">变拍挑战</li>
+          <li class="${beatState.currentMeter === "2/4" && beatState.currentStep !== "intro" ? "active" : ""}">2/4 强弱</li>
+          <li class="${beatState.currentMeter === "3/4" ? "active" : ""}">3/4 强弱弱</li>
+          <li class="${beatState.currentStep === "switch" ? "active" : ""}">A-B-A 切换</li>
         </ol>
         <div class="mode-buttons">
-          <button type="button" data-beat-mode="2/4">练 2/4</button>
-          <button type="button" data-beat-mode="3/4">练 3/4</button>
-          <button type="button" data-beat-switch>变拍</button>
+          <button type="button" data-beat-mode="2/4">练强弱</button>
+          <button type="button" data-beat-mode="3/4">练强弱弱</button>
+          <button type="button" data-beat-switch>A-B-A</button>
         </div>
       </aside>
 
@@ -51,14 +51,14 @@ export function renderBeatGame({ state, setState, onReward }) {
           <button data-stop-beat type="button">停止</button>
           <button data-reset-beat type="button">重来</button>
         </div>
-        <p class="feedback-pill" id="beatFeedback" data-tone="info">教师口令 3、2、1 后开始，网页负责练强弱拍。</p>
+        <p class="feedback-pill" id="beatFeedback" data-tone="info">第一关只练节拍识别：2/4 是强弱，3/4 是强弱弱。</p>
       </div>
 
       <aside class="hint-panel">
         <h3>拍子提示</h3>
-        <div class="meter-card"><strong>2/4</strong><span>强 弱</span></div>
-        <div class="meter-card"><strong>3/4</strong><span>强 弱 弱</span></div>
-        <p>练习模式用宽容窗口判定；课堂跟音乐时更适合看强弱区域是否合理。</p>
+        <div class="meter-card"><strong>2/4</strong><span>鼓心 鼓边</span></div>
+        <div class="meter-card"><strong>3/4</strong><span>鼓心 鼓边 鼓边</span></div>
+        <p>重点看顺序：三拍子第二、第三拍都要轻敲鼓边。</p>
       </aside>
     </section>
   `;
@@ -112,7 +112,7 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
       beatIndex: 0
     };
 
-    announceFeedback(feedback, current.beatGame.currentStep === "switch" ? "开始后听到第二段，点“变拍”按钮。" : "看光点，鼓心强拍，鼓边弱拍。");
+    announceFeedback(feedback, current.beatGame.currentStep === "switch" ? "先按强弱，看到提示后换成强弱弱。" : "看光点：强拍点鼓心，弱拍点鼓边。");
     tickBeat(root, patternConfig.pattern);
     ticker = setInterval(() => tickBeat(root, patternConfig.pattern), beatMs);
   });
@@ -193,10 +193,10 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
     });
   });
 
-  root.querySelector(".primary-action")?.insertAdjacentHTML("afterend", '<button data-switch-now type="button">换到 3/4</button>');
+  root.querySelector(".primary-action")?.insertAdjacentHTML("afterend", '<button data-switch-now type="button">换成强弱弱</button>');
   root.querySelector("[data-switch-now]")?.addEventListener("click", () => {
     if (!session) {
-      announceFeedback(feedback, "先点开始，再挑战变拍。", "warn");
+      announceFeedback(feedback, "先点开始，再练 A-B-A 切换。", "warn");
       return;
     }
     const result = evaluateMeterSwitch({

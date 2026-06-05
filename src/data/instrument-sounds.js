@@ -6,6 +6,12 @@ export const instruments = [
     image: "./assets/instruments/real-instruments-sheet.png",
     imagePosition: "0% 0%",
     color: "#d9482b",
+    sample: {
+      strong: "./assets/audio/percussion/hand-drum-strong.wav",
+      weak: "./assets/audio/percussion/hand-drum-rim.wav",
+      playbackRate: 1,
+      trimSeconds: 0.42
+    },
     tone: { type: "sine", frequency: 148, decay: 0.16, noise: 0.06 }
   },
   {
@@ -15,6 +21,12 @@ export const instruments = [
     image: "./assets/instruments/real-instruments-sheet.png",
     imagePosition: "100% 0%",
     color: "#a66a2b",
+    sample: {
+      strong: "./assets/audio/percussion/hand-drum-rim.wav",
+      weak: "./assets/audio/percussion/hand-drum-rim.wav",
+      playbackRate: 1.8,
+      trimSeconds: 0.18
+    },
     tone: { type: "square", frequency: 760, decay: 0.08, noise: 0.02 }
   },
   {
@@ -24,6 +36,12 @@ export const instruments = [
     image: "./assets/instruments/real-instruments-sheet.png",
     imagePosition: "0% 100%",
     color: "#e2a520",
+    sample: {
+      strong: "./assets/audio/percussion/tambourine.wav",
+      weak: "./assets/audio/percussion/tambourine.wav",
+      playbackRate: 1.55,
+      trimSeconds: 0.28
+    },
     tone: { type: "triangle", frequency: 1080, decay: 0.12, noise: 0.12 }
   },
   {
@@ -33,6 +51,12 @@ export const instruments = [
     image: "./assets/instruments/real-instruments-sheet.png",
     imagePosition: "100% 100%",
     color: "#4f9b78",
+    sample: {
+      strong: "./assets/audio/percussion/shaker.wav",
+      weak: "./assets/audio/percussion/shaker.wav",
+      playbackRate: 2.15,
+      trimSeconds: 0.16
+    },
     tone: { type: "sawtooth", frequency: 420, decay: 0.2, noise: 0.18 }
   }
 ];

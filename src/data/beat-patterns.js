@@ -41,6 +41,13 @@ export function evaluateBeatHit({ pattern, beatIndex, zone, offsetMs, toleranceM
   const actual = zoneToBeat[zone];
 
   if (expected !== actual) {
+    if (pattern.length === 3 && beatIndex % pattern.length === 2 && actual === "strong") {
+      return {
+        result: "wrong-third-beat",
+        message: "三拍子后两拍都是弱拍，第三拍轻敲鼓边"
+      };
+    }
+
     return {
       result: "wrong-zone",
       message: expected === "strong" ? "强拍在鼓心" : "弱拍在鼓边"
@@ -75,4 +82,3 @@ export function evaluateMeterSwitch({ elapsedMs, switchAtMs, toleranceMs }) {
     message: "变拍已经过去了，再来一次"
   };
 }
-
