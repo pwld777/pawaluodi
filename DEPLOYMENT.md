@@ -2,6 +2,12 @@
 
 本项目是纯前端静态网页，可以部署到 GitHub Pages、Vercel 或学校可访问的 HTTPS 静态站点。
 
+当前 GitHub Pages 课堂地址：
+
+```text
+https://pwld777.github.io/pawaluodi/
+```
+
 ## 部署前本地验证
 
 ```bash
@@ -32,7 +38,7 @@ npm run package:classroom
 部署完成后运行：
 
 ```bash
-npm run check:url -- https://你的部署地址/
+npm run check:url -- https://pwld777.github.io/pawaluodi/
 ```
 
 ## Vercel

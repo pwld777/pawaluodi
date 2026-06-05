@@ -16,22 +16,22 @@
 | 本机状态保存 | `localStorage` 状态序列化 | `npm run verify` 覆盖状态序列化/恢复 |
 | 不依赖本机绝对资源路径 | 所有资源使用相对路径或 CSS/Web Audio 合成 | `rg -n "/Users|file://" index.html src assets README.md package.json` 仅命中文档警示，不命中代码引用 |
 | 部署前验证命令 | `npm run verify` | 已运行通过，10/10 测试通过 |
-| HTTPS 二维码 URL 校验 | `scripts/validate-classroom-url.mjs` | `npm run check:url -- https://example.github.io/huaer-yu-shaonian/` 通过；`http://localhost:4173` 被拒绝 |
+| HTTPS 二维码 URL 校验 | `scripts/validate-classroom-url.mjs` | `npm run check:url -- https://pwld777.github.io/pawaluodi/` 通过；`http://localhost:4173` 被拒绝 |
 | 学校网络受限时的局域网备用地址 | `scripts/print-lan-urls.mjs` | `npm run lan:urls` 可输出同 Wi-Fi 访问地址 |
 
-## 已准备但需要外部账号/地址才能最终验证
+## 已完成部署
 
 | 要求 | 当前准备 | 缺口 |
 | --- | --- | --- |
-| GitHub Pages 或 Vercel HTTPS 访问 | `.github/workflows/pages.yml`、`.nojekyll`、`vercel.json`、`DEPLOYMENT.md` | 需要 GitHub/Vercel 仓库或账号项目地址 |
-| 用部署后的 HTTPS 地址生成课堂二维码 | `DEPLOYMENT.md` 写明流程，`npm run check:url` 可校验 URL | 需要真实部署 URL 后生成二维码 |
+| GitHub Pages HTTPS 访问 | `.github/workflows/pages.yml` 已部署到 `https://pwld777.github.io/pawaluodi/` | 无 |
+| 用部署后的 HTTPS 地址生成课堂二维码 | `npm run check:url -- https://pwld777.github.io/pawaluodi/` 已通过 | 需要按该 URL 生成实际二维码图片 |
 | 至少 2 台真实设备扫码测试 | `DEPLOYMENT.md` 提供设备验收清单 | 需要真实教室网络或学生设备 |
 
 ## 当前验证命令
 
 ```bash
 npm run verify
-npm run check:url -- https://你的部署地址/
+npm run check:url -- https://pwld777.github.io/pawaluodi/
 npm run lan:urls
 npm run serve
 ```

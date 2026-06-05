@@ -11,13 +11,21 @@ npm run serve
 
 然后打开 `http://localhost:4173`。
 
+## 课堂地址
+
+GitHub Pages 已部署：
+
+```text
+https://pwld777.github.io/pawaluodi/
+```
+
 ## 验证
 
 ```bash
 find src tests scripts \( -name '*.js' -o -name '*.mjs' \) -print0 | xargs -0 -n1 node --check
 npm test
 npm run verify
-npm run check:url -- https://example.github.io/huaer-yu-shaonian/
+npm run check:url -- https://pwld777.github.io/pawaluodi/
 npm run lan:urls
 npm run package:classroom
 ```
