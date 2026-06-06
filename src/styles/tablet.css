@@ -12,7 +12,8 @@
   .rhythm-layout,
   .compose-grid,
   .compose-control-deck,
-  .compose-game-hud {
+  .compose-game-hud,
+  .compose-top-strip {
     grid-template-columns: 1fr;
   }
 
@@ -46,11 +47,24 @@
   }
 
   .compose-arcade-stage {
-    min-height: 520px;
+    min-height: 620px;
   }
 
   .compose-game-hud {
     align-items: stretch;
+  }
+
+  .compose-play-layer {
+    inset: 16px;
+  }
+
+  .current-bar-stage {
+    padding: 16px;
+  }
+
+  .current-beat-pit,
+  .current-rhythm-piece {
+    min-height: 210px;
   }
 
   .bottom-nav {
@@ -84,18 +98,48 @@
   }
 
   .compose-arcade-stage {
-    min-height: 430px;
+    min-height: 640px;
     border-width: 6px;
   }
 
-  .compose-game-hud {
+  .compose-game-hud,
+  .compose-play-layer {
     left: 14px;
     right: 14px;
     bottom: 14px;
   }
 
+  .compose-play-layer {
+    top: 14px;
+  }
+
   .hud-controls {
     grid-template-columns: 1fr;
+  }
+
+  .compose-top-strip {
+    justify-content: start;
+  }
+
+  .current-bar-header {
+    display: grid;
+  }
+
+  .current-beat-pits,
+  .current-rhythm-pieces {
+    gap: 8px;
+  }
+
+  .current-beat-pit,
+  .current-rhythm-piece {
+    min-height: 170px;
+    border-radius: 20px;
+  }
+
+  .compose-settings .instrument-grid {
+    left: 0;
+    right: auto;
+    width: min(82vw, 260px);
   }
 
   .block-tray .notation-card,

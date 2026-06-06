@@ -882,13 +882,13 @@ h3 {
 
 .compose-game-shell {
   display: grid;
-  gap: 16px;
+  gap: 18px;
 }
 
 .compose-arcade-stage {
   position: relative;
   overflow: hidden;
-  min-height: clamp(360px, 52vw, 650px);
+  min-height: clamp(470px, 55vw, 660px);
   border: 8px solid #5b2d17;
   border-radius: 30px;
   background:
@@ -933,6 +933,233 @@ h3 {
 .compose-stage-canvas canvas + .compose-stage-fallback,
 .compose-stage-canvas[data-stage-status="phaser"] .compose-stage-fallback {
   display: none;
+}
+
+.compose-play-layer {
+  position: absolute;
+  inset: 22px;
+  z-index: 4;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 14px;
+}
+
+.compose-top-strip,
+.current-bar-header,
+.compose-bottom-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.compose-top-strip {
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border: 4px solid rgba(91, 42, 15, 0.68);
+  border-radius: 18px;
+  background: rgba(255, 246, 190, 0.92);
+  box-shadow: 0 7px 0 rgba(73, 35, 16, 0.36);
+}
+
+.compose-top-strip h2 {
+  font-size: clamp(1.45rem, 3vw, 2.5rem);
+  color: #9b321e;
+}
+
+.compose-top-strip strong {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #e8492f;
+  color: #fff7d1;
+}
+
+.compose-top-strip label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 900;
+}
+
+.compose-top-strip select {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 3px solid rgba(88, 43, 15, 0.34);
+  border-radius: 999px;
+  background: #fff8c8;
+  font-weight: 900;
+}
+
+.bar-progress-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.bar-progress-dot {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 4px solid rgba(91, 42, 15, 0.5);
+  border-radius: 50%;
+  background: rgba(255, 247, 205, 0.88);
+  color: #743619;
+  font-weight: 1000;
+  box-shadow: 0 5px 0 rgba(73, 35, 16, 0.26);
+}
+
+.bar-progress-dot.is-current {
+  background: #ffd45a;
+  border-color: #e8492f;
+  transform: scale(1.12);
+}
+
+.bar-progress-dot.is-complete {
+  background: #bdf678;
+  color: #286b23;
+}
+
+.current-bar-stage {
+  align-self: stretch;
+  display: grid;
+  grid-template-rows: auto minmax(180px, 1fr);
+  gap: 14px;
+  max-width: 960px;
+  width: min(100%, 960px);
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 28px);
+  border: 8px solid #e8492f;
+  border-radius: 28px;
+  background: rgba(255, 250, 213, 0.95);
+  box-shadow:
+    0 12px 0 #7a3718,
+    0 24px 42px rgba(73, 35, 16, 0.28),
+    inset 0 0 0 6px rgba(255, 212, 90, 0.38);
+}
+
+.current-bar-stage.complete {
+  border-color: #56a63e;
+  background: rgba(230, 255, 196, 0.96);
+}
+
+.current-bar-header {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.current-bar-header > span {
+  display: inline-grid;
+  place-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: #e8492f;
+  color: #fff7d1;
+  font-size: 1.28rem;
+  font-weight: 1000;
+}
+
+.current-bar-header .feedback-pill {
+  margin: 0;
+  min-height: 44px;
+  padding: 8px 18px;
+  font-size: clamp(1.15rem, 2.2vw, 1.65rem);
+}
+
+.current-bar-fill {
+  position: relative;
+  display: grid;
+  min-height: clamp(190px, 27vw, 280px);
+}
+
+.current-beat-pits,
+.current-rhythm-pieces {
+  display: grid;
+  grid-template-columns: repeat(var(--bar-beats, 2), minmax(0, 1fr));
+  gap: clamp(12px, 2vw, 20px);
+}
+
+.current-beat-pit {
+  display: grid;
+  place-items: center;
+  min-height: clamp(180px, 26vw, 270px);
+  border: 8px dashed rgba(122, 55, 24, 0.62);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 245, 189, 0.72));
+  color: rgba(122, 55, 24, 0.78);
+  font-size: clamp(3.7rem, 9vw, 7rem);
+  font-style: normal;
+  font-weight: 1000;
+  box-shadow: inset 0 0 0 8px rgba(255, 212, 90, 0.2);
+}
+
+.current-rhythm-pieces {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.current-rhythm-piece {
+  min-height: clamp(180px, 26vw, 270px);
+  border-width: 7px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #fff8aa, #ffc52e);
+  box-shadow: 0 11px 0 #8d4a18, 0 18px 28px rgba(75, 39, 9, 0.18);
+}
+
+.current-rhythm-piece .rhythm-mark-piece {
+  transform: scale(1.28);
+}
+
+.compose-bottom-actions {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.compose-settings {
+  position: relative;
+}
+
+.compose-settings summary {
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff4bd, #f1b547);
+  box-shadow: 0 7px 0 #b97524, 0 14px 25px rgba(85, 45, 7, 0.2);
+  cursor: pointer;
+  font-weight: 900;
+  list-style: none;
+}
+
+.compose-settings summary::-webkit-details-marker {
+  display: none;
+}
+
+.compose-settings .instrument-grid {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  width: 260px;
+  padding: 12px;
+  border: 4px solid #743619;
+  border-radius: 18px;
+  background: #fff4bd;
+  box-shadow: 0 12px 30px rgba(75, 39, 9, 0.24);
+}
+
+.compose-main-tray {
+  margin-top: 0;
+  padding: 16px;
+  border: 6px solid #743619;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.46), transparent 30%),
+    linear-gradient(145deg, #ffe77d, #f1a13c);
+  box-shadow: 0 10px 0 #5b2a14, 0 20px 36px rgba(86, 47, 12, 0.2);
 }
 
 .compose-game-hud {
@@ -1160,7 +1387,7 @@ h3 {
 
 .block-tray .notation-card {
   flex: 1 1 118px;
-  min-height: 104px;
+  min-height: 112px;
   padding: 10px;
   border-color: rgba(87, 41, 13, 0.54);
   border-radius: 16px;
@@ -1169,11 +1396,11 @@ h3 {
 }
 
 .block-tray .notation-card[data-piece-beats="2"] {
-  flex-basis: 188px;
+  flex-basis: 228px;
 }
 
 .block-tray .notation-card[data-piece-beats="3"] {
-  flex-basis: 246px;
+  flex-basis: 320px;
 }
 
 .block-card {

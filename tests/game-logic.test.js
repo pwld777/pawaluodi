@@ -43,6 +43,8 @@ test("composition defaults to a four-bar student phrase", () => {
   const composition = createDefaultComposition({ meter: "2/4" });
   assert.equal(composition.bars.length, 4);
   assert.equal(composition.bars.every((bar) => bar.capacity === 2), true);
+  assert.equal(composition.activeBarIndex, 0);
+  assert.equal(composition.isComplete, false);
   assert.equal(createInitialState().composition.bars.length, 4);
 });
 
@@ -50,7 +52,20 @@ test("composition bars reject overfilled rhythm blocks", () => {
   const composition = createDefaultComposition({ meter: "2/4", bars: 4 });
   const afterHalf = addBlockToBar(composition, 0, "half-note");
   assert.equal(afterHalf.bars[0].filledBeats, 2);
+  assert.equal(afterHalf.activeBarIndex, 1);
   assert.throws(() => addBlockToBar(afterHalf, 0, "quarter-note"), /放不下/);
+});
+
+test("composition advances one active bar at a time", () => {
+  const start = createDefaultComposition({ meter: "2/4", bars: 2 });
+  const first = addBlockToBar(start, 0, "quarter-note");
+  assert.equal(first.activeBarIndex, 0);
+  const second = addBlockToBar(first, 0, "quarter-note");
+  assert.equal(second.activeBarIndex, 1);
+  assert.equal(second.isComplete, false);
+  const done = addBlockToBar(second, 1, "half-note");
+  assert.equal(done.activeBarIndex, 1);
+  assert.equal(done.isComplete, true);
 });
 
 test("composition allows 3/4 completion with a dotted half note", () => {
@@ -93,11 +108,13 @@ test("composition workshop renders clear beat pits and rhythm-only cards", () =>
 
   assert.match(html, /compose-game-shell/);
   assert.match(html, /data-compose-game-stage/);
-  assert.match(html, /class="beat-pit"/);
-  assert.equal((html.match(/class="beat-pit"/g) ?? []).length, 8);
+  assert.match(html, /current-bar-stage/);
+  assert.match(html, /class="current-beat-pit"/);
+  assert.equal((html.match(/class="current-beat-pit"/g) ?? []).length, 2);
+  assert.doesNotMatch(html, /闯关星标|真实音色|准备展示|把节奏块放进空坑|每小节刚好填满/);
   assert.match(html, /data-piece-beats="2"/);
   assert.match(html, /style="--tray-beats:2"/);
-  const blockTray = html.match(/<div class="block-tray">[\s\S]*?<\/div>\s*<\/div>\s*<aside/)?.[0] ?? "";
+  const blockTray = html.match(/<div class="block-tray compose-main-tray">[\s\S]*?<\/div>\s*<\/section>/)?.[0] ?? "";
   assert.match(blockTray, /data-block-id="eighth-sixteenth"/);
   assert.match(blockTray, /data-block-id="sixteenth-eighth"/);
   assert.match(blockTray, /2 格/);

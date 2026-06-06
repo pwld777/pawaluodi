@@ -13,13 +13,13 @@ function clearPlayback() {
 }
 
 function completionMessage(composition, barIndex) {
-  if (composition.bars.every((bar) => bar.status === "complete")) {
-    return "小乐队排练成功！";
+  if (composition.isComplete || composition.bars.every((bar) => bar.status === "complete")) {
+    return "排练成功！";
   }
 
   const bar = composition.bars[barIndex];
   const remaining = bar.capacity - bar.filledBeats;
-  return remaining === 0 ? "刚好装满！" : `还差 ${remaining} 拍。`;
+  return remaining === 0 ? "刚好！" : `还差 ${remaining} 格`;
 }
 
 function shakeBar(root, barIndex) {
@@ -29,100 +29,146 @@ function shakeBar(root, barIndex) {
   bar?.classList.add("shake");
 }
 
+function shortFeedback(message) {
+  if (!message) {
+    return "选节奏块，填空坑";
+  }
+
+  if (message.includes("放不下")) {
+    return "放不下";
+  }
+
+  if (message.includes("刚好")) {
+    return "刚好！";
+  }
+
+  if (message.includes("排练成功")) {
+    return "排练成功！";
+  }
+
+  if (message.includes("还差")) {
+    return message.replace("拍", "格").replace("。", "");
+  }
+
+  return message;
+}
+
+function addSelectedBlock({ root, state, setState, render, onReward, feedback, blockId, barIndex }) {
+  try {
+    const current = state.get();
+    const nextComposition = addBlockToBar(current.composition, barIndex, blockId);
+    const filled = nextComposition.bars[barIndex].status === "complete";
+    const message = completionMessage(nextComposition, barIndex);
+    setState({
+      ...current,
+      composition: {
+        ...nextComposition,
+        feedbackMessage: message
+      }
+    });
+    announceFeedback(feedback, message, filled ? "good" : "info");
+    if (nextComposition.isComplete) {
+      onReward(2);
+    }
+    render();
+  } catch (error) {
+    const message = shortFeedback(error.message);
+    shakeBar(root, barIndex);
+    announceFeedback(feedback, message, "warn");
+    const current = state.get();
+    setState({
+      ...current,
+      composition: {
+        ...current.composition,
+        feedbackMessage: message
+      }
+    });
+  }
+}
+
 export function renderCompositionWorkshop({ state }) {
   const composition = state.composition;
   const blocks = getAllowedBlocksForMeter(composition.meter);
-  const completeBars = composition.bars.filter((bar) => bar.status === "complete").length;
+  const activeBarIndex = composition.activeBarIndex ?? 0;
+  const activeBar = composition.bars[activeBarIndex] ?? composition.bars[0];
+  const feedbackMessage = shortFeedback(composition.feedbackMessage);
 
   return `
     <section class="compose-game-shell enter-view">
-      <div class="compose-arcade-stage">
+      <div class="compose-arcade-stage compose-quiet-stage">
         <div class="compose-stage-canvas" data-compose-game-stage aria-label="小乐队闯关台动画舞台">
           <img class="compose-stage-fallback" src="./assets/images/compose-stage-scene.png" alt="小乐队节奏闯关舞台">
         </div>
-        <div class="compose-game-hud">
-          <div class="mission-ticket hud-mission">
-            <strong>${composition.mode}闯关</strong>
-            <span>${composition.meter} · ${completeBars}/${composition.bars.length} 小节</span>
-            <small>把节奏块放进空坑。每小节刚好填满就成功。</small>
+
+        <div class="compose-play-layer">
+          <div class="compose-top-strip">
+            <h2>节奏填坑闯关</h2>
+            <strong>第 ${activeBarIndex + 1} / ${composition.bars.length} 小节</strong>
+            <label>节拍
+              <select data-compose-meter>
+                <option ${composition.meter === "2/4" ? "selected" : ""}>2/4</option>
+                <option ${composition.meter === "3/4" ? "selected" : ""}>3/4</option>
+              </select>
+            </label>
+            <label>段落
+              <select data-compose-mode>
+                <option ${composition.mode === "欢快段" ? "selected" : ""}>欢快段</option>
+                <option ${composition.mode === "悠扬段" ? "selected" : ""}>悠扬段</option>
+              </select>
+            </label>
           </div>
-          <p class="feedback-pill" id="composeFeedback" data-tone="info">${composition.feedbackMessage ?? "把节奏块放进空坑。每小节刚好填满就成功。"}</p>
-          <div class="control-row hud-controls">
-            <button class="primary-action" data-play-composition type="button">播放我的节奏</button>
+
+          <div class="bar-progress-dots" aria-label="小节进度">
+            ${composition.bars.map((bar, index) => `
+              <span class="bar-progress-dot ${index === activeBarIndex ? "is-current" : ""} ${bar.status === "complete" ? "is-complete" : ""}">${index + 1}</span>
+            `).join("")}
+          </div>
+
+          <div class="current-bar-stage ${activeBar.status}" data-bar-index="${activeBarIndex}" style="--bar-beats:${activeBar.capacity}">
+            <div class="current-bar-header">
+              <span>填这里</span>
+              <p class="feedback-pill" id="composeFeedback" data-tone="info">${feedbackMessage}</p>
+            </div>
+            <div class="current-bar-fill">
+              <div class="current-beat-pits" aria-label="${composition.meter} 空坑">
+                ${Array.from({ length: activeBar.capacity }, (_, beatIndex) => `<i class="current-beat-pit">${beatIndex + 1}</i>`).join("")}
+              </div>
+              <div class="placed-notes rhythm-pieces current-rhythm-pieces" style="--bar-beats:${activeBar.capacity}">
+                ${activeBar.blocks.map((blockId) => {
+                  const card = getNotationCard(blockId);
+                  return `<span class="rhythm-piece current-rhythm-piece" style="--piece-beats:${card.beats}" data-piece-beats="${card.beats}">
+                    ${renderRhythmMark(card, "rhythm-mark-piece")}
+                  </span>`;
+                }).join("")}
+              </div>
+            </div>
+          </div>
+
+          <div class="compose-bottom-actions">
+            <button class="primary-action" data-play-composition type="button">播放</button>
             <button data-clear-composition type="button">清空</button>
+            <details class="compose-settings">
+              <summary>设置</summary>
+              <div class="instrument-grid">
+                ${instruments.map((instrument) => `
+                  <button class="${composition.instrument === instrument.id ? "active" : ""}" data-instrument="${instrument.id}" type="button" style="--instrument:${instrument.color}">
+                    <span class="instrument-photo" style="background-image:url('${instrument.image}'); background-position:${instrument.imagePosition}" aria-hidden="true"></span>
+                    <strong>${instrument.name}</strong>
+                  </button>
+                `).join("")}
+              </div>
+            </details>
           </div>
         </div>
       </div>
 
-      <div class="compose-control-deck">
-        <aside class="toolbox arcade-panel">
-          <p class="eyebrow">游戏三</p>
-          <h2>节奏填坑</h2>
-          <label>创编段落
-            <select data-compose-mode>
-              <option ${composition.mode === "欢快段" ? "selected" : ""}>欢快段</option>
-              <option ${composition.mode === "悠扬段" ? "selected" : ""}>悠扬段</option>
-            </select>
-          </label>
-          <label>节拍
-            <select data-compose-meter>
-              <option ${composition.meter === "2/4" ? "selected" : ""}>2/4</option>
-              <option ${composition.meter === "3/4" ? "selected" : ""}>3/4</option>
-            </select>
-          </label>
-          <div class="instrument-grid">
-            ${instruments.map((instrument) => `
-              <button class="${composition.instrument === instrument.id ? "active" : ""}" data-instrument="${instrument.id}" type="button" style="--instrument:${instrument.color}">
-                <span class="instrument-photo" style="background-image:url('${instrument.image}'); background-position:${instrument.imagePosition}" aria-hidden="true"></span>
-                <strong>${instrument.name}</strong>
-              </button>
-            `).join("")}
-          </div>
-        </aside>
-
-        <div class="score-paper puzzle-board arcade-panel">
-          <div class="score-title">
-            <strong>${composition.mode} · ${composition.meter}</strong>
-            <span>${completeBars}/${composition.bars.length} 小节完成</span>
-          </div>
-          <div class="bar-row">
-            ${composition.bars.map((bar, index) => `
-              <div class="music-bar ${bar.status}" data-bar-index="${index}" style="--bar-beats:${bar.capacity}">
-                <span class="bar-number">第 ${index + 1} 小节</span>
-                <div class="bar-fill-stage">
-                  <div class="beat-pits" aria-label="${composition.meter} 拍格">
-                    ${Array.from({ length: bar.capacity }, (_, beatIndex) => `<i class="beat-pit">${beatIndex + 1}</i>`).join("")}
-                  </div>
-                  <div class="placed-notes rhythm-pieces" style="--bar-beats:${bar.capacity}">
-                    ${bar.blocks.map((blockId) => {
-                      const card = getNotationCard(blockId);
-                      return `<span class="rhythm-piece" style="--piece-beats:${card.beats}" data-piece-beats="${card.beats}">
-                        ${renderRhythmMark(card, "rhythm-mark-piece")}
-                      </span>`;
-                    }).join("")}
-                  </div>
-                </div>
-                <small>${bar.filledBeats}/${bar.capacity} 拍</small>
-              </div>
-            `).join("")}
-          </div>
-          <div class="block-tray">
-            ${blocks.map((block) => `
-              <button class="notation-card block-card" data-block-id="${block.id}" data-piece-beats="${block.beats}" type="button" style="--tray-beats:${block.beats}">
-                <span class="card-tag">${block.beats} 格</span>
-                ${renderRhythmMark(block, "rhythm-mark-card")}
-              </button>
-            `).join("")}
-          </div>
-        </div>
-
-        <aside class="review-card arcade-panel">
-          <h3>闯关星标</h3>
-          <span class="${completeBars === composition.bars.length ? "is-earned" : ""}">拍数正确</span>
-          <span class="${completeBars > 0 ? "is-earned" : ""}">空坑看懂</span>
-          <span class="is-earned">真实音色</span>
-          <span>准备展示</span>
-        </aside>
+      <div class="block-tray compose-main-tray">
+        ${blocks.map((block) => `
+          <button class="notation-card block-card" data-block-id="${block.id}" data-piece-beats="${block.beats}" type="button" style="--tray-beats:${block.beats}">
+            <span class="card-tag">${block.beats} 格</span>
+            ${renderRhythmMark(block, "rhythm-mark-card")}
+          </button>
+        `).join("")}
       </div>
     </section>
   `;
@@ -196,27 +242,18 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
         delete block.dataset.pointerDrag;
       }, 0);
       startBlockDrag(event, block, root, (barIndex) => {
-      try {
         const current = state.get();
-        const nextComposition = addBlockToBar(current.composition, barIndex, block.dataset.blockId);
-        const filled = nextComposition.bars[barIndex].status === "complete";
-        const message = completionMessage(nextComposition, barIndex);
-        setState({
-          ...current,
-          composition: {
-            ...nextComposition,
-            feedbackMessage: message
-          }
+        const activeBarIndex = current.composition.activeBarIndex ?? 0;
+        addSelectedBlock({
+          root,
+          state,
+          setState,
+          render,
+          onReward,
+          feedback,
+          blockId: block.dataset.blockId,
+          barIndex: Number.isInteger(barIndex) ? barIndex : activeBarIndex
         });
-        announceFeedback(feedback, message, filled ? "good" : "info");
-        if (nextComposition.bars.every((bar) => bar.status === "complete")) {
-          onReward(2);
-        }
-        render();
-      } catch (error) {
-        shakeBar(root, barIndex);
-        announceFeedback(feedback, error.message, "warn");
-      }
       });
     });
 
@@ -225,66 +262,57 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
         return;
       }
       startMouseBlockDrag(event, block, root, (barIndex) => {
-        try {
-          const current = state.get();
-          const nextComposition = addBlockToBar(current.composition, barIndex, block.dataset.blockId);
-          const filled = nextComposition.bars[barIndex].status === "complete";
-          const message = completionMessage(nextComposition, barIndex);
-          setState({
-            ...current,
-            composition: {
-              ...nextComposition,
-              feedbackMessage: message
-            }
-          });
-          announceFeedback(feedback, message, filled ? "good" : "info");
-          if (nextComposition.bars.every((bar) => bar.status === "complete")) {
-            onReward(2);
-          }
-          render();
-        } catch (error) {
-          shakeBar(root, barIndex);
-          announceFeedback(feedback, error.message, "warn");
-        }
+        const current = state.get();
+        const activeBarIndex = current.composition.activeBarIndex ?? 0;
+        addSelectedBlock({
+          root,
+          state,
+          setState,
+          render,
+          onReward,
+          feedback,
+          blockId: block.dataset.blockId,
+          barIndex: Number.isInteger(barIndex) ? barIndex : activeBarIndex
+        });
       });
     });
 
     block.addEventListener("click", () => {
-      selectedBlockId = block.dataset.blockId;
-      root.querySelectorAll("[data-block-id]").forEach((candidate) => candidate.classList.toggle("is-selected", candidate === block));
-      announceFeedback(feedback, "已选中节奏块，再点一个小节。", "info");
+      if (block.dataset.skipClick) {
+        return;
+      }
+
+      selectedBlockId = null;
+      root.querySelectorAll("[data-block-id]").forEach((candidate) => candidate.classList.remove("is-selected"));
+      const current = state.get();
+      addSelectedBlock({
+        root,
+        state,
+        setState,
+        render,
+        onReward,
+        feedback,
+        blockId: block.dataset.blockId,
+        barIndex: current.composition.activeBarIndex ?? 0
+      });
     });
   });
 
   root.querySelectorAll("[data-bar-index]").forEach((bar) => {
     bar.addEventListener("click", () => {
       if (!selectedBlockId) {
-        announceFeedback(feedback, "先选一块节奏块，再点小节。", "info");
+        announceFeedback(feedback, "选节奏块", "info");
         return;
       }
 
       try {
         const current = state.get();
-        const barIndex = Number(bar.dataset.barIndex);
-        const nextComposition = addBlockToBar(current.composition, barIndex, selectedBlockId);
-        const filled = nextComposition.bars[barIndex].status === "complete";
-        const message = completionMessage(nextComposition, barIndex);
-        setState({
-          ...current,
-          composition: {
-            ...nextComposition,
-            feedbackMessage: message
-          }
-        });
+        const barIndex = current.composition.activeBarIndex ?? Number(bar.dataset.barIndex);
+        addSelectedBlock({ root, state, setState, render, onReward, feedback, blockId: selectedBlockId, barIndex });
         selectedBlockId = null;
-        announceFeedback(feedback, message, filled ? "good" : "info");
-        if (nextComposition.bars.every((item) => item.status === "complete")) {
-          onReward(2);
-        }
-        render();
       } catch (error) {
         shakeBar(root, Number(bar.dataset.barIndex));
-        announceFeedback(feedback, error.message, "warn");
+        announceFeedback(feedback, shortFeedback(error.message), "warn");
       }
     });
   });
@@ -362,6 +390,10 @@ function startBlockDrag(event, element, root, onDrop) {
     const bar = [...root.querySelectorAll("[data-bar-index]")].find((candidate) => isInside(upEvent, candidate));
     root.querySelectorAll("[data-bar-index]").forEach((candidate) => candidate.classList.remove("is-hot"));
     if (bar) {
+      element.dataset.skipClick = "1";
+      setTimeout(() => {
+        delete element.dataset.skipClick;
+      }, 160);
       onDrop(Number(bar.dataset.barIndex));
     }
   }
@@ -393,6 +425,10 @@ function startMouseBlockDrag(event, element, root, onDrop) {
     const bar = [...root.querySelectorAll("[data-bar-index]")].find((candidate) => isInside(upEvent, candidate));
     root.querySelectorAll("[data-bar-index]").forEach((candidate) => candidate.classList.remove("is-hot"));
     if (bar) {
+      element.dataset.skipClick = "1";
+      setTimeout(() => {
+        delete element.dataset.skipClick;
+      }, 160);
       onDrop(Number(bar.dataset.barIndex));
     }
   }

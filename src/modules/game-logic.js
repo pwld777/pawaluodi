@@ -10,6 +10,8 @@ export function createDefaultComposition({ meter = "2/4", bars = 4 } = {}) {
     mode: meter === "2/4" ? "欢快段" : "悠扬段",
     meter,
     instrument: "hand-drum",
+    activeBarIndex: 0,
+    isComplete: false,
     feedbackMessage: null,
     bars: Array.from({ length: bars }, (_, index) => ({
       id: `bar-${index + 1}`,
@@ -57,8 +59,13 @@ export function addBlockToBar(composition, barIndex, blockId) {
     });
   });
 
+  const isComplete = nextBars.every((item) => item.status === "complete");
+  const nextActiveBarIndex = isComplete ? barIndex : nextBars.findIndex((item) => item.status !== "complete");
+
   return {
     ...composition,
+    activeBarIndex: nextActiveBarIndex === -1 ? barIndex : nextActiveBarIndex,
+    isComplete,
     bars: nextBars
   };
 }
@@ -76,14 +83,20 @@ function normalizeComposition(composition) {
     return createDefaultComposition();
   }
 
-  if (composition.bars.length >= 4) {
-    return composition;
-  }
-
   const fresh = createDefaultComposition({ meter: composition.meter ?? "2/4", bars: 4 });
+  const bars = composition.bars.length >= 4
+    ? composition.bars
+    : fresh.bars.map((bar, index) => composition.bars[index] ?? bar);
+  const isComplete = bars.every((bar) => bar.status === "complete");
+  const activeBarIndex = Number.isInteger(composition.activeBarIndex)
+    ? Math.min(Math.max(composition.activeBarIndex, 0), bars.length - 1)
+    : Math.max(0, bars.findIndex((bar) => bar.status !== "complete"));
+
   return {
     ...composition,
-    bars: fresh.bars.map((bar, index) => composition.bars[index] ?? bar)
+    activeBarIndex: activeBarIndex === -1 ? bars.length - 1 : activeBarIndex,
+    isComplete,
+    bars
   };
 }
 
