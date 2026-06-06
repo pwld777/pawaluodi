@@ -147,6 +147,23 @@ test("composition workshop renders clear beat pits and rhythm-only cards", () =>
   assert.doesNotMatch(blockTray, /ta-ka-di-mi|ta-ti|欢快|舒展|四分音符|二分音符|八分音符|十六分音符/);
 });
 
+test("composition workshop keeps instruments in the top strip", () => {
+  const html = renderCompositionWorkshop({ state: createInitialState() });
+  const topStrip = html.match(/<div class="compose-top-strip">[\s\S]*?<\/div>\s*<p class="feedback-pill/)?.[0] ?? "";
+
+  assert.match(topStrip, /compose-instrument-row/);
+  assert.equal((topStrip.match(/data-instrument=/g) ?? []).length, 4);
+});
+
+test("composition workshop edits bars without full rerender hooks", () => {
+  const source = readFileSync("src/modules/composition-workshop.js", "utf8");
+  const updateCompositionSource = source.match(/function updateComposition[\s\S]*?\n}\n\nexport function renderCompositionWorkshop/)?.[0] ?? "";
+  const instrumentListenerSource = source.match(/root\.querySelectorAll\("\[data-instrument\]"[\s\S]*?\n  }\);/)?.[0] ?? "";
+
+  assert.doesNotMatch(updateCompositionSource, /\brender\(\);/);
+  assert.doesNotMatch(instrumentListenerSource, /\brender\(\);/);
+});
+
 test("online classroom shell loads Phaser for the composition game stage", () => {
   const html = readFileSync("index.html", "utf8");
   assert.match(html, /phaser@3\.90\.0/);

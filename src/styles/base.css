@@ -142,6 +142,18 @@ button:active {
   margin: 0 auto 18px;
 }
 
+body[data-view="compose"] .app-shell {
+  padding-top: 10px;
+}
+
+body[data-view="compose"] .game-header {
+  display: none;
+}
+
+body[data-view="compose"] .enter-view {
+  animation: none;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   color: #a64022;
@@ -758,17 +770,17 @@ h3 {
 }
 
 .rhythm-mark-card {
-  min-height: 78px;
-  transform: scale(0.96);
+  min-height: 44px;
+  transform: scale(0.64);
 }
 
 .block-card[data-piece-beats="1"] .rhythm-mark-card {
-  transform: scale(0.92);
+  transform: scale(0.62);
 }
 
 .block-card[data-piece-beats="2"] .rhythm-mark-card,
 .block-card[data-piece-beats="3"] .rhythm-mark-card {
-  transform: scale(0.86);
+  transform: scale(0.6);
 }
 
 .rhythm-mark-piece {
@@ -882,13 +894,13 @@ h3 {
 
 .compose-game-shell {
   display: grid;
-  gap: 18px;
+  gap: 10px;
 }
 
 .compose-arcade-stage {
   position: relative;
   overflow: hidden;
-  min-height: clamp(590px, 58vw, 720px);
+  min-height: min(590px, calc(100vh - 232px));
   border: 8px solid #5b2d17;
   border-radius: 30px;
   background:
@@ -937,11 +949,11 @@ h3 {
 
 .compose-play-layer {
   position: absolute;
-  inset: 22px;
+  inset: 18px;
   z-index: 4;
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
-  gap: 14px;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 10px;
 }
 
 .compose-top-strip,
@@ -955,7 +967,7 @@ h3 {
 .compose-top-strip {
   justify-content: center;
   flex-wrap: wrap;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border: 4px solid rgba(91, 42, 15, 0.68);
   border-radius: 18px;
   background: rgba(255, 246, 190, 0.92);
@@ -963,12 +975,12 @@ h3 {
 }
 
 .compose-top-strip h2 {
-  font-size: clamp(1.45rem, 3vw, 2.5rem);
+  font-size: clamp(1.3rem, 2.5vw, 2.05rem);
   color: #9b321e;
 }
 
 .compose-top-strip strong {
-  padding: 8px 14px;
+  padding: 7px 12px;
   border-radius: 999px;
   background: #e8492f;
   color: #fff7d1;
@@ -1024,8 +1036,9 @@ h3 {
   justify-self: center;
   width: min(100%, 420px);
   margin: 0;
+  min-height: 44px;
   text-align: center;
-  font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+  font-size: clamp(1.05rem, 2vw, 1.38rem);
 }
 
 .four-bar-board {
@@ -1041,9 +1054,9 @@ h3 {
   position: relative;
   display: grid;
   grid-template-rows: auto 1fr;
-  gap: 10px;
-  min-height: 210px;
-  padding: 12px;
+  gap: 8px;
+  min-height: 184px;
+  padding: 10px;
   border: 6px solid rgba(122, 55, 24, 0.76);
   border-radius: 22px;
   background: rgba(255, 250, 213, 0.94);
@@ -1096,7 +1109,7 @@ h3 {
 .compose-bar-fill {
   position: relative;
   display: grid;
-  min-height: 150px;
+  min-height: 124px;
 }
 
 .compose-beat-pits,
@@ -1109,7 +1122,7 @@ h3 {
 .compose-beat-pit {
   display: grid;
   place-items: center;
-  min-height: 150px;
+  min-height: 124px;
   border: 7px dashed rgba(122, 55, 24, 0.62);
   border-radius: 22px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 245, 189, 0.72));
@@ -1127,7 +1140,7 @@ h3 {
 }
 
 .compose-rhythm-piece {
-  min-height: 150px;
+  min-height: 124px;
   border-width: 6px;
   border-radius: 22px;
   background: linear-gradient(180deg, #fff8aa, #ffc52e);
@@ -1239,49 +1252,50 @@ h3 {
 .compose-instrument-row {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-  width: min(100%, 620px);
-  justify-self: center;
-  padding: 8px;
-  border: 4px solid rgba(91, 42, 15, 0.58);
-  border-radius: 18px;
-  background: rgba(255, 246, 190, 0.92);
-  box-shadow: 0 7px 0 rgba(73, 35, 16, 0.32);
+  flex: 1 1 460px;
+  gap: 7px;
+  width: min(100%, 540px);
+  padding: 6px;
+  border: 3px solid rgba(91, 42, 15, 0.58);
+  border-radius: 16px;
+  background: rgba(255, 253, 221, 0.9);
+  box-shadow: inset 0 0 0 2px rgba(255, 212, 90, 0.3);
 }
 
 .compose-instrument-row button {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
+  grid-template-columns: 34px minmax(0, 1fr);
   align-items: center;
-  gap: 8px;
-  min-height: 54px;
-  padding: 6px 10px;
+  gap: 7px;
+  min-height: 46px;
+  padding: 5px 8px;
   border: 3px solid rgba(92, 43, 14, 0.24);
   border-radius: 14px;
   background: linear-gradient(180deg, color-mix(in srgb, var(--instrument) 42%, #fff), #fff2b6);
 }
 
 .compose-instrument-row button.active {
-  outline: 4px solid #e8492f;
+  border-color: #e8492f;
+  box-shadow: 0 0 0 3px rgba(232, 73, 47, 0.22);
 }
 
 .compose-instrument-row .instrument-photo {
-  width: 40px;
-  max-width: 40px;
-  border-radius: 12px;
+  width: 34px;
+  max-width: 34px;
+  border-radius: 10px;
 }
 
 .compose-instrument-row strong {
   overflow: hidden;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   text-align: left;
   white-space: nowrap;
 }
 
 .compose-main-tray {
   margin-top: 0;
-  padding: 16px;
-  border: 6px solid #743619;
+  padding: 6px;
+  border: 5px solid #743619;
   border-radius: 24px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.46), transparent 30%),
@@ -1508,14 +1522,14 @@ h3 {
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  gap: 10px;
-  margin-top: 14px;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .block-tray .notation-card {
-  flex: 1 1 118px;
-  min-height: 112px;
-  padding: 10px;
+  flex: 1 1 88px;
+  min-height: 58px;
+  padding: 6px;
   border-color: rgba(87, 41, 13, 0.54);
   border-radius: 16px;
   background: linear-gradient(180deg, #fff8a9, #ffc247);
@@ -1528,11 +1542,11 @@ h3 {
 }
 
 .block-tray .notation-card[data-piece-beats="2"] {
-  flex-basis: 228px;
+  flex-basis: 126px;
 }
 
 .block-tray .notation-card[data-piece-beats="3"] {
-  flex-basis: 320px;
+  flex-basis: 180px;
 }
 
 .block-card {

@@ -23,7 +23,7 @@ function completionMessage(composition, barIndex, action = "place") {
   }
 
   const remaining = bar.capacity - bar.filledBeats;
-  return remaining === 0 ? "刚好！" : (bar.blocks.length === 1 ? "已替换" : `还差 ${remaining} 格`);
+  return remaining === 0 ? "刚好！" : `还差 ${remaining} 格`;
 }
 
 function shakeBar(root, barIndex) {
@@ -57,7 +57,58 @@ function shortFeedback(message) {
   return message;
 }
 
-function updateComposition({ root, state, setState, render, onReward, feedback, barIndex, action, blockId }) {
+function renderInstrumentRow(composition) {
+  return `
+    <div class="compose-instrument-row" aria-label="选择乐器">
+      ${instruments.map((instrument) => `
+        <button class="${composition.instrument === instrument.id ? "active" : ""}" data-instrument="${instrument.id}" type="button" style="--instrument:${instrument.color}" aria-pressed="${composition.instrument === instrument.id ? "true" : "false"}">
+          <span class="instrument-photo" style="background-image:url('${instrument.image}'); background-position:${instrument.imagePosition}" aria-hidden="true"></span>
+          <strong>${instrument.name}</strong>
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderBarPieces(bar) {
+  return bar.blocks.map((blockId) => {
+    const card = getNotationCard(blockId);
+    return `<span class="rhythm-piece compose-rhythm-piece" style="--piece-beats:${card.beats}" data-piece-beats="${card.beats}">
+      ${renderRhythmMark(card, "rhythm-mark-piece")}
+    </span>`;
+  }).join("");
+}
+
+function refreshCompositionView(root, composition, feedback, message, tone = "info") {
+  composition.bars.forEach((bar, index) => {
+    const barNode = root.querySelector(`[data-bar-index="${index}"]`);
+    if (!barNode) {
+      return;
+    }
+
+    barNode.className = `compose-bar-stage ${bar.status} ${index === composition.activeBarIndex ? "is-current" : ""}`;
+    barNode.style.setProperty("--bar-beats", bar.capacity);
+    const pieces = barNode.querySelector(".compose-rhythm-pieces");
+    if (pieces) {
+      pieces.innerHTML = renderBarPieces(bar);
+      pieces.style.setProperty("--bar-beats", bar.capacity);
+    }
+  });
+
+  if (message) {
+    announceFeedback(feedback, shortFeedback(message), tone);
+  }
+}
+
+function refreshInstrumentButtons(root, composition) {
+  root.querySelectorAll("[data-instrument]").forEach((button) => {
+    const isActive = button.dataset.instrument === composition.instrument;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+}
+
+function updateComposition({ root, state, setState, onReward, feedback, barIndex, action, blockId }) {
   try {
     const current = state.get();
     const nextComposition = action === "clear"
@@ -72,11 +123,10 @@ function updateComposition({ root, state, setState, render, onReward, feedback, 
         feedbackMessage: message
       }
     });
-    announceFeedback(feedback, message, filled ? "good" : "info");
+    refreshCompositionView(root, nextComposition, feedback, message, filled ? "good" : "info");
     if (nextComposition.isComplete) {
       onReward(2);
     }
-    render();
   } catch (error) {
     const message = shortFeedback(error.message);
     shakeBar(root, barIndex);
@@ -121,6 +171,7 @@ export function renderCompositionWorkshop({ state }) {
                 <option ${composition.mode === "悠扬段" ? "selected" : ""}>悠扬段</option>
               </select>
             </label>
+            ${renderInstrumentRow(composition)}
           </div>
 
           <p class="feedback-pill compose-feedback-main" id="composeFeedback" data-tone="info">${feedbackMessage}</p>
@@ -137,12 +188,7 @@ export function renderCompositionWorkshop({ state }) {
                     ${Array.from({ length: bar.capacity }, (_, beatIndex) => `<i class="compose-beat-pit">${beatIndex + 1}</i>`).join("")}
                   </div>
                   <div class="placed-notes rhythm-pieces compose-rhythm-pieces" style="--bar-beats:${bar.capacity}">
-                    ${bar.blocks.map((blockId) => {
-                      const card = getNotationCard(blockId);
-                      return `<span class="rhythm-piece compose-rhythm-piece" style="--piece-beats:${card.beats}" data-piece-beats="${card.beats}">
-                        ${renderRhythmMark(card, "rhythm-mark-piece")}
-                      </span>`;
-                    }).join("")}
+                    ${renderBarPieces(bar)}
                   </div>
                 </div>
               </div>
@@ -152,15 +198,6 @@ export function renderCompositionWorkshop({ state }) {
           <div class="compose-bottom-actions">
             <button class="primary-action" data-play-composition type="button">播放</button>
             <button data-clear-composition type="button">重做</button>
-          </div>
-
-          <div class="compose-instrument-row" aria-label="选择乐器">
-            ${instruments.map((instrument) => `
-              <button class="${composition.instrument === instrument.id ? "active" : ""}" data-instrument="${instrument.id}" type="button" style="--instrument:${instrument.color}">
-                <span class="instrument-photo" style="background-image:url('${instrument.image}'); background-position:${instrument.imagePosition}" aria-hidden="true"></span>
-                <strong>${instrument.name}</strong>
-              </button>
-            `).join("")}
           </div>
         </div>
       </div>
@@ -229,7 +266,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
           instrument: instrumentId
         }
       });
-      render();
+      refreshInstrumentButtons(root, state.get().composition);
       unlockAudio()
         .then(() => playInstrument(instrumentId, { volume: current.settings.volume }))
         .catch(() => {
@@ -249,7 +286,6 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
           root,
           state,
           setState,
-          render,
           onReward,
           feedback,
           blockId: block.dataset.blockId,
@@ -267,7 +303,6 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
           root,
           state,
           setState,
-          render,
           onReward,
           feedback,
           blockId: block.dataset.blockId,
@@ -296,8 +331,9 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
 
       try {
         const barIndex = Number(bar.dataset.barIndex);
-        updateComposition({ root, state, setState, render, onReward, feedback, blockId: selectedBlockId, barIndex });
+        updateComposition({ root, state, setState, onReward, feedback, blockId: selectedBlockId, barIndex });
         selectedBlockId = null;
+        root.querySelectorAll("[data-block-id]").forEach((candidate) => candidate.classList.remove("is-selected"));
       } catch (error) {
         shakeBar(root, Number(bar.dataset.barIndex));
         announceFeedback(feedback, shortFeedback(error.message), "warn");
@@ -313,7 +349,6 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
         root,
         state,
         setState,
-        render,
         onReward,
         feedback,
         action: "clear",
@@ -327,13 +362,17 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
     const current = state.get();
     setState({
       ...current,
-      composition: resetComposition({
-        meter: current.composition.meter,
-        instrument: current.composition.instrument,
-        mode: current.composition.mode
-      })
+      composition: {
+        ...resetComposition({
+          meter: current.composition.meter,
+          instrument: current.composition.instrument,
+          mode: current.composition.mode
+        }),
+        feedbackMessage: "选节奏块，填空坑"
+      }
     });
-    render();
+    refreshCompositionView(root, state.get().composition, feedback, "选节奏块，填空坑", "info");
+    root.querySelectorAll("[data-block-id]").forEach((candidate) => candidate.classList.remove("is-selected"));
   });
 
   root.querySelector("[data-play-composition]")?.addEventListener("click", async () => {
@@ -355,7 +394,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
         });
 
         const highlightTimer = setTimeout(() => {
-          root.querySelectorAll(".music-bar").forEach((barNode) => barNode.classList.remove("is-playing"));
+          root.querySelectorAll("[data-bar-index]").forEach((barNode) => barNode.classList.remove("is-playing"));
           root.querySelector(`[data-bar-index="${barIndex}"]`)?.classList.add("is-playing");
         }, barIndex * bar.capacity * beatMs + blockStartBeat * beatMs);
         playbackTimers.push(highlightTimer);
@@ -365,7 +404,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
 
     const cursor = current.composition.bars.length * current.composition.bars[0].capacity * beatMs;
     playbackTimers.push(setTimeout(() => {
-      root.querySelectorAll(".music-bar").forEach((barNode) => barNode.classList.remove("is-playing"));
+      root.querySelectorAll("[data-bar-index]").forEach((barNode) => barNode.classList.remove("is-playing"));
       announceFeedback(feedback, "小乐队排练成功！", "good");
     }, cursor + 80));
   });

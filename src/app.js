@@ -105,6 +105,7 @@ function renderShowcase() {
 }
 
 function render() {
+  document.body.dataset.view = appState.currentView;
   updateNavigation(appState.currentView);
   starCount.textContent = String(appState.stars);
 

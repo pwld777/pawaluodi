@@ -1,6 +1,6 @@
 @media (max-width: 920px) {
   .app-shell {
-    padding: 16px 14px 108px;
+    padding: 16px 14px 96px;
   }
 
   .game-header {
@@ -47,7 +47,7 @@
   }
 
   .compose-arcade-stage {
-    min-height: 760px;
+    min-height: min(560px, calc(100vh - 216px));
   }
 
   .compose-game-hud {
@@ -55,7 +55,8 @@
   }
 
   .compose-play-layer {
-    inset: 16px;
+    inset: 14px;
+    gap: 8px;
   }
 
   .current-bar-stage {
@@ -66,7 +67,7 @@
   .current-rhythm-piece,
   .compose-beat-pit,
   .compose-rhythm-piece {
-    min-height: 150px;
+    min-height: 104px;
   }
 
   .bottom-nav {
@@ -138,7 +139,7 @@
   .current-rhythm-piece,
   .compose-beat-pit,
   .compose-rhythm-piece {
-    min-height: 170px;
+    min-height: 150px;
     border-radius: 20px;
   }
 
@@ -151,7 +152,24 @@
   }
 
   .compose-instrument-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  .compose-instrument-row button {
+    grid-template-columns: 30px minmax(0, 1fr);
+    min-height: 44px;
+    padding: 5px 6px;
+  }
+
+  .compose-instrument-row .instrument-photo {
+    width: 30px;
+    max-width: 30px;
+  }
+
+  .compose-instrument-row strong {
+    font-size: 0.84rem;
   }
 
   .block-tray .notation-card,
