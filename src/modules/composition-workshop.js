@@ -152,17 +152,15 @@ export function renderCompositionWorkshop({ state }) {
           <div class="compose-bottom-actions">
             <button class="primary-action" data-play-composition type="button">播放</button>
             <button data-clear-composition type="button">重做</button>
-            <details class="compose-settings">
-              <summary>设置</summary>
-              <div class="instrument-grid">
-                ${instruments.map((instrument) => `
-                  <button class="${composition.instrument === instrument.id ? "active" : ""}" data-instrument="${instrument.id}" type="button" style="--instrument:${instrument.color}">
-                    <span class="instrument-photo" style="background-image:url('${instrument.image}'); background-position:${instrument.imagePosition}" aria-hidden="true"></span>
-                    <strong>${instrument.name}</strong>
-                  </button>
-                `).join("")}
-              </div>
-            </details>
+          </div>
+
+          <div class="compose-instrument-row" aria-label="选择乐器">
+            ${instruments.map((instrument) => `
+              <button class="${composition.instrument === instrument.id ? "active" : ""}" data-instrument="${instrument.id}" type="button" style="--instrument:${instrument.color}">
+                <span class="instrument-photo" style="background-image:url('${instrument.image}'); background-position:${instrument.imagePosition}" aria-hidden="true"></span>
+                <strong>${instrument.name}</strong>
+              </button>
+            `).join("")}
           </div>
         </div>
       </div>

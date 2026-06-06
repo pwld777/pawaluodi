@@ -150,10 +150,8 @@
     min-height: 220px;
   }
 
-  .compose-settings .instrument-grid {
-    left: 0;
-    right: auto;
-    width: min(82vw, 260px);
+  .compose-instrument-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .block-tray .notation-card,

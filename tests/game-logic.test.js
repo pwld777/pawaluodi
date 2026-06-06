@@ -133,6 +133,9 @@ test("composition workshop renders clear beat pits and rhythm-only cards", () =>
   assert.equal((html.match(/class="compose-beat-pit"/g) ?? []).length, 8);
   assert.equal((html.match(/data-clear-bar/g) ?? []).length, 4);
   assert.match(html, /data-clear-composition/);
+  assert.match(html, /compose-instrument-row/);
+  assert.equal((html.match(/data-instrument=/g) ?? []).length, 4);
+  assert.doesNotMatch(html, /<details class="compose-settings">/);
   assert.doesNotMatch(html, /闯关星标|真实音色|准备展示|把节奏块放进空坑|每小节刚好填满/);
   assert.match(html, /data-piece-beats="2"/);
   assert.match(html, /style="--tray-beats:2"/);
@@ -147,6 +150,12 @@ test("composition workshop renders clear beat pits and rhythm-only cards", () =>
 test("online classroom shell loads Phaser for the composition game stage", () => {
   const html = readFileSync("index.html", "utf8");
   assert.match(html, /phaser@3\.90\.0/);
+});
+
+test("app preserves the Phaser stage host when composition rerenders", () => {
+  const appSource = readFileSync("src/app.js", "utf8");
+  assert.match(appSource, /existingStage.*data-compose-game-stage/s);
+  assert.match(appSource, /nextStage\.replaceWith\(existingStage\)/);
 });
 
 test("composition workshop exposes four classroom percussion instruments", () => {

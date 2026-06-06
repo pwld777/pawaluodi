@@ -3,12 +3,16 @@ import * as Phaser from "phaser";
 const sceneAsset = "./assets/images/compose-stage-scene.png";
 
 let game = null;
+let activeContainer = null;
+let lastCompleteState = false;
 
 function destroyStage() {
   if (game) {
     game.destroy(true);
     game = null;
   }
+  activeContainer = null;
+  lastCompleteState = false;
 }
 
 function fitBackground(scene, image) {
@@ -36,7 +40,17 @@ function makeText(scene, text, x, y, size = 28) {
 }
 
 function launchStage(container, data) {
+  if (game && activeContainer === container) {
+    if (data.isComplete && !lastCompleteState) {
+      game.scene.scenes[0]?.events.emit("composition-complete");
+    }
+    lastCompleteState = data.isComplete;
+    return;
+  }
+
   destroyStage();
+  activeContainer = container;
+  lastCompleteState = data.isComplete;
   container.setAttribute("data-stage-status", "phaser");
 
   class ComposeStageScene extends Phaser.Scene {
@@ -54,7 +68,7 @@ function launchStage(container, data) {
 
       makeText(this, "节奏填坑", 92, 92, 34);
 
-      if (data.isComplete) {
+      this.events.on("composition-complete", () => {
         const star = makeText(this, "★", this.scale.width - 150, 92, 50);
         this.tweens.add({
           targets: star,
@@ -63,8 +77,13 @@ function launchStage(container, data) {
           duration: 520,
           yoyo: true,
           repeat: 2,
-          ease: "Sine.easeInOut"
+          ease: "Sine.easeInOut",
+          onComplete: () => star.destroy()
         });
+      });
+
+      if (data.isComplete) {
+        this.events.emit("composition-complete");
       }
     }
   }

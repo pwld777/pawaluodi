@@ -117,7 +117,13 @@ function render() {
     viewRoot.innerHTML = renderRhythmGame({ state: appState });
     bindRhythmGame({ root: viewRoot, state: stateRef, setState, render, onReward: reward });
   } else if (appState.currentView === "compose") {
+    const existingStage = viewRoot.querySelector("[data-compose-game-stage]");
+    existingStage?.remove();
     viewRoot.innerHTML = renderCompositionWorkshop({ state: appState });
+    const nextStage = viewRoot.querySelector("[data-compose-game-stage]");
+    if (existingStage && nextStage) {
+      nextStage.replaceWith(existingStage);
+    }
     bindCompositionWorkshop({ root: viewRoot, state: stateRef, setState, render, onReward: reward });
   } else {
     viewRoot.innerHTML = renderShowcase();
