@@ -726,7 +726,7 @@ h3 {
   gap: 8px;
 }
 
-.answer-zone.has-card span {
+.answer-zone.has-card > .answer-chip {
   padding: 8px 12px;
   border-radius: 999px;
   background: #fff;
@@ -742,8 +742,8 @@ h3 {
 .notation-card {
   position: relative;
   display: grid;
-  align-content: start;
-  justify-items: start;
+  align-content: center;
+  justify-items: center;
   gap: 8px;
   min-height: 174px;
   padding: 16px;
@@ -752,6 +752,12 @@ h3 {
   text-align: left;
   touch-action: none;
   background: linear-gradient(180deg, #fffbed, #ffe19a);
+}
+
+.notation-card .card-tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
 }
 
 .notation-card.is-dragging {
@@ -792,6 +798,121 @@ h3 {
   left: 22%;
   top: 8px;
   font-size: 2rem;
+}
+
+.rhythm-mark {
+  --note-ink: #2e2619;
+  position: relative;
+  display: inline-flex;
+  align-items: end;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  min-width: 58px;
+  min-height: 62px;
+  color: var(--note-ink);
+}
+
+.rhythm-mark-card {
+  min-height: 78px;
+  transform: scale(1.08);
+}
+
+.rhythm-mark-piece {
+  min-height: 52px;
+  transform: scale(0.86);
+}
+
+.rhythm-mark-answer {
+  min-width: 86px;
+  min-height: 42px;
+  transform: scale(0.72);
+}
+
+.rhythm-note {
+  position: relative;
+  display: inline-block;
+  width: 22px;
+  height: 58px;
+  flex: 0 0 22px;
+}
+
+.note-head {
+  position: absolute;
+  left: 0;
+  bottom: 2px;
+  width: 22px;
+  height: 15px;
+  border: 3px solid var(--note-ink);
+  border-radius: 50%;
+  background: var(--note-ink);
+  transform: rotate(-18deg);
+}
+
+.rhythm-note-open .note-head {
+  background: #fffdf0;
+  border-width: 4px;
+}
+
+.note-stem {
+  position: absolute;
+  left: 18px;
+  bottom: 12px;
+  width: 4px;
+  height: 44px;
+  border-radius: 4px;
+  background: var(--note-ink);
+}
+
+.beamed-note-group {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--note-count), 22px);
+  gap: 10px;
+  align-items: end;
+  padding-top: 10px;
+}
+
+.beamed-note-group .rhythm-note {
+  height: 58px;
+}
+
+.beam {
+  position: absolute;
+  left: 20px;
+  right: 2px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--note-ink);
+}
+
+.beam-one {
+  top: 8px;
+}
+
+.beam-two {
+  top: 18px;
+}
+
+.rhythm-dot {
+  width: 9px;
+  height: 9px;
+  align-self: end;
+  margin: 0 0 13px -4px;
+  border-radius: 50%;
+  background: var(--note-ink);
+}
+
+.rhythm-rest {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border: 4px solid var(--note-ink);
+  font-size: 2rem;
+  font-weight: 1000;
+  line-height: 1;
+  background: #fffdf0;
 }
 
 .word-card {
@@ -895,7 +1016,7 @@ h3 {
   position: relative;
   display: grid;
   gap: 12px;
-  min-height: 168px;
+  min-height: 196px;
   padding: 14px;
   border: 3px solid rgba(90, 55, 20, 0.34);
   border-radius: 24px;
@@ -921,21 +1042,30 @@ h3 {
     linear-gradient(145deg, rgba(255, 249, 218, 0.96), rgba(246, 208, 126, 0.92));
 }
 
-.beat-slots {
+.bar-fill-stage {
+  position: relative;
+  display: grid;
+  min-height: 98px;
+}
+
+.beat-pits {
   display: grid;
   grid-template-columns: repeat(var(--bar-beats, 2), minmax(0, 1fr));
   gap: 8px;
 }
 
-.beat-slots i {
+.beat-pit {
   display: grid;
   place-items: center;
-  min-height: 30px;
-  border-radius: 999px;
-  background: rgba(255, 212, 90, 0.28);
+  min-height: 92px;
+  border: 4px dashed rgba(139, 74, 25, 0.34);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.48);
   color: #8b4a19;
   font-style: normal;
+  font-size: 1.45rem;
   font-weight: 900;
+  box-shadow: inset 0 0 0 4px rgba(255, 212, 90, 0.18);
 }
 
 .staff-lines {
@@ -944,39 +1074,29 @@ h3 {
 }
 
 .placed-notes {
-  min-height: 42px;
-  font-size: 2rem;
-  letter-spacing: 0.3em;
+  min-height: 92px;
 }
 
 .rhythm-pieces {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--bar-beats, 2), minmax(0, 1fr));
   gap: 8px;
-  min-height: 58px;
-  font-size: 1rem;
-  letter-spacing: 0;
+  pointer-events: none;
 }
 
 .rhythm-piece {
   display: grid;
   place-items: center;
-  min-width: calc(var(--piece-beats) * 58px);
-  padding: 8px 10px;
-  border: 2px solid rgba(118, 63, 25, 0.2);
-  border-radius: 18px;
+  grid-column: span var(--piece-beats);
+  min-width: 0;
+  min-height: 92px;
+  padding: 8px;
+  border: 3px solid rgba(118, 63, 25, 0.24);
+  border-radius: 20px;
   background: linear-gradient(180deg, #fff8d0, #ffd66d);
-  box-shadow: 0 8px 0 rgba(174, 101, 28, 0.24);
-}
-
-.rhythm-piece b {
-  font-size: 1.35rem;
-}
-
-.rhythm-piece small {
-  color: #7b4a18;
-  font-weight: 900;
+  box-shadow: 0 8px 0 rgba(174, 101, 28, 0.3);
 }
 
 .block-tray {
@@ -991,12 +1111,9 @@ h3 {
   padding: 12px;
 }
 
-.block-tray .block-glyph {
-  font-size: 2rem;
-}
-
-.block-glyph {
-  font-size: 2.5rem;
+.block-card {
+  min-width: 0;
+  overflow: hidden;
 }
 
 .review-card {

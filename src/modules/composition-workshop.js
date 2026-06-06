@@ -3,12 +3,30 @@ import { instruments } from "../data/instrument-sounds.js";
 import { addBlockToBar, resetComposition } from "./game-logic.js";
 import { playInstrument, preloadInstrument, unlockAudio } from "./audio-engine.js";
 import { announceFeedback } from "./feedback.js";
+import { renderRhythmMark } from "./rhythm-mark.js";
 
 let playbackTimers = [];
 
 function clearPlayback() {
   playbackTimers.forEach((timer) => clearTimeout(timer));
   playbackTimers = [];
+}
+
+function completionMessage(composition, barIndex) {
+  if (composition.bars.every((bar) => bar.status === "complete")) {
+    return "小乐队排练成功！";
+  }
+
+  const bar = composition.bars[barIndex];
+  const remaining = bar.capacity - bar.filledBeats;
+  return remaining === 0 ? "刚好装满！" : `还差 ${remaining} 拍。`;
+}
+
+function shakeBar(root, barIndex) {
+  const bar = root.querySelector(`[data-bar-index="${barIndex}"]`);
+  bar?.classList.remove("shake");
+  void bar?.offsetWidth;
+  bar?.classList.add("shake");
 }
 
 export function renderCompositionWorkshop({ state }) {
@@ -24,7 +42,7 @@ export function renderCompositionWorkshop({ state }) {
         <div class="mission-ticket">
           <strong>${composition.mode}任务</strong>
           <span>${composition.meter} · 完成 ${composition.bars.length} 小节节奏拼图</span>
-          <small>${composition.mode === "欢快段" ? "多用短节奏，让小花鼓队跑起来。" : "多用长音和留白，让旋律更舒展。"}</small>
+          <small>把节奏块放进空坑。每小节刚好填满就成功。</small>
         </div>
         <label>创编段落
           <select data-compose-mode>
@@ -50,7 +68,7 @@ export function renderCompositionWorkshop({ state }) {
           <button class="primary-action" data-play-composition type="button">播放我的节奏</button>
           <button data-clear-composition type="button">清空</button>
         </div>
-        <p class="feedback-pill" id="composeFeedback" data-tone="info">${composition.feedbackMessage ?? "把节奏拼图块放进小节，刚好装满就能播放。"}</p>
+        <p class="feedback-pill" id="composeFeedback" data-tone="info">${composition.feedbackMessage ?? "把节奏块放进空坑。每小节刚好填满就成功。"}</p>
       </aside>
 
       <div class="stage-card score-paper puzzle-board">
@@ -62,17 +80,18 @@ export function renderCompositionWorkshop({ state }) {
           ${composition.bars.map((bar, index) => `
             <div class="music-bar ${bar.status}" data-bar-index="${index}" style="--bar-beats:${bar.capacity}">
               <span class="bar-number">第 ${index + 1} 小节</span>
-              <div class="beat-slots" aria-label="${composition.meter} 拍格">
-                ${Array.from({ length: bar.capacity }, (_, beatIndex) => `<i>${beatIndex + 1}</i>`).join("")}
-              </div>
-              <div class="placed-notes rhythm-pieces">
-                ${bar.blocks.map((blockId) => {
-                  const card = getNotationCard(blockId);
-                  return `<span class="rhythm-piece" style="--piece-beats:${card.beats}">
-                    <b>${card.glyph}</b>
-                    <small>${card.syllables}</small>
-                  </span>`;
-                }).join("")}
+              <div class="bar-fill-stage">
+                <div class="beat-pits" aria-label="${composition.meter} 拍格">
+                  ${Array.from({ length: bar.capacity }, (_, beatIndex) => `<i class="beat-pit">${beatIndex + 1}</i>`).join("")}
+                </div>
+                <div class="placed-notes rhythm-pieces" style="--bar-beats:${bar.capacity}">
+                  ${bar.blocks.map((blockId) => {
+                    const card = getNotationCard(blockId);
+                    return `<span class="rhythm-piece" style="--piece-beats:${card.beats}" data-piece-beats="${card.beats}">
+                      ${renderRhythmMark(card, "rhythm-mark-piece")}
+                    </span>`;
+                  }).join("")}
+                </div>
               </div>
               <small>${bar.filledBeats}/${bar.capacity} 拍</small>
             </div>
@@ -80,11 +99,9 @@ export function renderCompositionWorkshop({ state }) {
         </div>
         <div class="block-tray">
           ${blocks.map((block) => `
-            <button class="notation-card block-card" data-block-id="${block.id}" type="button">
+            <button class="notation-card block-card" data-block-id="${block.id}" data-piece-beats="${block.beats}" type="button">
               <span class="card-tag">${block.beats} 拍</span>
-              <span class="block-glyph">${block.glyph}</span>
-              <strong>${block.name}</strong>
-              <small>${block.syllables} · ${block.mood}</small>
+              ${renderRhythmMark(block, "rhythm-mark-card")}
             </button>
           `).join("")}
         </div>
@@ -93,7 +110,7 @@ export function renderCompositionWorkshop({ state }) {
       <aside class="review-card stage-card">
         <h3>创编星标</h3>
         <span class="${completeBars === composition.bars.length ? "is-earned" : ""}">拍数正确</span>
-        <span class="${composition.mode === "欢快段" ? "is-earned" : ""}">风格清楚</span>
+        <span class="${completeBars > 0 ? "is-earned" : ""}">空坑看懂</span>
         <span class="is-earned">真实音色</span>
         <span>准备展示</span>
       </aside>
@@ -161,7 +178,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
         const current = state.get();
         const nextComposition = addBlockToBar(current.composition, barIndex, block.dataset.blockId);
         const filled = nextComposition.bars[barIndex].status === "complete";
-        const message = filled ? "这一小节刚好装满！" : "还差一点，再补一块。";
+        const message = completionMessage(nextComposition, barIndex);
         setState({
           ...current,
           composition: {
@@ -175,6 +192,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
         }
         render();
       } catch (error) {
+        shakeBar(root, barIndex);
         announceFeedback(feedback, error.message, "warn");
       }
       });
@@ -189,7 +207,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
           const current = state.get();
           const nextComposition = addBlockToBar(current.composition, barIndex, block.dataset.blockId);
           const filled = nextComposition.bars[barIndex].status === "complete";
-          const message = filled ? "这一小节刚好装满！" : "还差一点，再补一块。";
+          const message = completionMessage(nextComposition, barIndex);
           setState({
             ...current,
             composition: {
@@ -203,6 +221,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
           }
           render();
         } catch (error) {
+          shakeBar(root, barIndex);
           announceFeedback(feedback, error.message, "warn");
         }
       });
@@ -211,22 +230,23 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
     block.addEventListener("click", () => {
       selectedBlockId = block.dataset.blockId;
       root.querySelectorAll("[data-block-id]").forEach((candidate) => candidate.classList.toggle("is-selected", candidate === block));
-      announceFeedback(feedback, `已选中 ${block.querySelector("strong")?.textContent ?? "节奏拼图"}，再点一个小节。`, "info");
+      announceFeedback(feedback, "已选中节奏块，再点一个小节。", "info");
     });
   });
 
   root.querySelectorAll("[data-bar-index]").forEach((bar) => {
     bar.addEventListener("click", () => {
       if (!selectedBlockId) {
-        announceFeedback(feedback, "先选一块节奏拼图，再点小节。", "info");
+        announceFeedback(feedback, "先选一块节奏块，再点小节。", "info");
         return;
       }
 
       try {
         const current = state.get();
-        const nextComposition = addBlockToBar(current.composition, Number(bar.dataset.barIndex), selectedBlockId);
-        const filled = nextComposition.bars[Number(bar.dataset.barIndex)].status === "complete";
-        const message = filled ? "这一小节刚好装满！" : "还差一点，再补一块。";
+        const barIndex = Number(bar.dataset.barIndex);
+        const nextComposition = addBlockToBar(current.composition, barIndex, selectedBlockId);
+        const filled = nextComposition.bars[barIndex].status === "complete";
+        const message = completionMessage(nextComposition, barIndex);
         setState({
           ...current,
           composition: {
@@ -241,6 +261,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
         }
         render();
       } catch (error) {
+        shakeBar(root, Number(bar.dataset.barIndex));
         announceFeedback(feedback, error.message, "warn");
       }
     });
@@ -290,7 +311,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
     const cursor = current.composition.bars.length * current.composition.bars[0].capacity * beatMs;
     playbackTimers.push(setTimeout(() => {
       root.querySelectorAll(".music-bar").forEach((barNode) => barNode.classList.remove("is-playing"));
-      announceFeedback(feedback, "播放完成，可以展示给同桌听。", "good");
+      announceFeedback(feedback, "小乐队排练成功！", "good");
     }, cursor + 80));
   });
 }

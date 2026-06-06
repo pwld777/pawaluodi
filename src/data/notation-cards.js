@@ -1,107 +1,59 @@
 export const notationCards = [
   {
     id: "sixteenth-run",
-    name: "四个十六分音符",
     beats: 1,
-    section: "A",
-    density: "dense",
-    mood: "欢快、跳动",
-    glyph: "♬♬",
-    syllables: "ta-ka-di-mi",
+    pattern: "sixteenth-run",
     hits: [0, 0.25, 0.5, 0.75],
-    sustainBeats: 0.12,
-    tag: "四下"
+    sustainBeats: 0.12
   },
   {
     id: "eighth-pair",
-    name: "两个八分音符",
     beats: 1,
-    section: "A",
-    density: "medium",
-    mood: "流动",
-    glyph: "♪♪",
-    syllables: "ta-ti",
+    pattern: "eighth-pair",
     hits: [0, 0.5],
-    sustainBeats: 0.18,
-    tag: "两下"
+    sustainBeats: 0.18
   },
   {
     id: "quarter-note",
-    name: "四分音符",
     beats: 1,
-    section: "B",
-    density: "open",
-    mood: "平稳",
-    glyph: "♩",
-    syllables: "ta",
+    pattern: "quarter-note",
     hits: [0],
-    sustainBeats: 0.28,
-    tag: "一拍"
+    sustainBeats: 0.28
   },
   {
     id: "half-note",
-    name: "二分音符",
     beats: 2,
-    section: "B",
-    density: "open",
-    mood: "舒展、歌唱",
-    glyph: "𝅗𝅥",
-    syllables: "ta-a",
+    pattern: "half-note",
     hits: [0],
-    sustainBeats: 1.5,
-    tag: "两拍"
+    sustainBeats: 1.5
   },
   {
     id: "dotted-half-note",
-    name: "附点二分音符",
     beats: 3,
-    section: "B",
-    density: "long",
-    mood: "悠扬、停连",
-    glyph: "𝅗𝅥.",
-    syllables: "ta-a-a",
+    pattern: "dotted-half-note",
     hits: [0],
-    sustainBeats: 2.4,
-    tag: "三拍"
+    sustainBeats: 2.4
   },
   {
     id: "two-quarters",
-    name: "两个四分音符",
     beats: 2,
-    section: "A",
-    density: "medium",
-    mood: "稳稳前进",
-    glyph: "♩♩",
-    syllables: "ta ta",
+    pattern: "two-quarters",
     hits: [0, 1],
-    sustainBeats: 0.28,
-    tag: "整齐"
+    sustainBeats: 0.28
   },
   {
     id: "three-quarters",
-    name: "三个四分音符",
     beats: 3,
-    section: "B",
-    density: "open",
-    mood: "三拍舒展",
-    glyph: "♩♩♩",
-    syllables: "ta ta ta",
+    pattern: "three-quarters",
     hits: [0, 1, 2],
-    sustainBeats: 0.28,
-    tag: "三拍"
+    sustainBeats: 0.28
   },
   {
     id: "quarter-rest",
-    name: "四分休止符",
     beats: 1,
-    section: "B",
-    density: "rest",
-    mood: "留白、呼吸",
-    glyph: "休",
-    syllables: "休",
+    pattern: "quarter-rest",
     hits: [],
-    sustainBeats: 0,
-    tag: "停一拍"
+    sustainBeats: 0
   }
 ];
 

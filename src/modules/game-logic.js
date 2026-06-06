@@ -42,7 +42,7 @@ export function addBlockToBar(composition, barIndex, blockId) {
   }
 
   if (bar.filledBeats + card.beats > bar.capacity) {
-    throw new Error(`${card.name} 这小节放不下`);
+    throw new Error("放不下，换一个短一点的节奏。");
   }
 
   const nextBars = composition.bars.map((item, index) => {

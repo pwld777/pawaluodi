@@ -1,6 +1,7 @@
 import { notationCards } from "../data/notation-cards.js";
 import { rhythmQuestions, evaluateRhythmAnswer } from "../data/rhythm-questions.js";
 import { announceFeedback } from "./feedback.js";
+import { renderRhythmMark } from "./rhythm-mark.js";
 
 const customOptionLabels = {
   "dense-a": "更密 → 第一段",
@@ -54,10 +55,8 @@ function renderRhythmOption(optionId) {
 
   return `
     <button class="notation-card" data-rhythm-option="${card.id}" type="button">
-      <span class="card-tag">${card.tag}</span>
-      <span class="mini-staff rhythm-symbol"><b>${card.glyph}</b><small>${card.syllables}</small></span>
-      <strong>${card.name}</strong>
-      <small>${card.mood}</small>
+      <span class="card-tag">${card.beats} 拍</span>
+      ${renderRhythmMark(card, "rhythm-mark-card")}
     </button>
   `;
 }
@@ -90,7 +89,7 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
       startDrag(event, card, zone, (optionId) => {
       selected.add(optionId);
       zone.classList.add("has-card");
-      zone.innerHTML = [...selected].map((id) => `<span>${labelForOption(id)}</span>`).join("");
+      zone.innerHTML = [...selected].map((id) => `<span class="answer-chip">${labelForOption(id)}</span>`).join("");
 
       if (question.type === "single" || selected.size >= question.answer.length) {
         const result = evaluateRhythmAnswer(question.id, [...selected]);
@@ -132,7 +131,7 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
       startMouseDrag(event, card, zone, (optionId) => {
         selected.add(optionId);
         zone.classList.add("has-card");
-        zone.innerHTML = [...selected].map((id) => `<span>${labelForOption(id)}</span>`).join("");
+        zone.innerHTML = [...selected].map((id) => `<span class="answer-chip">${labelForOption(id)}</span>`).join("");
 
         if (question.type === "single" || selected.size >= question.answer.length) {
           const result = evaluateRhythmAnswer(question.id, [...selected]);
@@ -168,7 +167,7 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
     card.addEventListener("click", () => {
       selected.add(card.dataset.rhythmOption);
       zone.classList.add("has-card");
-      zone.innerHTML = [...selected].map((id) => `<span>${labelForOption(id)}</span>`).join("");
+      zone.innerHTML = [...selected].map((id) => `<span class="answer-chip">${labelForOption(id)}</span>`).join("");
 
       if (question.type === "single" || selected.size >= question.answer.length) {
         const result = evaluateRhythmAnswer(question.id, [...selected]);
@@ -203,7 +202,8 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
 }
 
 function labelForOption(optionId) {
-  return notationCards.find((item) => item.id === optionId)?.name ?? customOptionLabels[optionId] ?? optionId;
+  const card = notationCards.find((item) => item.id === optionId);
+  return card ? renderRhythmMark(card, "rhythm-mark-answer") : customOptionLabels[optionId] ?? optionId;
 }
 
 function startDrag(event, element, target, onDrop) {
