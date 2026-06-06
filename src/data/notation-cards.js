@@ -14,6 +14,20 @@ export const notationCards = [
     sustainBeats: 0.18
   },
   {
+    id: "eighth-sixteenth",
+    beats: 1,
+    pattern: "eighth-sixteenth",
+    hits: [0, 0.5, 0.75],
+    sustainBeats: 0.16
+  },
+  {
+    id: "sixteenth-eighth",
+    beats: 1,
+    pattern: "sixteenth-eighth",
+    hits: [0, 0.25, 0.5],
+    sustainBeats: 0.16
+  },
+  {
     id: "quarter-note",
     beats: 1,
     pattern: "quarter-note",

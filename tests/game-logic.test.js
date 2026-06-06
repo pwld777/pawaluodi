@@ -76,6 +76,16 @@ test("rhythm block playback expands internal hits", () => {
     { beat: 1.5, accent: false },
     { beat: 1.75, accent: false }
   ]);
+  assert.deepEqual(getPlaybackEvents("eighth-sixteenth", 0), [
+    { beat: 0, accent: true },
+    { beat: 0.5, accent: false },
+    { beat: 0.75, accent: false }
+  ]);
+  assert.deepEqual(getPlaybackEvents("sixteenth-eighth", 0), [
+    { beat: 0, accent: true },
+    { beat: 0.25, accent: false },
+    { beat: 0.5, accent: false }
+  ]);
 });
 
 test("composition block filtering keeps oversized 3-beat blocks out of 2/4", () => {
@@ -92,6 +102,8 @@ test("composition workshop renders clear beat pits and rhythm-only cards", () =>
   assert.match(html, /data-piece-beats="2"/);
   assert.match(html, /style="--tray-beats:2"/);
   const blockTray = html.match(/<div class="block-tray">[\s\S]*?<\/div>\s*<\/div>\s*<aside/)?.[0] ?? "";
+  assert.match(blockTray, /data-block-id="eighth-sixteenth"/);
+  assert.match(blockTray, /data-block-id="sixteenth-eighth"/);
   assert.match(blockTray, /2 格/);
   assert.doesNotMatch(blockTray, /2 拍/);
   assert.doesNotMatch(blockTray, /ta-ka-di-mi|ta-ti|欢快|舒展|四分音符|二分音符|八分音符|十六分音符/);

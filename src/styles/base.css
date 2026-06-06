@@ -847,6 +847,14 @@ h3 {
   top: 18px;
 }
 
+.beamed-note-mixed.beam-right .beam-two {
+  left: 52px;
+}
+
+.beamed-note-mixed.beam-left .beam-two {
+  right: 34px;
+}
+
 .rhythm-dot {
   width: 9px;
   height: 9px;

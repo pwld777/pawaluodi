@@ -17,6 +17,17 @@ function beamedNotes(count, beamCount) {
   `;
 }
 
+function mixedSixteenthNotes(type) {
+  const secondBeamClass = type === "eighth-sixteenth" ? "beam-right" : "beam-left";
+  return `
+    <span class="beamed-note-group beamed-note-mixed ${secondBeamClass}" style="--note-count:3; --beam-count:2" aria-hidden="true">
+      ${Array.from({ length: 3 }, () => note()).join("")}
+      <span class="beam beam-one"></span>
+      <span class="beam beam-two"></span>
+    </span>
+  `;
+}
+
 function renderPattern(pattern) {
   if (pattern === "sixteenth-run") {
     return beamedNotes(4, 2);
@@ -24,6 +35,10 @@ function renderPattern(pattern) {
 
   if (pattern === "eighth-pair") {
     return beamedNotes(2, 1);
+  }
+
+  if (pattern === "eighth-sixteenth" || pattern === "sixteenth-eighth") {
+    return mixedSixteenthNotes(pattern);
   }
 
   if (pattern === "quarter-note") {
