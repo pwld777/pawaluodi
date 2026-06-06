@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 
-import { beatGame, evaluateBeatHit, evaluateMeterSwitch } from "../src/data/beat-patterns.js";
+import { beatGame, evaluateBeatHit } from "../src/data/beat-patterns.js";
 import { instruments } from "../src/data/instrument-sounds.js";
 import { getAllowedBlocksForMeter, getPlaybackEvents } from "../src/data/notation-cards.js";
 import { rhythmQuestions, evaluateRhythmAnswer } from "../src/data/rhythm-questions.js";
@@ -14,25 +14,19 @@ test("beat patterns map 2/4 to strong-weak and 3/4 to strong-weak-weak", () => {
   assert.deepEqual(beatGame.sectionB.pattern, ["strong", "weak", "weak"]);
 });
 
-test("beat hit evaluation accepts correct zone inside timing window", () => {
-  assert.equal(evaluateBeatHit({ pattern: ["strong", "weak"], beatIndex: 0, zone: "center", offsetMs: 80 }).result, "correct");
-  assert.equal(evaluateBeatHit({ pattern: ["strong", "weak"], beatIndex: 1, zone: "rim", offsetMs: -120 }).result, "correct");
+test("beat hit evaluation accepts correct zones without fixed tempo", () => {
+  assert.equal(evaluateBeatHit({ pattern: ["strong", "weak"], beatIndex: 0, zone: "center", offsetMs: 9999 }).result, "correct");
+  assert.equal(evaluateBeatHit({ pattern: ["strong", "weak"], beatIndex: 1, zone: "rim", offsetMs: -9999 }).result, "correct");
 });
 
-test("beat hit evaluation distinguishes reversed zones from missed timing", () => {
+test("beat hit evaluation distinguishes reversed strong and weak zones", () => {
   assert.equal(evaluateBeatHit({ pattern: ["strong", "weak"], beatIndex: 0, zone: "rim", offsetMs: 40 }).result, "wrong-zone");
-  assert.equal(evaluateBeatHit({ pattern: ["strong", "weak"], beatIndex: 1, zone: "rim", offsetMs: 420 }).result, "missed");
+  assert.equal(evaluateBeatHit({ pattern: ["strong", "weak"], beatIndex: 1, zone: "center", offsetMs: 420 }).result, "wrong-zone");
 });
 
 test("3/4 beat evaluation treats the third beat as weak", () => {
   assert.equal(evaluateBeatHit({ pattern: ["strong", "weak", "weak"], beatIndex: 2, zone: "rim", offsetMs: 40 }).result, "correct");
   assert.equal(evaluateBeatHit({ pattern: ["strong", "weak", "weak"], beatIndex: 2, zone: "center", offsetMs: 40 }).result, "wrong-third-beat");
-});
-
-test("meter switch window reports early, correct, and late clicks", () => {
-  assert.equal(evaluateMeterSwitch({ elapsedMs: 7200, switchAtMs: 9000, toleranceMs: 1200 }).result, "early");
-  assert.equal(evaluateMeterSwitch({ elapsedMs: 9400, switchAtMs: 9000, toleranceMs: 1200 }).result, "correct");
-  assert.equal(evaluateMeterSwitch({ elapsedMs: 10800, switchAtMs: 9000, toleranceMs: 1200 }).result, "late");
 });
 
 test("rhythm question answers cover meter, density, and style prompts", () => {

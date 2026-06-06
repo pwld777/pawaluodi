@@ -107,7 +107,8 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
           currentStep: "practice",
           currentMeter: meter,
           streak: 0,
-          lastResult: null
+          lastResult: null,
+          sequenceIndex: 0
         }
       });
       render();
@@ -122,7 +123,8 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
         ...state.get().beatGame,
         currentStep: "switch",
         currentMeter: "2/4",
-        streak: 0
+        streak: 0,
+        sequenceIndex: 0
       }
     });
     render();
@@ -133,17 +135,20 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
     stopTicker();
     const current = state.get();
     const patternConfig = current.beatGame.currentMeter === "3/4" ? beatGame.sectionB : beatGame.sectionA;
-    const beatMs = 60000 / patternConfig.bpm;
     session = {
-      startedAt: performance.now(),
-      beatMs,
-      pattern: patternConfig.pattern,
-      beatIndex: 0
+      pattern: patternConfig.pattern
     };
 
-    announceFeedback(feedback, current.beatGame.currentStep === "switch" ? "先按强弱，看到提示后换成强弱弱。" : "看光点：强拍点鼓心，弱拍点鼓边。");
-    tickBeat(root, patternConfig.pattern);
-    ticker = setInterval(() => tickBeat(root, patternConfig.pattern), beatMs);
+    setState({
+      ...current,
+      beatGame: {
+        ...current.beatGame,
+        currentStep: current.beatGame.currentStep === "intro" ? "practice" : current.beatGame.currentStep,
+        sequenceIndex: 0
+      }
+    });
+    highlightExpectedBeat(root, patternConfig.pattern, 0);
+    announceFeedback(feedback, current.beatGame.currentStep === "switch" ? "按自己的速度先敲强弱，准备好再换成强弱弱。" : "不用跟固定速度：按自己的速度敲对强弱规律。");
   });
 
   root.querySelector("[data-stop-beat]")?.addEventListener("click", () => {
@@ -160,7 +165,8 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
         currentMeter: "2/4",
         score: 0,
         streak: 0,
-        lastResult: null
+        lastResult: null,
+        sequenceIndex: 0
       }
     });
     render();
@@ -192,7 +198,7 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
         delete drum.dataset.hitZone;
       }, 180);
 
-      if (!session) {
+      if (current.beatGame.currentStep === "intro") {
         const expectedZone = current.beatGame.currentStep === "intro" && isCenterHit;
         announceFeedback(feedback, expectedZone ? "准！强拍在鼓心。" : "再听一听，强拍在鼓心。", expectedZone ? "good" : "warn");
         if (expectedZone) {
@@ -201,28 +207,29 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
         return;
       }
 
-      const hitAt = performance.now();
-      const nearestBeat = Math.round((hitAt - session.startedAt) / session.beatMs);
-      const targetTime = session.startedAt + nearestBeat * session.beatMs;
+      const patternConfig = current.beatGame.currentMeter === "3/4" ? beatGame.sectionB : beatGame.sectionA;
+      const sequenceIndex = current.beatGame.sequenceIndex ?? 0;
       const result = evaluateBeatHit({
-        pattern: session.pattern,
-        beatIndex: nearestBeat,
-        zone,
-        offsetMs: hitAt - targetTime
+        pattern: patternConfig.pattern,
+        beatIndex: sequenceIndex,
+        zone
       });
 
       if (result.result === "correct") {
         const streak = current.beatGame.streak + 1;
+        const nextSequenceIndex = (sequenceIndex + 1) % patternConfig.pattern.length;
         setState({
           ...current,
           beatGame: {
             ...current.beatGame,
             score: current.beatGame.score + 1,
             streak,
-            lastResult: result.result
+            lastResult: result.result,
+            sequenceIndex: nextSequenceIndex
           }
         });
-        announceFeedback(feedback, streak >= 4 ? "小小花鼓手！连续四次真稳。" : result.message, "good");
+        highlightExpectedBeat(root, patternConfig.pattern, nextSequenceIndex);
+        announceFeedback(feedback, nextSequenceIndex === 0 ? "这一组规律对了！继续按自己的速度来。" : result.message, "good");
         if (streak === 4) {
           onReward(2);
         }
@@ -232,10 +239,12 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
           beatGame: {
             ...current.beatGame,
             streak: 0,
-            lastResult: result.result
+            lastResult: result.result,
+            sequenceIndex: 0
           }
         });
-        announceFeedback(feedback, result.message, result.result === "missed" ? "warn" : "bad");
+        highlightExpectedBeat(root, patternConfig.pattern, 0);
+        announceFeedback(feedback, `${result.message}，这一组从强拍重新来。`, "bad");
       }
     };
 
@@ -246,39 +255,28 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
   root.querySelector(".primary-action")?.insertAdjacentHTML("afterend", '<button data-switch-now type="button">换成强弱弱</button>');
   root.querySelector("[data-switch-now]")?.addEventListener("click", () => {
     if (!session) {
-      announceFeedback(feedback, "先点开始，再练 A-B-A 切换。", "warn");
+      announceFeedback(feedback, "先点开始，再按自己的速度练 A-B-A 切换。", "warn");
       return;
     }
-    const result = evaluateMeterSwitch({
-      elapsedMs: performance.now() - session.startedAt,
-      switchAtMs: beatGame.switchChallenge.switchAtMs,
-      toleranceMs: beatGame.switchChallenge.toleranceMs
+    onReward(2);
+    setState({
+      ...state.get(),
+      beatGame: {
+        ...state.get().beatGame,
+        currentMeter: "3/4",
+        currentStep: "practice",
+        sequenceIndex: 0
+      }
     });
-    announceFeedback(feedback, result.message, result.result === "correct" ? "good" : "warn");
-    if (result.result === "correct") {
-      onReward(2);
-      setState({
-        ...state.get(),
-        beatGame: {
-          ...state.get().beatGame,
-          currentMeter: "3/4",
-          currentStep: "practice"
-        }
-      });
-      stopTicker();
-      setTimeout(render, 600);
-    }
+    stopTicker();
+    announceFeedback(feedback, "已经换成强弱弱，现在按自己的速度敲三拍子。", "good");
+    setTimeout(render, 600);
   });
 }
 
-function tickBeat(root, pattern) {
-  if (!session) {
-    return;
-  }
-
+function highlightExpectedBeat(root, pattern, beatIndex) {
   const dots = root.querySelectorAll("[data-beat-dot]");
   dots.forEach((dot) => dot.classList.remove("is-now"));
-  const activeIndex = session.beatIndex % pattern.length;
+  const activeIndex = beatIndex % pattern.length;
   dots[activeIndex]?.classList.add("is-now");
-  session.beatIndex += 1;
 }

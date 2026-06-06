@@ -116,7 +116,8 @@ export function createInitialState() {
       currentMeter: "2/4",
       score: 0,
       streak: 0,
-      lastResult: null
+      lastResult: null,
+      sequenceIndex: 0
     },
     rhythmGame: {
       currentQuestionIndex: 0,

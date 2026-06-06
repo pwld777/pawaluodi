@@ -29,14 +29,7 @@ export function expectedBeat(pattern, beatIndex) {
   return pattern[beatIndex % pattern.length];
 }
 
-export function evaluateBeatHit({ pattern, beatIndex, zone, offsetMs, toleranceMs = beatGame.timingToleranceMs }) {
-  if (Math.abs(offsetMs) > toleranceMs) {
-    return {
-      result: "missed",
-      message: "漏了一拍，再跟紧光点"
-    };
-  }
-
+export function evaluateBeatHit({ pattern, beatIndex, zone }) {
   const expected = expectedBeat(pattern, beatIndex);
   const actual = zoneToBeat[zone];
 
