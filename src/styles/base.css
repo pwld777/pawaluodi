@@ -759,7 +759,16 @@ h3 {
 
 .rhythm-mark-card {
   min-height: 78px;
-  transform: scale(1.08);
+  transform: scale(0.96);
+}
+
+.block-card[data-piece-beats="1"] .rhythm-mark-card {
+  transform: scale(0.92);
+}
+
+.block-card[data-piece-beats="2"] .rhythm-mark-card,
+.block-card[data-piece-beats="3"] .rhythm-mark-card {
+  transform: scale(0.86);
 }
 
 .rhythm-mark-piece {
@@ -1044,15 +1053,25 @@ h3 {
 }
 
 .block-tray {
-  display: grid;
-  gap: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 12px;
   margin-top: 14px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .block-tray .notation-card {
-  min-height: 108px;
+  flex: 1 1 132px;
+  min-height: 116px;
   padding: 12px;
+}
+
+.block-tray .notation-card[data-piece-beats="2"] {
+  flex-basis: 178px;
+}
+
+.block-tray .notation-card[data-piece-beats="3"] {
+  flex-basis: 224px;
 }
 
 .block-card {
