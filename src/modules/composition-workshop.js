@@ -35,85 +35,95 @@ export function renderCompositionWorkshop({ state }) {
   const completeBars = composition.bars.filter((bar) => bar.status === "complete").length;
 
   return `
-    <section class="compose-grid enter-view">
-      <aside class="toolbox stage-card">
-        <p class="eyebrow">游戏三</p>
-        <h2>小乐队节奏拼图台</h2>
-        <div class="mission-ticket">
-          <strong>${composition.mode}任务</strong>
-          <span>${composition.meter} · 完成 ${composition.bars.length} 小节节奏拼图</span>
-          <small>把节奏块放进空坑。每小节刚好填满就成功。</small>
+    <section class="compose-game-shell enter-view">
+      <div class="compose-arcade-stage">
+        <div class="compose-stage-canvas" data-compose-game-stage aria-label="小乐队闯关台动画舞台">
+          <img class="compose-stage-fallback" src="./assets/images/compose-stage-scene.png" alt="小乐队节奏闯关舞台">
         </div>
-        <label>创编段落
-          <select data-compose-mode>
-            <option ${composition.mode === "欢快段" ? "selected" : ""}>欢快段</option>
-            <option ${composition.mode === "悠扬段" ? "selected" : ""}>悠扬段</option>
-          </select>
-        </label>
-        <label>节拍
-          <select data-compose-meter>
-            <option ${composition.meter === "2/4" ? "selected" : ""}>2/4</option>
-            <option ${composition.meter === "3/4" ? "selected" : ""}>3/4</option>
-          </select>
-        </label>
-        <div class="instrument-grid">
-          ${instruments.map((instrument) => `
-            <button class="${composition.instrument === instrument.id ? "active" : ""}" data-instrument="${instrument.id}" type="button" style="--instrument:${instrument.color}">
-              <span class="instrument-photo" style="background-image:url('${instrument.image}'); background-position:${instrument.imagePosition}" aria-hidden="true"></span>
-              <strong>${instrument.name}</strong>
-            </button>
-          `).join("")}
-        </div>
-        <div class="control-row">
-          <button class="primary-action" data-play-composition type="button">播放我的节奏</button>
-          <button data-clear-composition type="button">清空</button>
-        </div>
-        <p class="feedback-pill" id="composeFeedback" data-tone="info">${composition.feedbackMessage ?? "把节奏块放进空坑。每小节刚好填满就成功。"}</p>
-      </aside>
-
-      <div class="stage-card score-paper puzzle-board">
-        <div class="score-title">
-          <strong>${composition.mode} · ${composition.meter}</strong>
-          <span>${completeBars}/${composition.bars.length} 小节完成</span>
-        </div>
-        <div class="bar-row">
-          ${composition.bars.map((bar, index) => `
-            <div class="music-bar ${bar.status}" data-bar-index="${index}" style="--bar-beats:${bar.capacity}">
-              <span class="bar-number">第 ${index + 1} 小节</span>
-              <div class="bar-fill-stage">
-                <div class="beat-pits" aria-label="${composition.meter} 拍格">
-                  ${Array.from({ length: bar.capacity }, (_, beatIndex) => `<i class="beat-pit">${beatIndex + 1}</i>`).join("")}
-                </div>
-                <div class="placed-notes rhythm-pieces" style="--bar-beats:${bar.capacity}">
-                  ${bar.blocks.map((blockId) => {
-                    const card = getNotationCard(blockId);
-                    return `<span class="rhythm-piece" style="--piece-beats:${card.beats}" data-piece-beats="${card.beats}">
-                      ${renderRhythmMark(card, "rhythm-mark-piece")}
-                    </span>`;
-                  }).join("")}
-                </div>
-              </div>
-              <small>${bar.filledBeats}/${bar.capacity} 拍</small>
-            </div>
-          `).join("")}
-        </div>
-        <div class="block-tray">
-          ${blocks.map((block) => `
-            <button class="notation-card block-card" data-block-id="${block.id}" data-piece-beats="${block.beats}" type="button" style="--tray-beats:${block.beats}">
-              <span class="card-tag">${block.beats} 格</span>
-              ${renderRhythmMark(block, "rhythm-mark-card")}
-            </button>
-          `).join("")}
+        <div class="compose-game-hud">
+          <div class="mission-ticket hud-mission">
+            <strong>${composition.mode}闯关</strong>
+            <span>${composition.meter} · ${completeBars}/${composition.bars.length} 小节</span>
+            <small>把节奏块放进空坑。每小节刚好填满就成功。</small>
+          </div>
+          <p class="feedback-pill" id="composeFeedback" data-tone="info">${composition.feedbackMessage ?? "把节奏块放进空坑。每小节刚好填满就成功。"}</p>
+          <div class="control-row hud-controls">
+            <button class="primary-action" data-play-composition type="button">播放我的节奏</button>
+            <button data-clear-composition type="button">清空</button>
+          </div>
         </div>
       </div>
 
-      <aside class="review-card stage-card">
-        <h3>创编星标</h3>
-        <span class="${completeBars === composition.bars.length ? "is-earned" : ""}">拍数正确</span>
-        <span class="${completeBars > 0 ? "is-earned" : ""}">空坑看懂</span>
-        <span class="is-earned">真实音色</span>
-        <span>准备展示</span>
-      </aside>
+      <div class="compose-control-deck">
+        <aside class="toolbox arcade-panel">
+          <p class="eyebrow">游戏三</p>
+          <h2>节奏填坑</h2>
+          <label>创编段落
+            <select data-compose-mode>
+              <option ${composition.mode === "欢快段" ? "selected" : ""}>欢快段</option>
+              <option ${composition.mode === "悠扬段" ? "selected" : ""}>悠扬段</option>
+            </select>
+          </label>
+          <label>节拍
+            <select data-compose-meter>
+              <option ${composition.meter === "2/4" ? "selected" : ""}>2/4</option>
+              <option ${composition.meter === "3/4" ? "selected" : ""}>3/4</option>
+            </select>
+          </label>
+          <div class="instrument-grid">
+            ${instruments.map((instrument) => `
+              <button class="${composition.instrument === instrument.id ? "active" : ""}" data-instrument="${instrument.id}" type="button" style="--instrument:${instrument.color}">
+                <span class="instrument-photo" style="background-image:url('${instrument.image}'); background-position:${instrument.imagePosition}" aria-hidden="true"></span>
+                <strong>${instrument.name}</strong>
+              </button>
+            `).join("")}
+          </div>
+        </aside>
+
+        <div class="score-paper puzzle-board arcade-panel">
+          <div class="score-title">
+            <strong>${composition.mode} · ${composition.meter}</strong>
+            <span>${completeBars}/${composition.bars.length} 小节完成</span>
+          </div>
+          <div class="bar-row">
+            ${composition.bars.map((bar, index) => `
+              <div class="music-bar ${bar.status}" data-bar-index="${index}" style="--bar-beats:${bar.capacity}">
+                <span class="bar-number">第 ${index + 1} 小节</span>
+                <div class="bar-fill-stage">
+                  <div class="beat-pits" aria-label="${composition.meter} 拍格">
+                    ${Array.from({ length: bar.capacity }, (_, beatIndex) => `<i class="beat-pit">${beatIndex + 1}</i>`).join("")}
+                  </div>
+                  <div class="placed-notes rhythm-pieces" style="--bar-beats:${bar.capacity}">
+                    ${bar.blocks.map((blockId) => {
+                      const card = getNotationCard(blockId);
+                      return `<span class="rhythm-piece" style="--piece-beats:${card.beats}" data-piece-beats="${card.beats}">
+                        ${renderRhythmMark(card, "rhythm-mark-piece")}
+                      </span>`;
+                    }).join("")}
+                  </div>
+                </div>
+                <small>${bar.filledBeats}/${bar.capacity} 拍</small>
+              </div>
+            `).join("")}
+          </div>
+          <div class="block-tray">
+            ${blocks.map((block) => `
+              <button class="notation-card block-card" data-block-id="${block.id}" data-piece-beats="${block.beats}" type="button" style="--tray-beats:${block.beats}">
+                <span class="card-tag">${block.beats} 格</span>
+                ${renderRhythmMark(block, "rhythm-mark-card")}
+              </button>
+            `).join("")}
+          </div>
+        </div>
+
+        <aside class="review-card arcade-panel">
+          <h3>闯关星标</h3>
+          <span class="${completeBars === composition.bars.length ? "is-earned" : ""}">拍数正确</span>
+          <span class="${completeBars > 0 ? "is-earned" : ""}">空坑看懂</span>
+          <span class="is-earned">真实音色</span>
+          <span>准备展示</span>
+        </aside>
+      </div>
     </section>
   `;
 }
@@ -121,6 +131,18 @@ export function renderCompositionWorkshop({ state }) {
 export function bindCompositionWorkshop({ root, state, setState, render, onReward }) {
   const feedback = root.querySelector("#composeFeedback");
   let selectedBlockId = null;
+  const composition = state.get().composition;
+  const blocks = getAllowedBlocksForMeter(composition.meter);
+
+  if (typeof window !== "undefined") {
+    import("./compose-game-stage.js")
+      .then(({ renderComposeGameStage }) => renderComposeGameStage({ root, composition, blocks }))
+      .catch((error) => {
+        const stage = root.querySelector("[data-compose-game-stage]");
+        stage?.setAttribute("data-stage-status", "fallback");
+        stage?.setAttribute("data-stage-error", error.message);
+      });
+  }
 
   root.querySelector("[data-compose-mode]")?.addEventListener("change", (event) => {
     const current = state.get();

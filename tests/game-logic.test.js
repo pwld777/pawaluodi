@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 import { beatGame, evaluateBeatHit } from "../src/data/beat-patterns.js";
 import { instruments } from "../src/data/instrument-sounds.js";
@@ -91,6 +91,8 @@ test("composition workshop renders clear beat pits and rhythm-only cards", () =>
   const state = createInitialState();
   const html = renderCompositionWorkshop({ state });
 
+  assert.match(html, /compose-game-shell/);
+  assert.match(html, /data-compose-game-stage/);
   assert.match(html, /class="beat-pit"/);
   assert.equal((html.match(/class="beat-pit"/g) ?? []).length, 8);
   assert.match(html, /data-piece-beats="2"/);
@@ -101,6 +103,11 @@ test("composition workshop renders clear beat pits and rhythm-only cards", () =>
   assert.match(blockTray, /2 格/);
   assert.doesNotMatch(blockTray, /2 拍/);
   assert.doesNotMatch(blockTray, /ta-ka-di-mi|ta-ti|欢快|舒展|四分音符|二分音符|八分音符|十六分音符/);
+});
+
+test("online classroom shell loads Phaser for the composition game stage", () => {
+  const html = readFileSync("index.html", "utf8");
+  assert.match(html, /phaser@3\.90\.0/);
 });
 
 test("composition workshop exposes four classroom percussion instruments", () => {

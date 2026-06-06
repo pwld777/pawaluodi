@@ -10,7 +10,9 @@
   .hero-card,
   .game-layout,
   .rhythm-layout,
-  .compose-grid {
+  .compose-grid,
+  .compose-control-deck,
+  .compose-game-hud {
     grid-template-columns: 1fr;
   }
 
@@ -43,6 +45,14 @@
     grid-template-columns: 1fr;
   }
 
+  .compose-arcade-stage {
+    min-height: 520px;
+  }
+
+  .compose-game-hud {
+    align-items: stretch;
+  }
+
   .bottom-nav {
     grid-template-columns: repeat(5, 1fr);
     gap: 5px;
@@ -71,5 +81,26 @@
 
   .score-board {
     justify-self: start;
+  }
+
+  .compose-arcade-stage {
+    min-height: 430px;
+    border-width: 6px;
+  }
+
+  .compose-game-hud {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+  }
+
+  .hud-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .block-tray .notation-card,
+  .block-tray .notation-card[data-piece-beats="2"],
+  .block-tray .notation-card[data-piece-beats="3"] {
+    flex-basis: 138px;
   }
 }
