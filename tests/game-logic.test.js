@@ -93,6 +93,13 @@ test("instrument sample files exist for classroom playback", () => {
   }
 });
 
+test("flower drum uses separate center and surface hit samples", () => {
+  const handDrum = instruments.find((instrument) => instrument.id === "hand-drum");
+  assert.equal(handDrum.sample.strong, "./assets/audio/percussion/hand-drum-strong.wav");
+  assert.equal(handDrum.sample.weak, "./assets/audio/percussion/hand-drum-rim.wav");
+  assert.notEqual(handDrum.sample.strong, handDrum.sample.weak);
+});
+
 test("state serialization round-trips current view and composition", () => {
   const composition = addBlockToBar(createDefaultComposition({ meter: "2/4", bars: 2 }), 0, "half-note");
   const saved = serializeState({ currentView: "compose", composition });

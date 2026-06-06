@@ -10,7 +10,7 @@ export const instruments = [
       strong: "./assets/audio/percussion/hand-drum-strong.wav",
       weak: "./assets/audio/percussion/hand-drum-rim.wav",
       playbackRate: 1,
-      trimSeconds: 0.5
+      trimSeconds: 0.56
     },
     tone: { type: "sine", frequency: 148, decay: 0.16, noise: 0.06 }
   },

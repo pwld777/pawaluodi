@@ -138,17 +138,30 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
   });
 
   root.querySelectorAll("[data-drum-zone]").forEach((button) => {
-    button.addEventListener("pointerdown", () => {
+    let lastPointerHitAt = 0;
+    const handleDrumHit = async (event) => {
+      const now = performance.now();
+      if (event.type === "click" && now - lastPointerHitAt < 320) {
+        return;
+      }
+      if (event.type === "pointerdown") {
+        lastPointerHitAt = now;
+      }
+
+      const current = state.get();
       const drum = button.closest(".huagu");
+      const isCenterHit = button.dataset.drumZone === "center";
       button.classList.add("is-hit");
       drum?.classList.add("is-hit");
+      void unlockAudio().catch(() => {});
+      playInstrument("hand-drum", { accent: isCenterHit, volume: current.settings.volume });
       setTimeout(() => {
         button.classList.remove("is-hit");
         drum?.classList.remove("is-hit");
       }, 180);
 
       if (!session) {
-        const expectedZone = state.get().beatGame.currentStep === "intro" && button.dataset.drumZone === "center";
+        const expectedZone = current.beatGame.currentStep === "intro" && isCenterHit;
         announceFeedback(feedback, expectedZone ? "准！强拍在鼓心。" : "再听一听，强拍在鼓心。", expectedZone ? "good" : "warn");
         if (expectedZone) {
           onReward(1);
@@ -156,18 +169,17 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
         return;
       }
 
-      const now = performance.now();
-      const nearestBeat = Math.round((now - session.startedAt) / session.beatMs);
+      const hitAt = performance.now();
+      const nearestBeat = Math.round((hitAt - session.startedAt) / session.beatMs);
       const targetTime = session.startedAt + nearestBeat * session.beatMs;
       const result = evaluateBeatHit({
         pattern: session.pattern,
         beatIndex: nearestBeat,
         zone: button.dataset.drumZone,
-        offsetMs: now - targetTime
+        offsetMs: hitAt - targetTime
       });
 
       if (result.result === "correct") {
-        const current = state.get();
         const streak = current.beatGame.streak + 1;
         setState({
           ...current,
@@ -178,13 +190,11 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
             lastResult: result.result
           }
         });
-        playInstrument("hand-drum", { accent: button.dataset.drumZone === "center", volume: current.settings.volume });
         announceFeedback(feedback, streak >= 4 ? "小小花鼓手！连续四次真稳。" : result.message, "good");
         if (streak === 4) {
           onReward(2);
         }
       } else {
-        const current = state.get();
         setState({
           ...current,
           beatGame: {
@@ -195,7 +205,10 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
         });
         announceFeedback(feedback, result.message, result.result === "missed" ? "warn" : "bad");
       }
-    });
+    };
+
+    button.addEventListener("pointerdown", handleDrumHit);
+    button.addEventListener("click", handleDrumHit);
   });
 
   root.querySelector(".primary-action")?.insertAdjacentHTML("afterend", '<button data-switch-now type="button">换成强弱弱</button>');
