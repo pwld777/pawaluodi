@@ -55,7 +55,7 @@ function renderRhythmOption(optionId) {
 
   return `
     <button class="notation-card" data-rhythm-option="${card.id}" type="button">
-      <span class="card-tag">${card.beats} 拍</span>
+      <span class="card-tag">${card.beats} 格</span>
       ${renderRhythmMark(card, "rhythm-mark-card")}
     </button>
   `;

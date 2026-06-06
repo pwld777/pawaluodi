@@ -92,6 +92,8 @@ test("composition workshop renders clear beat pits and rhythm-only cards", () =>
   assert.match(html, /data-piece-beats="2"/);
   assert.match(html, /style="--tray-beats:2"/);
   const blockTray = html.match(/<div class="block-tray">[\s\S]*?<\/div>\s*<\/div>\s*<aside/)?.[0] ?? "";
+  assert.match(blockTray, /2 格/);
+  assert.doesNotMatch(blockTray, /2 拍/);
   assert.doesNotMatch(blockTray, /ta-ka-di-mi|ta-ti|欢快|舒展|四分音符|二分音符|八分音符|十六分音符/);
 });
 

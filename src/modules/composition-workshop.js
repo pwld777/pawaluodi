@@ -100,7 +100,7 @@ export function renderCompositionWorkshop({ state }) {
         <div class="block-tray">
           ${blocks.map((block) => `
             <button class="notation-card block-card" data-block-id="${block.id}" data-piece-beats="${block.beats}" type="button" style="--tray-beats:${block.beats}">
-              <span class="card-tag">${block.beats} 拍</span>
+              <span class="card-tag">${block.beats} 格</span>
               ${renderRhythmMark(block, "rhythm-mark-card")}
             </button>
           `).join("")}
