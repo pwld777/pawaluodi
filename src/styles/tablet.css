@@ -47,7 +47,7 @@
   }
 
   .compose-arcade-stage {
-    min-height: 620px;
+    min-height: 760px;
   }
 
   .compose-game-hud {
@@ -63,8 +63,10 @@
   }
 
   .current-beat-pit,
-  .current-rhythm-piece {
-    min-height: 210px;
+  .current-rhythm-piece,
+  .compose-beat-pit,
+  .compose-rhythm-piece {
+    min-height: 150px;
   }
 
   .bottom-nav {
@@ -98,7 +100,7 @@
   }
 
   .compose-arcade-stage {
-    min-height: 640px;
+    min-height: 980px;
     border-width: 6px;
   }
 
@@ -126,14 +128,26 @@
   }
 
   .current-beat-pits,
-  .current-rhythm-pieces {
+  .current-rhythm-pieces,
+  .compose-beat-pits,
+  .compose-rhythm-pieces {
     gap: 8px;
   }
 
   .current-beat-pit,
-  .current-rhythm-piece {
+  .current-rhythm-piece,
+  .compose-beat-pit,
+  .compose-rhythm-piece {
     min-height: 170px;
     border-radius: 20px;
+  }
+
+  .four-bar-board {
+    grid-template-columns: 1fr;
+  }
+
+  .compose-bar-stage {
+    min-height: 220px;
   }
 
   .compose-settings .instrument-grid {

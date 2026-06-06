@@ -1,6 +1,6 @@
 import { getAllowedBlocksForMeter, getNotationCard, getPlaybackEvents } from "../data/notation-cards.js";
 import { instruments } from "../data/instrument-sounds.js";
-import { addBlockToBar, resetComposition } from "./game-logic.js";
+import { clearCompositionBar, placeBlockInBar, resetComposition } from "./game-logic.js";
 import { playInstrument, preloadInstrument, unlockAudio } from "./audio-engine.js";
 import { announceFeedback } from "./feedback.js";
 import { renderRhythmMark } from "./rhythm-mark.js";
@@ -12,14 +12,18 @@ function clearPlayback() {
   playbackTimers = [];
 }
 
-function completionMessage(composition, barIndex) {
+function completionMessage(composition, barIndex, action = "place") {
   if (composition.isComplete || composition.bars.every((bar) => bar.status === "complete")) {
     return "排练成功！";
   }
 
   const bar = composition.bars[barIndex];
+  if (action === "clear") {
+    return "已清空";
+  }
+
   const remaining = bar.capacity - bar.filledBeats;
-  return remaining === 0 ? "刚好！" : `还差 ${remaining} 格`;
+  return remaining === 0 ? "刚好！" : (bar.blocks.length === 1 ? "已替换" : `还差 ${remaining} 格`);
 }
 
 function shakeBar(root, barIndex) {
@@ -53,12 +57,14 @@ function shortFeedback(message) {
   return message;
 }
 
-function addSelectedBlock({ root, state, setState, render, onReward, feedback, blockId, barIndex }) {
+function updateComposition({ root, state, setState, render, onReward, feedback, barIndex, action, blockId }) {
   try {
     const current = state.get();
-    const nextComposition = addBlockToBar(current.composition, barIndex, blockId);
+    const nextComposition = action === "clear"
+      ? clearCompositionBar(current.composition, barIndex)
+      : placeBlockInBar(current.composition, barIndex, blockId);
     const filled = nextComposition.bars[barIndex].status === "complete";
-    const message = completionMessage(nextComposition, barIndex);
+    const message = completionMessage(nextComposition, barIndex, action);
     setState({
       ...current,
       composition: {
@@ -90,7 +96,6 @@ export function renderCompositionWorkshop({ state }) {
   const composition = state.composition;
   const blocks = getAllowedBlocksForMeter(composition.meter);
   const activeBarIndex = composition.activeBarIndex ?? 0;
-  const activeBar = composition.bars[activeBarIndex] ?? composition.bars[0];
   const feedbackMessage = shortFeedback(composition.feedbackMessage);
 
   return `
@@ -103,7 +108,7 @@ export function renderCompositionWorkshop({ state }) {
         <div class="compose-play-layer">
           <div class="compose-top-strip">
             <h2>节奏填坑闯关</h2>
-            <strong>第 ${activeBarIndex + 1} / ${composition.bars.length} 小节</strong>
+            <strong>4 个小节一起填</strong>
             <label>节拍
               <select data-compose-meter>
                 <option ${composition.meter === "2/4" ? "selected" : ""}>2/4</option>
@@ -118,35 +123,35 @@ export function renderCompositionWorkshop({ state }) {
             </label>
           </div>
 
-          <div class="bar-progress-dots" aria-label="小节进度">
-            ${composition.bars.map((bar, index) => `
-              <span class="bar-progress-dot ${index === activeBarIndex ? "is-current" : ""} ${bar.status === "complete" ? "is-complete" : ""}">${index + 1}</span>
-            `).join("")}
-          </div>
+          <p class="feedback-pill compose-feedback-main" id="composeFeedback" data-tone="info">${feedbackMessage}</p>
 
-          <div class="current-bar-stage ${activeBar.status}" data-bar-index="${activeBarIndex}" style="--bar-beats:${activeBar.capacity}">
-            <div class="current-bar-header">
-              <span>填这里</span>
-              <p class="feedback-pill" id="composeFeedback" data-tone="info">${feedbackMessage}</p>
-            </div>
-            <div class="current-bar-fill">
-              <div class="current-beat-pits" aria-label="${composition.meter} 空坑">
-                ${Array.from({ length: activeBar.capacity }, (_, beatIndex) => `<i class="current-beat-pit">${beatIndex + 1}</i>`).join("")}
+          <div class="four-bar-board" aria-label="四个小节">
+            ${composition.bars.map((bar, index) => `
+              <div class="compose-bar-stage ${bar.status} ${index === activeBarIndex ? "is-current" : ""}" data-bar-index="${index}" style="--bar-beats:${bar.capacity}">
+                <div class="compose-bar-header">
+                  <span>第 ${index + 1} 小节</span>
+                  <button class="bar-clear-button" data-clear-bar="${index}" type="button" aria-label="清空第 ${index + 1} 小节">清空</button>
+                </div>
+                <div class="compose-bar-fill">
+                  <div class="compose-beat-pits" aria-label="${composition.meter} 空坑">
+                    ${Array.from({ length: bar.capacity }, (_, beatIndex) => `<i class="compose-beat-pit">${beatIndex + 1}</i>`).join("")}
+                  </div>
+                  <div class="placed-notes rhythm-pieces compose-rhythm-pieces" style="--bar-beats:${bar.capacity}">
+                    ${bar.blocks.map((blockId) => {
+                      const card = getNotationCard(blockId);
+                      return `<span class="rhythm-piece compose-rhythm-piece" style="--piece-beats:${card.beats}" data-piece-beats="${card.beats}">
+                        ${renderRhythmMark(card, "rhythm-mark-piece")}
+                      </span>`;
+                    }).join("")}
+                  </div>
+                </div>
               </div>
-              <div class="placed-notes rhythm-pieces current-rhythm-pieces" style="--bar-beats:${activeBar.capacity}">
-                ${activeBar.blocks.map((blockId) => {
-                  const card = getNotationCard(blockId);
-                  return `<span class="rhythm-piece current-rhythm-piece" style="--piece-beats:${card.beats}" data-piece-beats="${card.beats}">
-                    ${renderRhythmMark(card, "rhythm-mark-piece")}
-                  </span>`;
-                }).join("")}
-              </div>
-            </div>
+            `).join("")}
           </div>
 
           <div class="compose-bottom-actions">
             <button class="primary-action" data-play-composition type="button">播放</button>
-            <button data-clear-composition type="button">清空</button>
+            <button data-clear-composition type="button">重做</button>
             <details class="compose-settings">
               <summary>设置</summary>
               <div class="instrument-grid">
@@ -242,9 +247,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
         delete block.dataset.pointerDrag;
       }, 0);
       startBlockDrag(event, block, root, (barIndex) => {
-        const current = state.get();
-        const activeBarIndex = current.composition.activeBarIndex ?? 0;
-        addSelectedBlock({
+        updateComposition({
           root,
           state,
           setState,
@@ -252,7 +255,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
           onReward,
           feedback,
           blockId: block.dataset.blockId,
-          barIndex: Number.isInteger(barIndex) ? barIndex : activeBarIndex
+          barIndex: Number.isInteger(barIndex) ? barIndex : 0
         });
       });
     });
@@ -262,9 +265,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
         return;
       }
       startMouseBlockDrag(event, block, root, (barIndex) => {
-        const current = state.get();
-        const activeBarIndex = current.composition.activeBarIndex ?? 0;
-        addSelectedBlock({
+        updateComposition({
           root,
           state,
           setState,
@@ -272,7 +273,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
           onReward,
           feedback,
           blockId: block.dataset.blockId,
-          barIndex: Number.isInteger(barIndex) ? barIndex : activeBarIndex
+          barIndex: Number.isInteger(barIndex) ? barIndex : 0
         });
       });
     });
@@ -282,19 +283,9 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
         return;
       }
 
-      selectedBlockId = null;
-      root.querySelectorAll("[data-block-id]").forEach((candidate) => candidate.classList.remove("is-selected"));
-      const current = state.get();
-      addSelectedBlock({
-        root,
-        state,
-        setState,
-        render,
-        onReward,
-        feedback,
-        blockId: block.dataset.blockId,
-        barIndex: current.composition.activeBarIndex ?? 0
-      });
+      selectedBlockId = block.dataset.blockId;
+      root.querySelectorAll("[data-block-id]").forEach((candidate) => candidate.classList.toggle("is-selected", candidate === block));
+      announceFeedback(feedback, "点小节", "info");
     });
   });
 
@@ -306,14 +297,30 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
       }
 
       try {
-        const current = state.get();
-        const barIndex = current.composition.activeBarIndex ?? Number(bar.dataset.barIndex);
-        addSelectedBlock({ root, state, setState, render, onReward, feedback, blockId: selectedBlockId, barIndex });
+        const barIndex = Number(bar.dataset.barIndex);
+        updateComposition({ root, state, setState, render, onReward, feedback, blockId: selectedBlockId, barIndex });
         selectedBlockId = null;
       } catch (error) {
         shakeBar(root, Number(bar.dataset.barIndex));
         announceFeedback(feedback, shortFeedback(error.message), "warn");
       }
+    });
+  });
+
+  root.querySelectorAll("[data-clear-bar]").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      clearPlayback();
+      updateComposition({
+        root,
+        state,
+        setState,
+        render,
+        onReward,
+        feedback,
+        action: "clear",
+        barIndex: Number(button.dataset.clearBar)
+      });
     });
   });
 

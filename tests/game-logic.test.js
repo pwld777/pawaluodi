@@ -6,7 +6,7 @@ import { beatGame, evaluateBeatHit } from "../src/data/beat-patterns.js";
 import { instruments } from "../src/data/instrument-sounds.js";
 import { getAllowedBlocksForMeter, getPlaybackEvents } from "../src/data/notation-cards.js";
 import { rhythmQuestions, evaluateRhythmAnswer } from "../src/data/rhythm-questions.js";
-import { createDefaultComposition, createInitialState, addBlockToBar, serializeState, restoreState } from "../src/modules/game-logic.js";
+import { addBlockToBar, clearCompositionBar, createDefaultComposition, createInitialState, placeBlockInBar, serializeState, restoreState } from "../src/modules/game-logic.js";
 import { renderCompositionWorkshop } from "../src/modules/composition-workshop.js";
 
 test("beat patterns map 2/4 to strong-weak and 3/4 to strong-weak-weak", () => {
@@ -68,6 +68,24 @@ test("composition advances one active bar at a time", () => {
   assert.equal(done.isComplete, true);
 });
 
+test("composition bars can be replaced and cleared directly", () => {
+  const start = createDefaultComposition({ meter: "2/4", bars: 4 });
+  const filled = placeBlockInBar(start, 2, "half-note");
+  assert.equal(filled.bars[2].status, "complete");
+  assert.deepEqual(filled.bars[2].blocks, ["half-note"]);
+  assert.equal(filled.activeBarIndex, 2);
+
+  const replaced = placeBlockInBar(filled, 2, "quarter-note");
+  assert.equal(replaced.bars[2].status, "partial");
+  assert.equal(replaced.bars[2].filledBeats, 1);
+  assert.deepEqual(replaced.bars[2].blocks, ["quarter-note"]);
+
+  const cleared = clearCompositionBar(replaced, 2);
+  assert.equal(cleared.bars[2].status, "empty");
+  assert.equal(cleared.bars[2].filledBeats, 0);
+  assert.deepEqual(cleared.bars[2].blocks, []);
+});
+
 test("composition allows 3/4 completion with a dotted half note", () => {
   const composition = createDefaultComposition({ meter: "3/4", bars: 4 });
   const next = addBlockToBar(composition, 0, "dotted-half-note");
@@ -108,9 +126,13 @@ test("composition workshop renders clear beat pits and rhythm-only cards", () =>
 
   assert.match(html, /compose-game-shell/);
   assert.match(html, /data-compose-game-stage/);
-  assert.match(html, /current-bar-stage/);
-  assert.match(html, /class="current-beat-pit"/);
-  assert.equal((html.match(/class="current-beat-pit"/g) ?? []).length, 2);
+  assert.match(html, /four-bar-board/);
+  assert.match(html, /class="compose-bar-stage/);
+  assert.equal((html.match(/class="compose-bar-stage/g) ?? []).length, 4);
+  assert.match(html, /class="compose-beat-pit"/);
+  assert.equal((html.match(/class="compose-beat-pit"/g) ?? []).length, 8);
+  assert.equal((html.match(/data-clear-bar/g) ?? []).length, 4);
+  assert.match(html, /data-clear-composition/);
   assert.doesNotMatch(html, /闯关星标|真实音色|准备展示|把节奏块放进空坑|每小节刚好填满/);
   assert.match(html, /data-piece-beats="2"/);
   assert.match(html, /style="--tray-beats:2"/);

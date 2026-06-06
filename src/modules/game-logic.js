@@ -35,6 +35,18 @@ function withBarStatus(bar) {
   return { ...bar, status: "partial" };
 }
 
+function refreshCompositionProgress(composition, bars, fallbackBarIndex = 0, preferFallback = false) {
+  const isComplete = bars.every((item) => item.status === "complete");
+  const nextOpenBarIndex = bars.findIndex((item) => item.status !== "complete");
+
+  return {
+    ...composition,
+    activeBarIndex: preferFallback || isComplete ? fallbackBarIndex : (nextOpenBarIndex === -1 ? fallbackBarIndex : nextOpenBarIndex),
+    isComplete,
+    bars
+  };
+}
+
 export function addBlockToBar(composition, barIndex, blockId) {
   const card = getNotationCard(blockId);
   const bar = composition.bars[barIndex];
@@ -59,15 +71,57 @@ export function addBlockToBar(composition, barIndex, blockId) {
     });
   });
 
-  const isComplete = nextBars.every((item) => item.status === "complete");
-  const nextActiveBarIndex = isComplete ? barIndex : nextBars.findIndex((item) => item.status !== "complete");
+  return refreshCompositionProgress(composition, nextBars, barIndex);
+}
 
-  return {
-    ...composition,
-    activeBarIndex: nextActiveBarIndex === -1 ? barIndex : nextActiveBarIndex,
-    isComplete,
-    bars: nextBars
-  };
+export function placeBlockInBar(composition, barIndex, blockId) {
+  const card = getNotationCard(blockId);
+  const bar = composition.bars[barIndex];
+
+  if (!bar) {
+    throw new Error("找不到这个小节");
+  }
+
+  if (card.beats > bar.capacity) {
+    throw new Error("放不下，换一个短一点的节奏。");
+  }
+
+  const shouldReplace = bar.filledBeats + card.beats > bar.capacity || bar.status === "complete";
+  const nextBars = composition.bars.map((item, index) => {
+    if (index !== barIndex) {
+      return item;
+    }
+
+    return withBarStatus({
+      ...item,
+      blocks: shouldReplace ? [blockId] : [...item.blocks, blockId],
+      filledBeats: shouldReplace ? card.beats : item.filledBeats + card.beats
+    });
+  });
+
+  return refreshCompositionProgress(composition, nextBars, barIndex, true);
+}
+
+export function clearCompositionBar(composition, barIndex) {
+  const bar = composition.bars[barIndex];
+
+  if (!bar) {
+    throw new Error("找不到这个小节");
+  }
+
+  const nextBars = composition.bars.map((item, index) => {
+    if (index !== barIndex) {
+      return item;
+    }
+
+    return withBarStatus({
+      ...item,
+      blocks: [],
+      filledBeats: 0
+    });
+  });
+
+  return refreshCompositionProgress(composition, nextBars, barIndex, true);
 }
 
 export function resetComposition({ meter = "2/4", instrument = "hand-drum", mode } = {}) {

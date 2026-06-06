@@ -888,7 +888,7 @@ h3 {
 .compose-arcade-stage {
   position: relative;
   overflow: hidden;
-  min-height: clamp(470px, 55vw, 660px);
+  min-height: clamp(590px, 58vw, 720px);
   border: 8px solid #5b2d17;
   border-radius: 30px;
   background:
@@ -1018,6 +1018,124 @@ h3 {
 .bar-progress-dot.is-complete {
   background: #bdf678;
   color: #286b23;
+}
+
+.compose-feedback-main {
+  justify-self: center;
+  width: min(100%, 420px);
+  margin: 0;
+  text-align: center;
+  font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+}
+
+.four-bar-board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(12px, 1.6vw, 18px);
+  align-content: stretch;
+  width: min(100%, 1040px);
+  margin: 0 auto;
+}
+
+.compose-bar-stage {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+  min-height: 210px;
+  padding: 12px;
+  border: 6px solid rgba(122, 55, 24, 0.76);
+  border-radius: 22px;
+  background: rgba(255, 250, 213, 0.94);
+  box-shadow:
+    0 8px 0 #7a3718,
+    0 16px 28px rgba(73, 35, 16, 0.24),
+    inset 0 0 0 5px rgba(255, 212, 90, 0.26);
+}
+
+.compose-bar-stage.is-current {
+  border-color: #e8492f;
+  box-shadow:
+    0 8px 0 #7a3718,
+    0 0 0 6px rgba(255, 212, 90, 0.46),
+    0 18px 30px rgba(73, 35, 16, 0.22);
+}
+
+.compose-bar-stage.complete {
+  background: rgba(230, 255, 196, 0.95);
+  border-color: #56a63e;
+}
+
+.compose-bar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.compose-bar-header > span {
+  display: inline-grid;
+  place-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #e8492f;
+  color: #fff7d1;
+  font-weight: 1000;
+}
+
+.bar-clear-button {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 900;
+  box-shadow: 0 4px 0 #b97524, 0 8px 16px rgba(85, 45, 7, 0.16);
+}
+
+.compose-bar-fill {
+  position: relative;
+  display: grid;
+  min-height: 150px;
+}
+
+.compose-beat-pits,
+.compose-rhythm-pieces {
+  display: grid;
+  grid-template-columns: repeat(var(--bar-beats, 2), minmax(0, 1fr));
+  gap: 10px;
+}
+
+.compose-beat-pit {
+  display: grid;
+  place-items: center;
+  min-height: 150px;
+  border: 7px dashed rgba(122, 55, 24, 0.62);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 245, 189, 0.72));
+  color: rgba(122, 55, 24, 0.78);
+  font-size: clamp(2.6rem, 5vw, 4.8rem);
+  font-style: normal;
+  font-weight: 1000;
+  box-shadow: inset 0 0 0 7px rgba(255, 212, 90, 0.2);
+}
+
+.compose-rhythm-pieces {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.compose-rhythm-piece {
+  min-height: 150px;
+  border-width: 6px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #fff8aa, #ffc52e);
+  box-shadow: 0 9px 0 #8d4a18, 0 15px 24px rgba(75, 39, 9, 0.18);
+}
+
+.compose-rhythm-piece .rhythm-mark-piece {
+  transform: scale(1.02);
 }
 
 .current-bar-stage {
@@ -1393,6 +1511,11 @@ h3 {
   border-radius: 16px;
   background: linear-gradient(180deg, #fff8a9, #ffc247);
   box-shadow: 0 8px 0 #8d4a18, 0 15px 24px rgba(75, 39, 9, 0.18);
+}
+
+.block-tray .notation-card.is-selected {
+  outline: 5px solid #e8492f;
+  transform: translateY(-4px);
 }
 
 .block-tray .notation-card[data-piece-beats="2"] {
