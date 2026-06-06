@@ -5,6 +5,36 @@ import { announceFeedback } from "./feedback.js";
 let ticker = null;
 let session = null;
 
+const drumHeadGeometry = {
+  centerX: 0.5,
+  centerY: 0.31,
+  radiusX: 0.39,
+  radiusY: 0.27,
+  centerThreshold: 0.42
+};
+
+export function classifyDrumHit({ x, y, width, height }) {
+  const normalizedX = (x / width - drumHeadGeometry.centerX) / drumHeadGeometry.radiusX;
+  const normalizedY = (y / height - drumHeadGeometry.centerY) / drumHeadGeometry.radiusY;
+  const distanceFromHeadCenter = Math.hypot(normalizedX, normalizedY);
+
+  return distanceFromHeadCenter <= drumHeadGeometry.centerThreshold ? "center" : "rim";
+}
+
+function getDrumHitZone(event, drum) {
+  if (!event.clientX && !event.clientY) {
+    return "center";
+  }
+
+  const rect = drum.getBoundingClientRect();
+  return classifyDrumHit({
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+    width: rect.width,
+    height: rect.height
+  });
+}
+
 function stopTicker() {
   if (ticker) {
     clearInterval(ticker);
@@ -42,9 +72,8 @@ export function renderBeatGame({ state, setState, onReward }) {
           ${patternConfig.pattern.map((beat, index) => `<span class="beat-dot ${beat}" data-beat-dot="${index}">${beat === "strong" ? "强" : "弱"}</span>`).join("")}
         </div>
         <div class="huagu" role="group" aria-label="可点击花鼓">
-          <img class="huagu-image" src="./assets/images/flower-drum-real.png" alt="红色大花鼓，鼓面贴有牡丹花图案">
-          <button class="drum-zone drum-rim" data-drum-zone="rim" type="button" aria-label="敲鼓面弱拍"><span>鼓面弱拍</span></button>
-          <button class="drum-zone drum-center" data-drum-zone="center" type="button" aria-label="敲鼓心强拍"><span>鼓心强拍</span></button>
+          <img class="huagu-image" src="./assets/images/flower-drum-3d.png" alt="红色大花鼓，鼓面朝上，鼓身贴有花纹">
+          <button class="drum-zone drum-hit-surface" data-drum-surface type="button" aria-label="敲花鼓，鼓心是强拍，鼓边是弱拍"><span>敲花鼓</span></button>
         </div>
         <div class="control-row">
           <button class="primary-action" data-start-beat type="button">开始练习</button>
@@ -137,7 +166,7 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
     render();
   });
 
-  root.querySelectorAll("[data-drum-zone]").forEach((button) => {
+  root.querySelectorAll("[data-drum-surface]").forEach((button) => {
     let lastPointerHitAt = 0;
     const handleDrumHit = async (event) => {
       const now = performance.now();
@@ -150,7 +179,9 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
 
       const current = state.get();
       const drum = button.closest(".huagu");
-      const isCenterHit = button.dataset.drumZone === "center";
+      const zone = getDrumHitZone(event, drum);
+      const isCenterHit = zone === "center";
+      drum.dataset.hitZone = zone;
       button.classList.add("is-hit");
       drum?.classList.add("is-hit");
       void unlockAudio().catch(() => {});
@@ -158,6 +189,7 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
       setTimeout(() => {
         button.classList.remove("is-hit");
         drum?.classList.remove("is-hit");
+        delete drum.dataset.hitZone;
       }, 180);
 
       if (!session) {
@@ -175,7 +207,7 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
       const result = evaluateBeatHit({
         pattern: session.pattern,
         beatIndex: nearestBeat,
-        zone: button.dataset.drumZone,
+        zone,
         offsetMs: hitAt - targetTime
       });
 
