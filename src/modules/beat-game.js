@@ -42,7 +42,7 @@ export function renderBeatGame({ state, setState, onReward }) {
           ${patternConfig.pattern.map((beat, index) => `<span class="beat-dot ${beat}" data-beat-dot="${index}">${beat === "strong" ? "强" : "弱"}</span>`).join("")}
         </div>
         <div class="huagu" role="group" aria-label="可点击花鼓">
-          <img class="huagu-image" src="./assets/images/flower-drum-real.png" alt="红色大花鼓，鼓面贴有牡丹花图案">
+          <img class="huagu-image" src="./assets/images/flower-drum-3d.png" alt="红色大花鼓，鼓面朝上，鼓身贴有花纹">
           <button class="drum-zone drum-rim" data-drum-zone="rim" type="button" aria-label="敲鼓面弱拍"><span>鼓面弱拍</span></button>
           <button class="drum-zone drum-center" data-drum-zone="center" type="button" aria-label="敲鼓心强拍"><span>鼓心强拍</span></button>
         </div>

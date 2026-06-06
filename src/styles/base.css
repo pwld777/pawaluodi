@@ -518,47 +518,10 @@ h3 {
   position: relative;
   display: grid;
   place-items: center;
-  width: min(620px, 78vw);
-  aspect-ratio: 1.28;
-  border-radius: 38% 38% 44% 44%;
+  width: min(660px, 80vw);
+  aspect-ratio: 1.37;
+  border-radius: 42% 42% 34% 34%;
   filter: drop-shadow(0 42px 34px rgba(10, 3, 2, 0.48));
-}
-
-.huagu::before {
-  content: "";
-  position: absolute;
-  left: 8%;
-  top: 34%;
-  width: 84%;
-  height: 48%;
-  border-radius: 12% 12% 46% 46% / 12% 12% 78% 78%;
-  background:
-    radial-gradient(circle at 18% 45%, #ffd66c 0 2%, transparent 2.4%),
-    radial-gradient(circle at 34% 62%, #ffd66c 0 1.8%, transparent 2.2%),
-    radial-gradient(circle at 58% 52%, #ffd66c 0 1.8%, transparent 2.2%),
-    radial-gradient(circle at 78% 42%, #ffd66c 0 2%, transparent 2.4%),
-    linear-gradient(110deg, rgba(255, 231, 155, 0.32), transparent 18% 78%, rgba(69, 0, 0, 0.24)),
-    repeating-linear-gradient(20deg, transparent 0 32px, rgba(255, 219, 125, 0.16) 33px 36px),
-    linear-gradient(180deg, #e43925 0%, #b91f17 55%, #73110f 100%);
-  box-shadow:
-    inset 0 12px 0 rgba(255, 193, 75, 0.46),
-    inset 0 -18px 28px rgba(53, 5, 3, 0.42),
-    0 28px 32px rgba(0, 0, 0, 0.32);
-}
-
-.huagu::after {
-  content: "";
-  position: absolute;
-  left: 8%;
-  top: 12%;
-  width: 84%;
-  height: 58%;
-  border-radius: 50%;
-  background:
-    radial-gradient(ellipse at center, transparent 0 65%, rgba(118, 20, 12, 0.24) 66% 72%, #c4281d 73% 100%);
-  box-shadow:
-    0 12px 0 rgba(116, 18, 13, 0.72),
-    0 20px 24px rgba(32, 2, 1, 0.28);
 }
 
 .drum-zone {
@@ -577,23 +540,20 @@ h3 {
 
 .huagu-image {
   position: absolute;
-  z-index: 3;
-  top: 13%;
-  left: 10%;
-  width: 80%;
-  height: 56%;
-  border-radius: 50%;
-  object-fit: cover;
-  clip-path: ellipse(49% 47% at 50% 50%);
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   user-select: none;
   pointer-events: none;
 }
 
 .drum-rim {
-  top: 10%;
-  left: 10%;
-  width: 80%;
-  height: 64%;
+  top: 4%;
+  left: 11%;
+  width: 78%;
+  height: 54%;
   border-radius: 50%;
   color: transparent;
   background: transparent;
@@ -603,10 +563,10 @@ h3 {
 
 .drum-center {
   z-index: 5;
-  top: 26%;
+  top: 20%;
   left: 50%;
-  width: 30%;
-  height: 25%;
+  width: 34%;
+  height: 24%;
   border-radius: 50%;
   color: transparent;
   background: transparent;
