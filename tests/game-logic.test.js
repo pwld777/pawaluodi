@@ -133,6 +133,8 @@ test("composition workshop renders clear beat pits and rhythm-only cards", () =>
   assert.equal((html.match(/class="compose-beat-pit"/g) ?? []).length, 8);
   assert.equal((html.match(/data-clear-bar/g) ?? []).length, 4);
   assert.match(html, /data-clear-composition/);
+  assert.match(html, /compose-action-dock/);
+  assert.match(html, /data-play-composition/);
   assert.match(html, /compose-instrument-row/);
   assert.equal((html.match(/data-instrument=/g) ?? []).length, 4);
   assert.doesNotMatch(html, /<details class="compose-settings">/);

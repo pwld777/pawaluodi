@@ -194,21 +194,23 @@ export function renderCompositionWorkshop({ state }) {
               </div>
             `).join("")}
           </div>
-
-          <div class="compose-bottom-actions">
-            <button class="primary-action" data-play-composition type="button">播放</button>
-            <button data-clear-composition type="button">重做</button>
-          </div>
         </div>
       </div>
 
-      <div class="block-tray compose-main-tray">
-        ${blocks.map((block) => `
-          <button class="notation-card block-card" data-block-id="${block.id}" data-piece-beats="${block.beats}" type="button" style="--tray-beats:${block.beats}">
-            <span class="card-tag">${block.beats} 格</span>
-            ${renderRhythmMark(block, "rhythm-mark-card")}
-          </button>
-        `).join("")}
+      <div class="compose-control-floor">
+        <div class="block-tray compose-main-tray">
+          ${blocks.map((block) => `
+            <button class="notation-card block-card" data-block-id="${block.id}" data-piece-beats="${block.beats}" type="button" style="--tray-beats:${block.beats}">
+              <span class="card-tag">${block.beats} 格</span>
+              ${renderRhythmMark(block, "rhythm-mark-card")}
+            </button>
+          `).join("")}
+        </div>
+
+        <div class="compose-action-dock" aria-label="创编操作">
+          <button class="primary-action" data-play-composition type="button">播放</button>
+          <button data-clear-composition type="button">重做</button>
+        </div>
       </div>
     </section>
   `;
