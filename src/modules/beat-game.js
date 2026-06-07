@@ -67,20 +67,27 @@ export function renderBeatGame({ state, setState, onReward }) {
       </aside>
 
       <div class="stage-card drum-stage">
+        <div class="stage-hud beat-stage-hud" aria-label="花鼓关卡状态">
+          <span>关卡 1</span>
+          <strong>连击 ${beatState.streak}</strong>
+          <span>得分 ${beatState.score}</span>
+        </div>
         <p class="round-label">${stepLabel}</p>
         <div class="beat-track" aria-label="拍点轨道">
           ${patternConfig.pattern.map((beat, index) => `<span class="beat-dot ${beat}" data-beat-dot="${index}">${beat === "strong" ? "强" : "弱"}</span>`).join("")}
         </div>
         <div class="huagu" role="group" aria-label="可点击花鼓">
           <img class="huagu-image" src="./assets/images/flower-drum-3d.png" alt="红色大花鼓，鼓面朝上，鼓身贴有花纹">
+          <span class="drum-callout drum-callout-strong" aria-hidden="true">鼓心 强</span>
+          <span class="drum-callout drum-callout-weak" aria-hidden="true">鼓边 弱</span>
           <button class="drum-zone drum-hit-surface" data-drum-surface type="button" aria-label="敲花鼓，鼓心是强拍，鼓边是弱拍"><span>敲花鼓</span></button>
         </div>
+        <p class="feedback-pill" id="beatFeedback" data-tone="info">第一关只练节拍识别：2/4 是强弱，3/4 是强弱弱。</p>
         <div class="control-row">
           <button class="primary-action" data-start-beat type="button">开始练习</button>
           <button data-stop-beat type="button">停止</button>
           <button data-reset-beat type="button">重来</button>
         </div>
-        <p class="feedback-pill" id="beatFeedback" data-tone="info">第一关只练节拍识别：2/4 是强弱，3/4 是强弱弱。</p>
       </div>
 
       <aside class="hint-panel">

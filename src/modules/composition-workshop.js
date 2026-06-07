@@ -57,6 +57,10 @@ function shortFeedback(message) {
   return message;
 }
 
+function completeCount(composition) {
+  return composition.bars.filter((bar) => bar.status === "complete").length;
+}
+
 function renderInstrumentRow(composition) {
   return `
     <div class="compose-instrument-row" aria-label="选择乐器">
@@ -149,7 +153,7 @@ export function renderCompositionWorkshop({ state }) {
   const feedbackMessage = shortFeedback(composition.feedbackMessage);
 
   return `
-    <section class="compose-game-shell enter-view">
+    <section class="compose-game-shell ${composition.isComplete ? "compose-is-complete" : ""} enter-view">
       <div class="compose-arcade-stage compose-quiet-stage">
         <div class="compose-stage-canvas" data-compose-game-stage aria-label="小乐队闯关台动画舞台">
           <img class="compose-stage-fallback" src="./assets/images/compose-stage-scene.png" alt="小乐队节奏闯关舞台">
@@ -157,8 +161,8 @@ export function renderCompositionWorkshop({ state }) {
 
         <div class="compose-play-layer">
           <div class="compose-top-strip">
-            <h2>节奏填坑闯关</h2>
-            <strong>4 个小节一起填</strong>
+            <h2>小乐队排练台</h2>
+            <strong>${composition.isComplete ? "舞台已点亮" : "填满 4 个小节"}</strong>
             <label>节拍
               <select data-compose-meter>
                 <option ${composition.meter === "2/4" ? "selected" : ""}>2/4</option>
@@ -175,6 +179,10 @@ export function renderCompositionWorkshop({ state }) {
           </div>
 
           <p class="feedback-pill compose-feedback-main" id="composeFeedback" data-tone="info">${feedbackMessage}</p>
+          <div class="compose-award ${composition.isComplete ? "is-lit" : ""}" aria-label="${composition.isComplete ? "创编徽章已点亮" : "创编徽章未点亮"}">
+            <span>乐</span>
+            <strong>${completeCount(composition)}/${composition.bars.length}</strong>
+          </div>
 
           <div class="four-bar-board" aria-label="四个小节">
             ${composition.bars.map((bar, index) => `

@@ -6,6 +6,14 @@ const labels = {
   showcase: "展示"
 };
 
+const icons = {
+  home: "会",
+  beat: "鼓",
+  rhythm: "花",
+  compose: "乐",
+  showcase: "奖"
+};
+
 export function bindNavigation({ state, setState, render }) {
   document.querySelectorAll(".nav-tab").forEach((button) => {
     button.addEventListener("click", () => {
@@ -18,9 +26,10 @@ export function bindNavigation({ state, setState, render }) {
 export function updateNavigation(currentView) {
   document.querySelectorAll(".nav-tab").forEach((button) => {
     const active = button.dataset.view === currentView;
+    const view = button.dataset.view;
     button.classList.toggle("is-active", active);
     button.setAttribute("aria-current", active ? "page" : "false");
-    button.setAttribute("aria-label", active ? `${labels[button.dataset.view]}，当前页` : labels[button.dataset.view]);
+    button.setAttribute("aria-label", active ? `${labels[view]}，当前页` : labels[view]);
+    button.innerHTML = `<span class="nav-icon" aria-hidden="true">${icons[view]}</span><span>${labels[view]}</span>`;
   });
 }
-

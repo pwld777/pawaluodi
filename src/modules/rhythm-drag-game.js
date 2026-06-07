@@ -22,12 +22,15 @@ export function renderRhythmGame({ state }) {
 
   return `
     <section class="game-layout rhythm-layout enter-view">
-      <div class="stage-card rhythm-question">
+      <div class="stage-card rhythm-question flower-field">
         <p class="eyebrow">游戏二</p>
         <h2>${question.title}</h2>
         <p class="large-prompt">${question.prompt}</p>
+        <div class="rhythm-progress" aria-label="节奏题进度">
+          ${rhythmQuestions.map((_, index) => `<span class="${index < rhythmState.correctCount ? "is-done" : index === rhythmState.currentQuestionIndex ? "is-current" : ""}">${index + 1}</span>`).join("")}
+        </div>
         <div class="answer-zone flower-road" data-answer-zone>
-          <span>把节奏花拖到这里</span>
+          <span>把节奏花拖进花篮</span>
         </div>
         <div class="control-row">
           <button type="button" data-reset-rhythm>重做节奏题</button>
@@ -94,6 +97,7 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
       if (question.type === "single" || selected.size >= question.answer.length) {
         const result = evaluateRhythmAnswer(question.id, [...selected]);
         if (result.correct) {
+          zone.classList.add("is-collected");
           announceFeedback(feedback, result.summary, "good");
           onReward(1);
           setTimeout(() => {
@@ -116,7 +120,9 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
           announceFeedback(feedback, result.summary, "warn");
           selected.clear();
           zone.classList.remove("has-card");
-          zone.innerHTML = "<span>把节奏花拖到这里</span>";
+          zone.classList.add("shake");
+          zone.innerHTML = "<span>把节奏花拖进花篮</span>";
+          setTimeout(() => zone.classList.remove("shake"), 350);
           card.classList.add("shake");
           setTimeout(() => card.classList.remove("shake"), 350);
         }
@@ -136,6 +142,7 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
         if (question.type === "single" || selected.size >= question.answer.length) {
           const result = evaluateRhythmAnswer(question.id, [...selected]);
           if (result.correct) {
+            zone.classList.add("is-collected");
             announceFeedback(feedback, result.summary, "good");
             onReward(1);
             setTimeout(() => {
@@ -158,7 +165,9 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
             announceFeedback(feedback, result.summary, "warn");
             selected.clear();
             zone.classList.remove("has-card");
-            zone.innerHTML = "<span>把节奏花拖到这里</span>";
+            zone.classList.add("shake");
+            zone.innerHTML = "<span>把节奏花拖进花篮</span>";
+            setTimeout(() => zone.classList.remove("shake"), 350);
           }
         }
       });
@@ -172,6 +181,7 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
       if (question.type === "single" || selected.size >= question.answer.length) {
         const result = evaluateRhythmAnswer(question.id, [...selected]);
         if (result.correct) {
+          zone.classList.add("is-collected");
           announceFeedback(feedback, result.summary, "good");
           onReward(1);
           setTimeout(() => {
@@ -194,7 +204,9 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
           announceFeedback(feedback, result.summary, "warn");
           selected.clear();
           zone.classList.remove("has-card");
-          zone.innerHTML = "<span>把节奏花拖到这里</span>";
+          zone.classList.add("shake");
+          zone.innerHTML = "<span>把节奏花拖进花篮</span>";
+          setTimeout(() => zone.classList.remove("shake"), 350);
         }
       }
     });
