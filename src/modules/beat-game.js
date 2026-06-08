@@ -52,16 +52,16 @@ export function renderBeatGame({ state, setState, onReward }) {
     <section class="game-layout beat-layout enter-view">
       <aside class="task-rail">
         <p class="eyebrow">游戏一</p>
-        <h2>花鼓节拍挑战</h2>
+        <h2>花鼓</h2>
         <ol class="step-list">
-          <li class="${beatState.currentStep === "intro" ? "active" : ""}">认识强弱</li>
+          <li class="${beatState.currentStep === "intro" ? "active" : ""}">强弱</li>
           <li class="${beatState.currentMeter === "2/4" && beatState.currentStep !== "intro" ? "active" : ""}">2/4 强弱</li>
           <li class="${beatState.currentMeter === "3/4" ? "active" : ""}">3/4 强弱弱</li>
           <li class="${beatState.currentStep === "switch" ? "active" : ""}">A-B-A 切换</li>
         </ol>
         <div class="mode-buttons">
-          <button type="button" data-beat-mode="2/4">练强弱</button>
-          <button type="button" data-beat-mode="3/4">练强弱弱</button>
+          <button type="button" data-beat-mode="2/4">强弱</button>
+          <button type="button" data-beat-mode="3/4">强弱弱</button>
           <button type="button" data-beat-switch>A-B-A</button>
         </div>
       </aside>
@@ -82,9 +82,9 @@ export function renderBeatGame({ state, setState, onReward }) {
           <span class="drum-callout drum-callout-weak" aria-hidden="true">鼓边 弱</span>
           <button class="drum-zone drum-hit-surface" data-drum-surface type="button" aria-label="敲花鼓，鼓心是强拍，鼓边是弱拍"><span>敲花鼓</span></button>
         </div>
-        <p class="feedback-pill" id="beatFeedback" data-tone="info">第一关只练节拍识别：2/4 是强弱，3/4 是强弱弱。</p>
+        <p class="feedback-pill" id="beatFeedback" data-tone="info">看颜色，敲鼓心/鼓边。</p>
         <div class="control-row">
-          <button class="primary-action" data-start-beat type="button">开始练习</button>
+          <button class="primary-action" data-start-beat type="button">开始</button>
           <button data-stop-beat type="button">停止</button>
           <button data-reset-beat type="button">重来</button>
         </div>
@@ -94,7 +94,7 @@ export function renderBeatGame({ state, setState, onReward }) {
         <h3>拍子提示</h3>
         <div class="meter-card"><strong>2/4</strong><span>鼓心 鼓边</span></div>
         <div class="meter-card"><strong>3/4</strong><span>鼓心 鼓边 鼓边</span></div>
-        <p>重点看顺序：三拍子第二、第三拍都要轻敲鼓边。</p>
+        <p>看颜色，跟着敲。</p>
       </aside>
     </section>
   `;
@@ -259,7 +259,7 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
     button.addEventListener("click", handleDrumHit);
   });
 
-  root.querySelector(".primary-action")?.insertAdjacentHTML("afterend", '<button data-switch-now type="button">换成强弱弱</button>');
+  root.querySelector(".primary-action")?.insertAdjacentHTML("afterend", '<button data-switch-now type="button">强弱弱</button>');
   root.querySelector("[data-switch-now]")?.addEventListener("click", () => {
     if (!session) {
       announceFeedback(feedback, "先点开始，再按自己的速度练 A-B-A 切换。", "warn");

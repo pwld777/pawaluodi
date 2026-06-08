@@ -153,7 +153,7 @@ export function renderCompositionWorkshop({ state }) {
   const feedbackMessage = shortFeedback(composition.feedbackMessage);
 
   return `
-    <section class="compose-game-shell ${composition.isComplete ? "compose-is-complete" : ""} enter-view">
+    <section class="compose-game-shell tablet-compose-layout ${composition.isComplete ? "compose-is-complete" : ""} enter-view">
       <div class="compose-arcade-stage compose-quiet-stage">
         <div class="compose-stage-canvas" data-compose-game-stage aria-label="小乐队闯关台动画舞台">
           <img class="compose-stage-fallback" src="./assets/images/compose-stage-scene.png" alt="小乐队节奏闯关舞台">
@@ -161,8 +161,8 @@ export function renderCompositionWorkshop({ state }) {
 
         <div class="compose-play-layer">
           <div class="compose-top-strip">
-            <h2>小乐队排练台</h2>
-            <strong>${composition.isComplete ? "舞台已点亮" : "填满 4 个小节"}</strong>
+            <h2>创编</h2>
+            <strong>${composition.isComplete ? "完成" : "填 4 小节"}</strong>
             <label>节拍
               <select data-compose-meter>
                 <option ${composition.meter === "2/4" ? "selected" : ""}>2/4</option>
@@ -188,7 +188,7 @@ export function renderCompositionWorkshop({ state }) {
             ${composition.bars.map((bar, index) => `
               <div class="compose-bar-stage ${bar.status} ${index === activeBarIndex ? "is-current" : ""}" data-bar-index="${index}" style="--bar-beats:${bar.capacity}">
                 <div class="compose-bar-header">
-                  <span>第 ${index + 1} 小节</span>
+                  <span>${index + 1}</span>
                   <button class="bar-clear-button" data-clear-bar="${index}" type="button" aria-label="清空第 ${index + 1} 小节">清空</button>
                 </div>
                 <div class="compose-bar-fill">
@@ -229,6 +229,12 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
   let selectedBlockId = null;
   const composition = state.get().composition;
   const blocks = getAllowedBlocksForMeter(composition.meter);
+
+  function selectBlock(block) {
+    selectedBlockId = block.dataset.blockId;
+    root.querySelectorAll("[data-block-id]").forEach((candidate) => candidate.classList.toggle("is-selected", candidate === block));
+    announceFeedback(feedback, "点小节", "info");
+  }
 
   if (typeof window !== "undefined") {
     import("./compose-game-stage.js")
@@ -301,7 +307,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
           blockId: block.dataset.blockId,
           barIndex: Number.isInteger(barIndex) ? barIndex : 0
         });
-      });
+      }, () => selectBlock(block));
     });
 
     block.addEventListener("mousedown", (event) => {
@@ -326,9 +332,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
         return;
       }
 
-      selectedBlockId = block.dataset.blockId;
-      root.querySelectorAll("[data-block-id]").forEach((candidate) => candidate.classList.toggle("is-selected", candidate === block));
-      announceFeedback(feedback, "点小节", "info");
+      selectBlock(block);
     });
   });
 
@@ -420,16 +424,22 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
   });
 }
 
-function startBlockDrag(event, element, root, onDrop) {
+function startBlockDrag(event, element, root, onDrop, onTap) {
   event.preventDefault();
   const startX = event.clientX;
   const startY = event.clientY;
-  element.setPointerCapture?.(event.pointerId);
+  let moved = false;
+  try {
+    element.setPointerCapture?.(event.pointerId);
+  } catch {
+    // Keep touch interactions working if pointer capture is unavailable.
+  }
   element.classList.add("is-dragging");
 
   function move(moveEvent) {
     const dx = moveEvent.clientX - startX;
     const dy = moveEvent.clientY - startY;
+    moved = moved || Math.hypot(dx, dy) > 8;
     element.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx / 20}deg)`;
     root.querySelectorAll("[data-bar-index]").forEach((bar) => {
       bar.classList.toggle("is-hot", isInside(moveEvent, bar));
@@ -439,8 +449,8 @@ function startBlockDrag(event, element, root, onDrop) {
   function up(upEvent) {
     element.classList.remove("is-dragging");
     element.style.transform = "";
-    element.removeEventListener("pointermove", move);
-    element.removeEventListener("pointerup", up);
+    document.removeEventListener("pointermove", move);
+    document.removeEventListener("pointerup", up);
     const bar = [...root.querySelectorAll("[data-bar-index]")].find((candidate) => isInside(upEvent, candidate));
     root.querySelectorAll("[data-bar-index]").forEach((candidate) => candidate.classList.remove("is-hot"));
     if (bar) {
@@ -449,11 +459,13 @@ function startBlockDrag(event, element, root, onDrop) {
         delete element.dataset.skipClick;
       }, 160);
       onDrop(Number(bar.dataset.barIndex));
+    } else if (!moved) {
+      onTap?.();
     }
   }
 
-  element.addEventListener("pointermove", move);
-  element.addEventListener("pointerup", up);
+  document.addEventListener("pointermove", move);
+  document.addEventListener("pointerup", up);
 }
 
 function startMouseBlockDrag(event, element, root, onDrop) {

@@ -936,7 +936,7 @@ h3 {
 .compose-arcade-stage {
   position: relative;
   overflow: hidden;
-  min-height: min(690px, calc(100vh - 190px));
+  min-height: min(660px, calc(100vh - 220px));
   border: 8px solid #5b2d17;
   border-radius: 30px;
   background:
@@ -2102,5 +2102,352 @@ h3 {
   .control-row button,
   .mode-buttons button {
     min-height: 44px;
+  }
+}
+
+@media (min-width: 921px) and (max-width: 1280px) and (orientation: landscape) {
+  .app-shell {
+    padding: 14px 18px 100px;
+  }
+
+  body[data-view="beat"] .app-shell {
+    padding-top: 10px;
+  }
+
+  body[data-view="beat"] .game-header {
+    display: none;
+  }
+
+  .game-header {
+    max-width: 1120px;
+    margin-bottom: 10px;
+  }
+
+  .game-header h1 {
+    font-size: clamp(2.2rem, 4.3vw, 3.35rem);
+  }
+
+  .score-board {
+    min-width: 82px;
+    padding: 9px 14px;
+    border-radius: 22px;
+  }
+
+  .bottom-nav {
+    bottom: 10px;
+    width: min(620px, calc(100vw - 32px));
+    gap: 6px;
+    padding: 7px;
+    border-width: 3px;
+    border-radius: 22px;
+  }
+
+  .nav-tab {
+    min-height: 48px;
+    border-radius: 14px;
+    font-size: 0.92rem;
+  }
+
+  .nav-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .beat-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "task"
+      "stage";
+    gap: 8px;
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+
+  .beat-layout .task-rail {
+    grid-area: task;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 20px;
+  }
+
+  .beat-layout .task-rail .eyebrow {
+    display: none;
+  }
+
+  .beat-layout .task-rail h2 {
+    margin: 0;
+  }
+
+  .beat-layout .task-rail h2 {
+    font-size: 1.6rem;
+  }
+
+  .beat-layout .step-list {
+    display: flex;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+    list-style-position: inside;
+  }
+
+  .beat-layout .step-list li {
+    display: none;
+    min-height: 42px;
+    padding: 8px 11px;
+    white-space: nowrap;
+  }
+
+  .beat-layout .step-list li.active {
+    display: list-item;
+  }
+
+  .beat-layout .mode-buttons {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .beat-layout .mode-buttons button {
+    min-height: 44px;
+    padding: 0 13px;
+    white-space: nowrap;
+  }
+
+  .beat-layout .drum-stage {
+    grid-area: stage;
+    min-height: calc(100vh - 180px);
+    padding: 12px 18px 16px;
+    gap: 6px;
+  }
+
+  .beat-layout .hint-panel {
+    display: none;
+  }
+
+  .beat-layout .beat-stage-hud {
+    display: none;
+  }
+
+  .beat-layout .round-label {
+    font-size: 1.05rem;
+  }
+
+  .beat-layout .beat-dot {
+    width: 48px;
+    height: 48px;
+  }
+
+  .beat-layout .huagu {
+    width: min(580px, 72vw);
+    max-height: 360px;
+  }
+
+  .beat-layout .feedback-pill {
+    width: min(760px, 96%);
+    min-height: 38px;
+    padding: 8px 14px;
+  }
+
+  .beat-layout .control-row {
+    justify-content: center;
+    flex-wrap: nowrap;
+  }
+
+  .beat-layout .control-row button {
+    min-width: 104px;
+    min-height: 48px;
+    padding: 0 18px;
+  }
+
+  body[data-view="compose"] .app-shell {
+    padding: 8px 14px 86px;
+  }
+
+  body[data-view="compose"] .bottom-nav {
+    bottom: 6px;
+    width: min(500px, calc(100vw - 32px));
+  }
+
+  .tablet-compose-layout {
+    gap: 8px;
+    max-width: 1150px;
+    margin: 0 auto;
+  }
+
+  .tablet-compose-layout .compose-arcade-stage {
+    min-height: 520px;
+    height: calc(100vh - 255px);
+    max-height: 620px;
+    border-width: 6px;
+    border-radius: 24px;
+  }
+
+  .tablet-compose-layout .compose-play-layer {
+    inset: 12px;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    gap: 7px;
+  }
+
+  .tablet-compose-layout .compose-top-strip {
+    display: grid;
+    grid-template-columns: auto auto auto auto minmax(300px, 1fr);
+    justify-content: stretch;
+    gap: 8px;
+    padding: 6px 8px;
+    border-width: 3px;
+    border-radius: 16px;
+  }
+
+  .tablet-compose-layout .compose-top-strip h2 {
+    font-size: 1.55rem;
+  }
+
+  .tablet-compose-layout .compose-top-strip strong,
+  .tablet-compose-layout .compose-top-strip label {
+    min-height: 40px;
+    white-space: nowrap;
+  }
+
+  .tablet-compose-layout .compose-top-strip select {
+    min-height: 36px;
+  }
+
+  .tablet-compose-layout .compose-instrument-row {
+    width: 100%;
+    padding: 4px;
+    gap: 5px;
+  }
+
+  .tablet-compose-layout .compose-instrument-row button {
+    grid-template-columns: 30px minmax(0, 1fr);
+    min-height: 42px;
+    padding: 4px 6px;
+    gap: 5px;
+    border-radius: 12px;
+  }
+
+  .tablet-compose-layout .compose-instrument-row .instrument-photo {
+    width: 30px;
+    max-width: 30px;
+  }
+
+  .tablet-compose-layout .compose-instrument-row strong {
+    font-size: 0.84rem;
+  }
+
+  .tablet-compose-layout .compose-feedback-main {
+    min-height: 38px;
+    padding: 8px 14px;
+    font-size: 1.04rem;
+  }
+
+  .tablet-compose-layout .compose-award {
+    right: 14px;
+    top: 86px;
+    width: 66px;
+    height: 66px;
+    border-radius: 20px;
+  }
+
+  .tablet-compose-layout .four-bar-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    align-content: stretch;
+  }
+
+  .tablet-compose-layout .compose-bar-stage {
+    min-height: 158px;
+    padding: 7px;
+    gap: 6px;
+    border-width: 5px;
+    border-radius: 18px;
+    box-shadow:
+      0 5px 0 #7a3718,
+      0 10px 18px rgba(73, 35, 16, 0.2),
+      inset 0 0 0 4px rgba(255, 212, 90, 0.24);
+  }
+
+  .tablet-compose-layout .compose-bar-header > span {
+    min-width: 40px;
+    min-height: 30px;
+    padding: 0 10px;
+  }
+
+  .tablet-compose-layout .bar-clear-button {
+    min-height: 32px;
+    padding: 0 10px;
+  }
+
+  .tablet-compose-layout .compose-bar-fill {
+    min-height: 104px;
+  }
+
+  .tablet-compose-layout .compose-beat-pits,
+  .tablet-compose-layout .compose-rhythm-pieces {
+    gap: 7px;
+  }
+
+  .tablet-compose-layout .compose-beat-pit,
+  .tablet-compose-layout .compose-rhythm-piece {
+    min-height: 104px;
+    border-radius: 16px;
+  }
+
+  .tablet-compose-layout .compose-beat-pit {
+    border-width: 5px;
+    font-size: 3rem;
+  }
+
+  .tablet-compose-layout .compose-rhythm-piece {
+    border-width: 5px;
+  }
+
+  .tablet-compose-layout .compose-rhythm-piece .rhythm-mark-piece {
+    transform: scale(0.82);
+  }
+
+  .tablet-compose-layout .compose-control-floor {
+    grid-template-columns: minmax(0, 1fr) minmax(118px, 140px);
+    gap: 8px;
+  }
+
+  .tablet-compose-layout .compose-main-tray {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 6px;
+    border-width: 4px;
+    border-radius: 18px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .tablet-compose-layout .compose-main-tray .notation-card {
+    flex: 0 0 110px;
+    min-height: 74px;
+    touch-action: none;
+  }
+
+  .tablet-compose-layout .compose-main-tray .notation-card[data-piece-beats="2"] {
+    flex-basis: 128px;
+  }
+
+  .tablet-compose-layout .compose-main-tray .notation-card[data-piece-beats="3"] {
+    flex-basis: 148px;
+  }
+
+  .tablet-compose-layout .compose-action-dock {
+    border-width: 4px;
+    border-radius: 18px;
+  }
+
+  .tablet-compose-layout .compose-action-dock button {
+    min-height: 54px;
+    font-size: 1.02rem;
   }
 }
