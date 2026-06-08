@@ -46,7 +46,7 @@ function stopTicker() {
 export function renderBeatGame({ state, setState, onReward }) {
   const beatState = state.beatGame;
   const patternConfig = beatState.currentMeter === "3/4" ? beatGame.sectionB : beatGame.sectionA;
-  const stepLabel = beatState.currentStep === "switch" ? "A-B-A 切换" : patternConfig.name;
+  const stepLabel = beatState.currentStep === "switch" ? "节拍转换" : patternConfig.name;
 
   return `
     <section class="game-layout beat-layout enter-view">
@@ -55,14 +55,14 @@ export function renderBeatGame({ state, setState, onReward }) {
         <h2>花鼓</h2>
         <ol class="step-list">
           <li class="${beatState.currentStep === "intro" ? "active" : ""}">听鼓</li>
-          <li class="${beatState.currentMeter === "2/4" && beatState.currentStep !== "intro" ? "active" : ""}">2拍</li>
-          <li class="${beatState.currentMeter === "3/4" ? "active" : ""}">3拍</li>
-          <li class="${beatState.currentStep === "switch" ? "active" : ""}">A-B-A 切换</li>
+          <li class="${beatState.currentMeter === "2/4" && beatState.currentStep !== "intro" ? "active" : ""}">2/4拍</li>
+          <li class="${beatState.currentMeter === "3/4" ? "active" : ""}">3/4拍</li>
+          <li class="${beatState.currentStep === "switch" ? "active" : ""}">节拍转换</li>
         </ol>
         <div class="mode-buttons">
-          <button type="button" data-beat-mode="2/4">2拍</button>
-          <button type="button" data-beat-mode="3/4">3拍</button>
-          <button type="button" data-beat-switch>A-B-A</button>
+          <button type="button" data-beat-mode="2/4">2/4拍</button>
+          <button type="button" data-beat-mode="3/4">3/4拍</button>
+          <button type="button" data-beat-switch>节拍转换</button>
         </div>
       </aside>
 
@@ -87,13 +87,6 @@ export function renderBeatGame({ state, setState, onReward }) {
           <button data-reset-beat type="button">重来</button>
         </div>
       </div>
-
-      <aside class="hint-panel">
-        <h3>听辨练习</h3>
-        <div class="meter-card"><strong>2/4</strong><span>2 拍一组</span></div>
-        <div class="meter-card"><strong>3/4</strong><span>3 拍一组</span></div>
-        <p>先听，再敲。</p>
-      </aside>
     </section>
   `;
 }
@@ -260,7 +253,7 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
   root.querySelector(".primary-action")?.insertAdjacentHTML("afterend", '<button data-switch-now type="button">换段</button>');
   root.querySelector("[data-switch-now]")?.addEventListener("click", () => {
     if (!session) {
-      announceFeedback(feedback, "先点开始，再按自己的速度练 A-B-A 切换。", "warn");
+      announceFeedback(feedback, "先点开始，再练节拍转换。", "warn");
       return;
     }
     onReward(2);

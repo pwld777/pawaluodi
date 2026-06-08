@@ -2548,7 +2548,7 @@ h3 {
 
 @media (min-width: 921px) and (orientation: landscape) {
   body[data-view="beat"] .app-shell {
-    padding: 14px 24px 24px;
+    padding: 14px 24px 112px;
   }
 
   body[data-view="beat"] .game-header {
@@ -2567,26 +2567,21 @@ h3 {
     border-radius: 22px;
   }
 
-  body[data-view="beat"] .bottom-nav {
-    display: none;
-  }
-
   body[data-view="beat"] .view-root {
     max-width: min(1600px, calc(100vw - 72px));
   }
 
   body[data-view="beat"] .beat-layout {
     display: grid;
-    grid-template-columns: clamp(160px, 11vw, 210px) minmax(0, 1fr) clamp(160px, 11vw, 210px);
-    grid-template-areas: "task stage hint";
+    grid-template-columns: clamp(160px, 11vw, 210px) minmax(0, 1fr);
+    grid-template-areas: "task stage";
     align-items: stretch;
     gap: clamp(12px, 1vw, 18px);
     max-width: none;
-    min-height: calc(100vh - 156px);
+    min-height: calc(100vh - 288px);
   }
 
-  body[data-view="beat"] .beat-layout .task-rail,
-  body[data-view="beat"] .beat-layout .hint-panel {
+  body[data-view="beat"] .beat-layout .task-rail {
     display: grid;
     padding: 18px 20px;
     border-radius: 26px;
@@ -2597,11 +2592,6 @@ h3 {
     grid-template-columns: 1fr;
     align-content: start;
     gap: 12px;
-  }
-
-  body[data-view="beat"] .beat-layout .hint-panel {
-    grid-area: hint;
-    align-content: start;
   }
 
   body[data-view="beat"] .beat-layout .task-rail .eyebrow {
@@ -2638,7 +2628,7 @@ h3 {
 
   body[data-view="beat"] .beat-layout .drum-stage {
     grid-area: stage;
-    min-height: calc(100vh - 156px);
+    min-height: calc(100vh - 288px);
     padding: clamp(14px, 1.2vw, 22px) clamp(18px, 1.5vw, 30px) clamp(18px, 1.5vw, 28px);
     gap: clamp(6px, 0.8vh, 10px);
   }
@@ -2657,7 +2647,7 @@ h3 {
   }
 
   body[data-view="beat"] .beat-layout .huagu {
-    width: min(760px, 78vw, calc((100vh - 312px) * 1.37));
+    width: min(680px, 78vw, calc((100vh - 444px) * 1.37));
     max-height: none;
   }
 
@@ -2676,5 +2666,11 @@ h3 {
     min-width: 108px;
     min-height: 50px;
     padding: 0 18px;
+  }
+}
+
+@media (min-width: 921px) and (max-width: 1280px) and (orientation: landscape) {
+  body[data-view="beat"] .beat-layout .huagu {
+    width: min(640px, 78vw, calc((100vh - 360px) * 1.37));
   }
 }
