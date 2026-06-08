@@ -32,35 +32,35 @@ export const notationCards = [
     beats: 1,
     pattern: "quarter-note",
     hits: [0],
-    sustainBeats: 0.28
+    sustainBeats: 0.85
   },
   {
     id: "half-note",
     beats: 2,
     pattern: "half-note",
     hits: [0],
-    sustainBeats: 1.5
+    sustainBeats: 2
   },
   {
     id: "dotted-half-note",
     beats: 3,
     pattern: "dotted-half-note",
     hits: [0],
-    sustainBeats: 2.4
+    sustainBeats: 3
   },
   {
     id: "two-quarters",
     beats: 2,
     pattern: "two-quarters",
     hits: [0, 1],
-    sustainBeats: 0.28
+    sustainBeats: 0.85
   },
   {
     id: "three-quarters",
     beats: 3,
     pattern: "three-quarters",
     hits: [0, 1, 2],
-    sustainBeats: 0.28
+    sustainBeats: 0.85
   },
   {
     id: "quarter-rest",

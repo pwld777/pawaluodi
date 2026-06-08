@@ -131,11 +131,14 @@ test("rhythm block playback expands internal hits", () => {
     { beat: 0.25, accent: false, sustainBeats: 0.16 },
     { beat: 0.5, accent: false, sustainBeats: 0.16 }
   ]);
+  assert.deepEqual(getPlaybackEvents("quarter-note", 0), [
+    { beat: 0, accent: true, sustainBeats: 0.85 }
+  ]);
   assert.deepEqual(getPlaybackEvents("half-note", 0), [
-    { beat: 0, accent: true, sustainBeats: 1.5 }
+    { beat: 0, accent: true, sustainBeats: 2 }
   ]);
   assert.deepEqual(getPlaybackEvents("dotted-half-note", 0), [
-    { beat: 0, accent: true, sustainBeats: 2.4 }
+    { beat: 0, accent: true, sustainBeats: 3 }
   ]);
 });
 

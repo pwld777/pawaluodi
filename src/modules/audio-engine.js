@@ -57,7 +57,8 @@ function playSample(context, instrument, { volume, start, accent, sustainSeconds
       const sampleDuration = buffer.duration / (instrument.sample.playbackRate ?? 1);
       const noteDuration = sustainSeconds ?? instrument.sample.trimSeconds ?? 0.35;
       const playDuration = Math.min(sampleDuration, noteDuration);
-      const releaseStart = Math.max(0.03, playDuration - 0.08);
+      const releaseSeconds = Math.min(0.22, playDuration * 0.35);
+      const releaseStart = Math.max(0.03, playDuration - releaseSeconds);
       gain.gain.setValueAtTime(volume * (accent ? 0.95 : 0.62), safeStart);
       gain.gain.setValueAtTime(volume * (accent ? 0.95 : 0.62), safeStart + releaseStart);
       gain.gain.exponentialRampToValueAtTime(0.001, safeStart + playDuration);
