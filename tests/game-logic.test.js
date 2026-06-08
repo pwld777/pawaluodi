@@ -155,6 +155,7 @@ test("composition workshop renders clear beat pits and rhythm-only cards", () =>
   assert.match(html, /data-play-composition/);
   assert.match(html, /compose-instrument-row/);
   assert.equal((html.match(/data-instrument=/g) ?? []).length, 4);
+  assert.doesNotMatch(html, /compose-award/);
   assert.doesNotMatch(html, /<details class="compose-settings">/);
   assert.doesNotMatch(html, /闯关星标|真实音色|准备展示|把节奏块放进空坑|每小节刚好填满/);
   assert.match(html, /data-piece-beats="2"/);
