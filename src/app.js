@@ -55,9 +55,9 @@ function renderHome() {
     {
       view: "beat",
       number: "01",
-      title: "花鼓节奏台",
-      desc: "听清 2/4 强弱、3/4 强弱弱",
-      status: appState.beatGame.score > 0 ? "继续挑战" : "开始挑战",
+      title: "花鼓",
+      desc: "",
+      status: appState.beatGame.score > 0 ? "继续" : "开始",
       badge: `连击 ${appState.beatGame.streak}`,
       icon: "鼓",
       isDone: appState.beatGame.score >= 4,
@@ -67,9 +67,9 @@ function renderHome() {
     {
       view: "rhythm",
       number: "02",
-      title: "节奏采花路",
-      desc: "把正确节奏花拖进答案槽",
-      status: appState.rhythmGame.correctCount > 0 ? "继续采花" : "开始采花",
+      title: "节奏",
+      desc: "",
+      status: appState.rhythmGame.correctCount > 0 ? "继续" : "开始",
       badge: `${appState.rhythmGame.correctCount}/${rhythmQuestions.length}`,
       icon: "花",
       isDone: appState.rhythmGame.correctCount >= rhythmQuestions.length,
@@ -79,9 +79,9 @@ function renderHome() {
     {
       view: "compose",
       number: "03",
-      title: "小乐队拼图台",
-      desc: "拼 4 小节，再播放自己的节奏",
-      status: completeBars > 0 ? "继续创编" : "开始创编",
+      title: "创编",
+      desc: "",
+      status: completeBars > 0 ? "继续" : "开始",
       badge: `${completeBars}/${appState.composition.bars.length} 小节`,
       icon: "乐",
       isDone: completeBars >= appState.composition.bars.length,
@@ -95,24 +95,11 @@ function renderHome() {
     <section class="home-view enter-view">
       <div class="festival-hud" aria-label="今日闯关进度">
         <div>
-          <span class="hud-kicker">今日任务</span>
-          <strong>点亮花儿会小舞台</strong>
+          <strong>闯三关</strong>
         </div>
         <div class="hud-badges">
           <span>星星 ${appState.stars}</span>
           <span>${completedLevels}/3 关</span>
-        </div>
-      </div>
-      <div class="hero-card stage-card game-lobby">
-        <img class="hero-scene" src="./assets/images/game-lobby-scene.png" alt="青海花儿会小舞台上，学生小乐队准备闯关">
-        <div class="hero-copy">
-          <p class="eyebrow">青海花儿会 · 小花鼓队</p>
-          <h2>闯三关，组一支会打节奏的小乐队。</h2>
-          <p>先敲花鼓识强弱，再采节奏花，最后把 4 个小节排成班级小舞台。</p>
-          <button class="primary-action" data-go-view="beat" type="button">开始敲花鼓</button>
-          <div class="mini-awards" aria-label="关卡奖章">
-            ${levels.map((level) => `<span class="${level.isDone ? "is-lit" : ""}">${level.icon}</span>`).join("")}
-          </div>
         </div>
       </div>
       <div class="quest-map" aria-label="花儿会闯关路线">
@@ -120,11 +107,8 @@ function renderHome() {
         ${levels.map((level) => `
           <button class="level-card level-${level.view} ${level.isDone ? "is-complete" : ""}" data-go-view="${level.view}" type="button">
             <span class="level-art" aria-hidden="true"></span>
-            <span class="level-number">${level.number}</span>
             <span class="level-icon" aria-hidden="true">${level.icon}</span>
             <strong>${level.title}</strong>
-            <small>${level.desc}</small>
-            <i>${level.badge}</i>
             <span class="level-meter" aria-hidden="true"><b style="--level-progress:${(level.progress / level.total) * 100}%"></b></span>
             <em>${level.status}</em>
           </button>
