@@ -5,11 +5,20 @@ const meterCapacity = {
   "3/4": 3
 };
 
+const compositionInstrumentFallbacks = {
+  "hand-drum": "bass-drum",
+  woodblock: "triangle"
+};
+
+function normalizeCompositionInstrument(instrument) {
+  return compositionInstrumentFallbacks[instrument] ?? instrument ?? "bass-drum";
+}
+
 export function createDefaultComposition({ meter = "2/4", bars = 4 } = {}) {
   return {
     mode: meter === "2/4" ? "欢快段" : "悠扬段",
     meter,
-    instrument: "hand-drum",
+    instrument: "bass-drum",
     activeBarIndex: 0,
     isComplete: false,
     feedbackMessage: null,
@@ -124,11 +133,11 @@ export function clearCompositionBar(composition, barIndex) {
   return refreshCompositionProgress(composition, nextBars, barIndex, true);
 }
 
-export function resetComposition({ meter = "2/4", instrument = "hand-drum", mode } = {}) {
+export function resetComposition({ meter = "2/4", instrument = "bass-drum", mode } = {}) {
   return {
     ...createDefaultComposition({ meter, bars: 4 }),
     mode: mode ?? (meter === "2/4" ? "欢快段" : "悠扬段"),
-    instrument
+    instrument: normalizeCompositionInstrument(instrument)
   };
 }
 
@@ -148,6 +157,7 @@ function normalizeComposition(composition) {
 
   return {
     ...composition,
+    instrument: normalizeCompositionInstrument(composition.instrument),
     activeBarIndex: activeBarIndex === -1 ? bars.length - 1 : activeBarIndex,
     isComplete,
     bars

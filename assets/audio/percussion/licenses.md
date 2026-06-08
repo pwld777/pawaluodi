@@ -20,5 +20,7 @@ Current mappings:
 - `tambourine.wav`: `samples/Tambourine/01_01.wav`.
 - `shaker.wav`: `samples/EggShaker/fast_01.wav`.
 - `maracas.wav`: `samples/Maracas/01_01.wav`.
+- `bass-drum-strong.wav` / `bass-drum-soft.wav`: generated classroom bass drum one-shots.
+- `triangle-strong.wav` / `triangle-soft.wav`: generated classroom triangle one-shots.
 
 The hand drum mapping is still a classroom approximation rather than an actual Chinese flower-drum recording, but it now preserves the intended center/edge contrast: low `doom` for drum center and bright `tak` for drum edge. If a licensed flower-drum one-shot is later available, replace `hand-drum-strong.wav` and `hand-drum-rim.wav` while keeping the same filenames.

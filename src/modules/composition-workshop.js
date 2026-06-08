@@ -1,5 +1,5 @@
 import { getAllowedBlocksForMeter, getNotationCard, getPlaybackEvents } from "../data/notation-cards.js";
-import { instruments } from "../data/instrument-sounds.js";
+import { compositionInstruments } from "../data/instrument-sounds.js";
 import { clearCompositionBar, placeBlockInBar, resetComposition } from "./game-logic.js";
 import { playInstrument, preloadInstrument, unlockAudio } from "./audio-engine.js";
 import { announceFeedback } from "./feedback.js";
@@ -60,7 +60,7 @@ function shortFeedback(message) {
 function renderInstrumentRow(composition) {
   return `
     <div class="compose-instrument-row" aria-label="选择乐器">
-      ${instruments.map((instrument) => `
+      ${compositionInstruments.map((instrument) => `
         <button class="${composition.instrument === instrument.id ? "active" : ""}" data-instrument="${instrument.id}" type="button" style="--instrument:${instrument.color}" aria-pressed="${composition.instrument === instrument.id ? "true" : "false"}">
           <span class="instrument-photo" style="background-image:url('${instrument.image}'); background-position:${instrument.imagePosition}" aria-hidden="true"></span>
           <strong>${instrument.name}</strong>

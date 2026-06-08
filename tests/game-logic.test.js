@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 
 import { beatGame, evaluateBeatHit } from "../src/data/beat-patterns.js";
-import { instruments } from "../src/data/instrument-sounds.js";
+import { compositionInstruments, instruments } from "../src/data/instrument-sounds.js";
 import { getAllowedBlocksForMeter, getPlaybackEvents } from "../src/data/notation-cards.js";
 import { rhythmQuestions, evaluateRhythmAnswer } from "../src/data/rhythm-questions.js";
 import { addBlockToBar, clearCompositionBar, createDefaultComposition, createInitialState, placeBlockInBar, serializeState, restoreState } from "../src/modules/game-logic.js";
@@ -197,7 +197,8 @@ test("app preserves the Phaser stage host when composition rerenders", () => {
 });
 
 test("composition workshop exposes four classroom percussion instruments", () => {
-  assert.deepEqual(instruments.map((instrument) => instrument.id), ["hand-drum", "woodblock", "tambourine", "shaker"]);
+  assert.deepEqual(compositionInstruments.map((instrument) => instrument.id), ["bass-drum", "triangle", "tambourine", "shaker"]);
+  assert.deepEqual(compositionInstruments.map((instrument) => instrument.name), ["大鼓", "三角铁", "铃鼓", "沙锤"]);
 });
 
 test("instrument sample files exist for classroom playback", () => {
@@ -212,6 +213,13 @@ test("flower drum uses separate center and surface hit samples", () => {
   assert.equal(handDrum.sample.strong, "./assets/audio/percussion/hand-drum-strong.wav");
   assert.equal(handDrum.sample.weak, "./assets/audio/percussion/hand-drum-rim.wav");
   assert.notEqual(handDrum.sample.strong, handDrum.sample.weak);
+});
+
+test("old composition instruments migrate to the new classroom set", () => {
+  const savedHandDrum = serializeState({ currentView: "compose", composition: { ...createDefaultComposition(), instrument: "hand-drum" } });
+  const savedWoodblock = serializeState({ currentView: "compose", composition: { ...createDefaultComposition(), instrument: "woodblock" } });
+  assert.equal(restoreState(savedHandDrum).composition.instrument, "bass-drum");
+  assert.equal(restoreState(savedWoodblock).composition.instrument, "triangle");
 });
 
 test("state serialization round-trips current view and composition", () => {
