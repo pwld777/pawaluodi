@@ -62,6 +62,9 @@ function playSample(context, instrument, { volume, start, accent }) {
       source.stop(safeStart + (instrument.sample.trimSeconds ?? 0.35));
     })
     .catch(() => {
+      if (instrument.sample?.realOnly) {
+        return;
+      }
       playSynth(context, instrument, { volume, start, accent });
     });
 

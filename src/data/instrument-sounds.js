@@ -25,7 +25,8 @@ export const instruments = [
       strong: "./assets/audio/percussion/bass-drum-strong.wav",
       weak: "./assets/audio/percussion/bass-drum-soft.wav",
       playbackRate: 1,
-      trimSeconds: 0.56
+      trimSeconds: 1.15,
+      realOnly: true
     },
     tone: { type: "sine", frequency: 82, decay: 0.22, noise: 0.05 }
   },
@@ -55,7 +56,8 @@ export const instruments = [
       strong: "./assets/audio/percussion/triangle-strong.wav",
       weak: "./assets/audio/percussion/triangle-soft.wav",
       playbackRate: 1,
-      trimSeconds: 0.74
+      trimSeconds: 1.4,
+      realOnly: true
     },
     tone: { type: "triangle", frequency: 1560, decay: 0.35, noise: 0.02 }
   },

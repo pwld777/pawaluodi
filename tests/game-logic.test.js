@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 
 import { beatGame, evaluateBeatHit } from "../src/data/beat-patterns.js";
 import { compositionInstruments, instruments } from "../src/data/instrument-sounds.js";
@@ -206,6 +206,17 @@ test("instrument sample files exist for classroom playback", () => {
     assert.equal(existsSync(instrument.sample.strong.replace("./", "")), true, `${instrument.id} strong sample missing`);
     assert.equal(existsSync(instrument.sample.weak.replace("./", "")), true, `${instrument.id} weak sample missing`);
   }
+});
+
+test("composition bass drum and triangle use real recorded samples only", () => {
+  const bassDrum = instruments.find((instrument) => instrument.id === "bass-drum");
+  const triangle = instruments.find((instrument) => instrument.id === "triangle");
+  assert.equal(bassDrum.sample.realOnly, true);
+  assert.equal(triangle.sample.realOnly, true);
+  assert.ok(statSync(bassDrum.sample.strong.replace("./", "")).size > 1_000_000);
+  assert.ok(statSync(bassDrum.sample.weak.replace("./", "")).size > 1_000_000);
+  assert.ok(statSync(triangle.sample.strong.replace("./", "")).size > 1_000_000);
+  assert.ok(statSync(triangle.sample.weak.replace("./", "")).size > 1_000_000);
 });
 
 test("flower drum uses separate center and surface hit samples", () => {

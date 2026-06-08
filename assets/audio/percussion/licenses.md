@@ -20,7 +20,15 @@ Current mappings:
 - `tambourine.wav`: `samples/Tambourine/01_01.wav`.
 - `shaker.wav`: `samples/EggShaker/fast_01.wav`.
 - `maracas.wav`: `samples/Maracas/01_01.wav`.
-- `bass-drum-strong.wav` / `bass-drum-soft.wav`: generated classroom bass drum one-shots.
-- `triangle-strong.wav` / `triangle-soft.wav`: generated classroom triangle one-shots.
+- `bass-drum-strong.wav`: VCSL `Membranophones/Struck Membranophones/Bass Drum 2/bassdrum_hit_ff.wav`, real recorded bass drum hit.
+- `bass-drum-soft.wav`: VCSL `Membranophones/Struck Membranophones/Bass Drum 2/bassdrum_hit_mp1.wav`, real recorded bass drum hit.
+- `triangle-strong.wav`: VCSL `Idiophones/Struck Idiophones/Triangles/Triangle3_Hit_v2_rr1_Mid.wav`, real recorded triangle hit.
+- `triangle-soft.wav`: VCSL `Idiophones/Struck Idiophones/Triangles/Triangle3_Hit_v1_rr1_Mid.wav`, real recorded triangle hit.
+
+## Versilian Community Sample Library
+
+The bass drum and triangle replacements are from Versilian Community Sample Library (VCSL), a CC0 sample library.
+
+Source repository: https://github.com/sgossner/VCSL
 
 The hand drum mapping is still a classroom approximation rather than an actual Chinese flower-drum recording, but it now preserves the intended center/edge contrast: low `doom` for drum center and bright `tak` for drum edge. If a licensed flower-drum one-shot is later available, replace `hand-drum-strong.wav` and `hand-drum-rim.wav` while keeping the same filenames.
