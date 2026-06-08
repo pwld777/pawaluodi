@@ -46,7 +46,7 @@ function stopTicker() {
 export function renderBeatGame({ state, setState, onReward }) {
   const beatState = state.beatGame;
   const patternConfig = beatState.currentMeter === "3/4" ? beatGame.sectionB : beatGame.sectionA;
-  const stepLabel = beatState.currentStep === "switch" ? "A-B-A 强弱切换" : `${patternConfig.name} · ${patternConfig.pattern.join(" ").replaceAll("strong", "强").replaceAll("weak", "弱")}`;
+  const stepLabel = beatState.currentStep === "switch" ? "A-B-A 切换" : patternConfig.name;
 
   return `
     <section class="game-layout beat-layout enter-view">
@@ -54,14 +54,14 @@ export function renderBeatGame({ state, setState, onReward }) {
         <p class="eyebrow">游戏一</p>
         <h2>花鼓</h2>
         <ol class="step-list">
-          <li class="${beatState.currentStep === "intro" ? "active" : ""}">强弱</li>
-          <li class="${beatState.currentMeter === "2/4" && beatState.currentStep !== "intro" ? "active" : ""}">2/4 强弱</li>
-          <li class="${beatState.currentMeter === "3/4" ? "active" : ""}">3/4 强弱弱</li>
+          <li class="${beatState.currentStep === "intro" ? "active" : ""}">听鼓</li>
+          <li class="${beatState.currentMeter === "2/4" && beatState.currentStep !== "intro" ? "active" : ""}">2拍</li>
+          <li class="${beatState.currentMeter === "3/4" ? "active" : ""}">3拍</li>
           <li class="${beatState.currentStep === "switch" ? "active" : ""}">A-B-A 切换</li>
         </ol>
         <div class="mode-buttons">
-          <button type="button" data-beat-mode="2/4">强弱</button>
-          <button type="button" data-beat-mode="3/4">强弱弱</button>
+          <button type="button" data-beat-mode="2/4">2拍</button>
+          <button type="button" data-beat-mode="3/4">3拍</button>
           <button type="button" data-beat-switch>A-B-A</button>
         </div>
       </aside>
@@ -74,15 +74,13 @@ export function renderBeatGame({ state, setState, onReward }) {
         </div>
         <p class="round-label">${stepLabel}</p>
         <div class="beat-track" aria-label="拍点轨道">
-          ${patternConfig.pattern.map((beat, index) => `<span class="beat-dot ${beat}" data-beat-dot="${index}">${beat === "strong" ? "强" : "弱"}</span>`).join("")}
+          ${patternConfig.pattern.map((beat, index) => `<span class="beat-dot ${beat}" data-beat-dot="${index}" aria-label="第 ${index + 1} 拍">${index + 1}</span>`).join("")}
         </div>
         <div class="huagu" role="group" aria-label="可点击花鼓">
           <img class="huagu-image" src="./assets/images/flower-drum-3d.png" alt="红色大花鼓，鼓面朝上，鼓身贴有花纹">
-          <span class="drum-callout drum-callout-strong" aria-hidden="true">鼓心 强</span>
-          <span class="drum-callout drum-callout-weak" aria-hidden="true">鼓边 弱</span>
-          <button class="drum-zone drum-hit-surface" data-drum-surface type="button" aria-label="敲花鼓，鼓心是强拍，鼓边是弱拍"><span>敲花鼓</span></button>
+          <button class="drum-zone drum-hit-surface" data-drum-surface type="button" aria-label="敲花鼓"><span>敲花鼓</span></button>
         </div>
-        <p class="feedback-pill" id="beatFeedback" data-tone="info">看颜色，敲鼓心/鼓边。</p>
+        <p class="feedback-pill" id="beatFeedback" data-tone="info">先听，再敲。</p>
         <div class="control-row">
           <button class="primary-action" data-start-beat type="button">开始</button>
           <button data-stop-beat type="button">停止</button>
@@ -91,10 +89,10 @@ export function renderBeatGame({ state, setState, onReward }) {
       </div>
 
       <aside class="hint-panel">
-        <h3>拍子提示</h3>
-        <div class="meter-card"><strong>2/4</strong><span>鼓心 鼓边</span></div>
-        <div class="meter-card"><strong>3/4</strong><span>鼓心 鼓边 鼓边</span></div>
-        <p>看颜色，跟着敲。</p>
+        <h3>听辨练习</h3>
+        <div class="meter-card"><strong>2/4</strong><span>2 拍一组</span></div>
+        <div class="meter-card"><strong>3/4</strong><span>3 拍一组</span></div>
+        <p>先听，再敲。</p>
       </aside>
     </section>
   `;
@@ -155,7 +153,7 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
       }
     });
     highlightExpectedBeat(root, patternConfig.pattern, 0);
-    announceFeedback(feedback, current.beatGame.currentStep === "switch" ? "按自己的速度先敲强弱，准备好再换成强弱弱。" : "不用跟固定速度：按自己的速度敲对强弱规律。");
+    announceFeedback(feedback, current.beatGame.currentStep === "switch" ? "先敲第一段，准备好再换段。" : "听清楚后，按自己的速度敲。");
   });
 
   root.querySelector("[data-stop-beat]")?.addEventListener("click", () => {
@@ -207,7 +205,7 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
 
       if (current.beatGame.currentStep === "intro") {
         const expectedZone = current.beatGame.currentStep === "intro" && isCenterHit;
-        announceFeedback(feedback, expectedZone ? "准！强拍在鼓心。" : "再听一听，强拍在鼓心。", expectedZone ? "good" : "warn");
+        announceFeedback(feedback, expectedZone ? "对了！" : "不对，再听一次。", expectedZone ? "good" : "warn");
         if (expectedZone) {
           onReward(1);
         }
@@ -236,7 +234,7 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
           }
         });
         highlightExpectedBeat(root, patternConfig.pattern, nextSequenceIndex);
-        announceFeedback(feedback, nextSequenceIndex === 0 ? "这一组规律对了！继续按自己的速度来。" : result.message, "good");
+        announceFeedback(feedback, nextSequenceIndex === 0 ? "这一组对了！继续。" : "对了！", "good");
         if (streak === 4) {
           onReward(2);
         }
@@ -251,7 +249,7 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
           }
         });
         highlightExpectedBeat(root, patternConfig.pattern, 0);
-        announceFeedback(feedback, `${result.message}，这一组从强拍重新来。`, "bad");
+        announceFeedback(feedback, "不对，从头再来。", "bad");
       }
     };
 
@@ -259,7 +257,7 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
     button.addEventListener("click", handleDrumHit);
   });
 
-  root.querySelector(".primary-action")?.insertAdjacentHTML("afterend", '<button data-switch-now type="button">强弱弱</button>');
+  root.querySelector(".primary-action")?.insertAdjacentHTML("afterend", '<button data-switch-now type="button">换段</button>');
   root.querySelector("[data-switch-now]")?.addEventListener("click", () => {
     if (!session) {
       announceFeedback(feedback, "先点开始，再按自己的速度练 A-B-A 切换。", "warn");
@@ -276,7 +274,7 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
       }
     });
     stopTicker();
-    announceFeedback(feedback, "已经换成强弱弱，现在按自己的速度敲三拍子。", "good");
+    announceFeedback(feedback, "已经换段，现在听着敲。", "good");
     setTimeout(render, 600);
   });
 }

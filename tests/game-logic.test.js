@@ -7,6 +7,7 @@ import { instruments } from "../src/data/instrument-sounds.js";
 import { getAllowedBlocksForMeter, getPlaybackEvents } from "../src/data/notation-cards.js";
 import { rhythmQuestions, evaluateRhythmAnswer } from "../src/data/rhythm-questions.js";
 import { addBlockToBar, clearCompositionBar, createDefaultComposition, createInitialState, placeBlockInBar, serializeState, restoreState } from "../src/modules/game-logic.js";
+import { renderBeatGame } from "../src/modules/beat-game.js";
 import { renderCompositionWorkshop } from "../src/modules/composition-workshop.js";
 
 test("beat patterns map 2/4 to strong-weak and 3/4 to strong-weak-weak", () => {
@@ -22,6 +23,23 @@ test("beat hit evaluation accepts correct zones without fixed tempo", () => {
 test("beat hit evaluation distinguishes reversed strong and weak zones", () => {
   assert.equal(evaluateBeatHit({ pattern: ["strong", "weak"], beatIndex: 0, zone: "rim", offsetMs: 40 }).result, "wrong-zone");
   assert.equal(evaluateBeatHit({ pattern: ["strong", "weak"], beatIndex: 1, zone: "center", offsetMs: 420 }).result, "wrong-zone");
+});
+
+test("beat game screen does not reveal strong and weak answers", () => {
+  const html = renderBeatGame({
+    state: createInitialState(),
+    setState: () => {},
+    onReward: () => {}
+  });
+  const visibleText = html
+    .replace(/<script[\s\S]*?<\/script>/g, "")
+    .replace(/<style[\s\S]*?<\/style>/g, "")
+    .replace(/<[^>]+>/g, "");
+
+  assert.match(html, /data-drum-surface/);
+  assert.match(html, /data-beat-dot/);
+  assert.doesNotMatch(visibleText, /强|弱|鼓心|鼓边/);
+  assert.doesNotMatch(html, /aria-label="[^"]*(强|弱|鼓心|鼓边)[^"]*"/);
 });
 
 test("3/4 beat evaluation treats the third beat as weak", () => {

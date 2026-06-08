@@ -1945,7 +1945,7 @@ h3 {
   box-shadow: 0 0 0 9px rgba(255, 212, 90, 0.22);
   transform: translate(-50%, -50%);
   animation: burst 360ms ease;
-  content: "强";
+  content: "";
 }
 
 .huagu[data-hit-zone="rim"] .drum-hit-surface::before {
@@ -1953,7 +1953,7 @@ h3 {
   top: 46%;
   color: #166a6d;
   box-shadow: 0 0 0 9px rgba(71, 193, 180, 0.2);
-  content: "弱";
+  content: "";
 }
 
 .flower-field {

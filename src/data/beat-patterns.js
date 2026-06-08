@@ -37,19 +37,19 @@ export function evaluateBeatHit({ pattern, beatIndex, zone }) {
     if (pattern.length === 3 && beatIndex % pattern.length === 2 && actual === "strong") {
       return {
         result: "wrong-third-beat",
-        message: "三拍子后两拍都是弱拍，第三拍轻敲鼓边"
+        message: "不对，从头再来。"
       };
     }
 
     return {
       result: "wrong-zone",
-      message: expected === "strong" ? "强拍在鼓心" : "弱拍在鼓边"
+      message: "不对，再听一次。"
     };
   }
 
   return {
     result: "correct",
-    message: expected === "strong" ? "准！强拍真稳" : "准！弱拍轻轻走"
+    message: "对了！"
   };
 }
 
