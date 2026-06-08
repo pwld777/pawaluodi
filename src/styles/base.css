@@ -260,8 +260,8 @@ h3 {
 
 .home-view {
   display: grid;
-  gap: 12px;
-  padding-bottom: 78px;
+  gap: 16px;
+  padding-bottom: 32px;
 }
 
 .hero-card {
@@ -335,15 +335,15 @@ h3 {
 }
 
 .level-card {
-  --level-art-height: clamp(138px, 13vw, 180px);
+  --level-art-height: clamp(190px, 18vw, 250px);
   position: relative;
   overflow: hidden;
   display: grid;
   justify-items: start;
-  gap: 8px;
-  min-height: calc(var(--level-art-height) + 138px);
-  padding: calc(var(--level-art-height) + 16px) 18px 18px;
-  border-radius: 24px;
+  gap: 12px;
+  min-height: calc(var(--level-art-height) + 170px);
+  padding: calc(var(--level-art-height) + 20px) 22px 22px;
+  border-radius: 28px;
   text-align: left;
   background: linear-gradient(160deg, #fff6c4, #f5b746);
 }
@@ -353,7 +353,7 @@ h3 {
   position: absolute;
   right: -20px;
   bottom: -34px;
-  width: 118px;
+  width: 140px;
   aspect-ratio: 1;
   border-radius: 42px;
   background: rgba(255, 255, 255, 0.28);
@@ -378,7 +378,7 @@ h3 {
   left: 0;
   width: 100%;
   height: var(--level-art-height);
-  border-radius: 20px 20px 16px 16px;
+  border-radius: 24px 24px 18px 18px;
   background-image: linear-gradient(180deg, transparent 58%, rgba(63, 31, 10, 0.38)), url("../../assets/images/level-cards-sheet.png");
   background-repeat: no-repeat;
   background-size: 300% auto;
@@ -405,13 +405,14 @@ h3 {
 }
 
 .level-card strong {
-  margin-top: 4px;
-  font-size: 1.55rem;
+  margin-top: 6px;
+  font-size: clamp(1.7rem, 2.4vw, 2.25rem);
 }
 
 .level-card em {
   align-self: end;
-  padding: 8px 13px;
+  min-height: 44px;
+  padding: 8px 16px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.72);
   color: #743313;
@@ -1752,9 +1753,9 @@ h3 {
   position: relative;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: start;
-  gap: 14px;
-  padding: 18px;
+  align-items: stretch;
+  gap: 18px;
+  padding: 22px;
   border: 4px solid rgba(123, 68, 24, 0.34);
   border-radius: 34px;
   background:
@@ -1778,8 +1779,8 @@ h3 {
 
 .quest-map .level-card {
   z-index: 1;
-  min-height: calc(var(--level-art-height) + 144px);
-  padding: calc(var(--level-art-height) + 16px) 18px 18px;
+  min-height: calc(var(--level-art-height) + 170px);
+  padding: calc(var(--level-art-height) + 20px) 22px 22px;
   border: 4px solid rgba(255, 248, 211, 0.86);
   border-radius: 24px;
   box-shadow: 0 12px 0 rgba(113, 64, 24, 0.24), 0 22px 34px rgba(77, 43, 9, 0.18);
@@ -1796,11 +1797,11 @@ h3 {
 
 .level-icon {
   position: absolute;
-  right: 16px;
-  top: calc(var(--level-art-height) - 32px);
+  right: 20px;
+  top: calc(var(--level-art-height) - 34px);
   z-index: 2;
-  width: 56px;
-  height: 56px;
+  width: 66px;
+  height: 66px;
   border: 4px solid rgba(255, 255, 255, 0.82);
   border-radius: 22px;
   background: rgba(255, 248, 204, 0.92);
@@ -1812,21 +1813,22 @@ h3 {
 
 @supports (aspect-ratio: 1) {
   .quest-map .level-card {
-    min-height: auto;
-    padding: 14px 18px 18px;
+    min-height: 0;
+    padding: 18px 22px 22px;
   }
 
   .quest-map .level-art {
     position: relative;
     aspect-ratio: 1;
-    width: min(100%, 158px);
+    width: clamp(190px, 17vw, 245px);
+    max-width: 100%;
     height: auto;
     justify-self: center;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
   }
 
   .quest-map .level-icon {
-    top: clamp(108px, 10vw, 148px);
+    top: clamp(168px, 15vw, 226px);
   }
 }
 
@@ -2132,10 +2134,34 @@ h3 {
 
 @media (min-width: 921px) and (orientation: landscape) {
   body[data-view="home"] .app-shell {
-    padding-top: 10px;
+    padding: 18px 24px 28px;
   }
 
   body[data-view="home"] .game-header {
+    max-width: 1180px;
+    min-height: 88px;
+    padding: 0 28px;
+    border: 4px solid rgba(255, 244, 174, 0.9);
+    border-radius: 32px;
+    background:
+      linear-gradient(90deg, rgba(255, 251, 218, 0.94), rgba(223, 246, 213, 0.88)),
+      rgba(255, 255, 255, 0.8);
+    box-shadow: 0 12px 30px rgba(77, 48, 13, 0.16);
+  }
+
+  body[data-view="home"] .game-header .eyebrow {
+    display: none;
+  }
+
+  body[data-view="home"] .game-header h1 {
+    font-size: clamp(2.4rem, 3.2vw, 3.35rem);
+  }
+
+  body[data-view="home"] .bottom-nav {
+    display: none;
+  }
+
+  body[data-view="home"] .festival-hud {
     display: none;
   }
 }
@@ -2146,16 +2172,12 @@ h3 {
   }
 
   body[data-view="home"] .app-shell {
-    padding-top: 10px;
-  }
-
-  body[data-view="home"] .game-header {
-    display: none;
+    padding: 12px 18px 24px;
   }
 
   body[data-view="home"] .home-view {
-    gap: 10px;
-    padding-bottom: 76px;
+    gap: 12px;
+    padding-bottom: 0;
   }
 
   body[data-view="home"] .festival-hud {
@@ -2165,19 +2187,21 @@ h3 {
   }
 
   body[data-view="home"] .quest-map {
-    padding: 14px;
+    padding: 16px;
   }
 
   body[data-view="home"] .quest-map .level-card {
-    padding: 12px 14px 14px;
+    padding: 14px 18px 18px;
   }
 
   body[data-view="home"] .quest-map .level-art {
-    width: min(100%, 152px);
+    width: clamp(174px, 16vw, 205px);
   }
 
   body[data-view="home"] .quest-map .level-icon {
-    top: 106px;
+    top: clamp(154px, 14vw, 184px);
+    width: 60px;
+    height: 60px;
   }
 
   body[data-view="beat"] .app-shell {

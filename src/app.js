@@ -10,6 +10,7 @@ const storageKey = "huaer-yu-shaonian-state";
 const viewRoot = document.querySelector("#viewRoot");
 const starCount = document.querySelector("#starCount");
 const scoreBoard = document.querySelector(".score-board");
+const pageTitle = document.querySelector(".game-header h1");
 
 let appState = restoreState(localStorage.getItem(storageKey)) ?? createInitialState();
 
@@ -95,7 +96,7 @@ function renderHome() {
     <section class="home-view enter-view">
       <div class="festival-hud" aria-label="今日闯关进度">
         <div>
-          <strong>闯三关</strong>
+          <strong>小舞台</strong>
         </div>
         <div class="hud-badges">
           <span>星星 ${appState.stars}</span>
@@ -151,6 +152,9 @@ function render() {
   updateNavigation(appState.currentView);
   updateNavProgress();
   starCount.textContent = String(appState.stars);
+  if (pageTitle) {
+    pageTitle.textContent = appState.currentView === "home" ? "闯三关" : "《花儿与少年》音乐闯关";
+  }
 
   if (appState.currentView === "home") {
     viewRoot.innerHTML = renderHome();
