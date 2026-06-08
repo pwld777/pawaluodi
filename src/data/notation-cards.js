@@ -88,6 +88,7 @@ export function getPlaybackEvents(cardId, startBeat = 0) {
   const card = getNotationCard(cardId);
   return card.hits.map((hitOffset, index) => ({
     beat: startBeat + hitOffset,
-    accent: index === 0
+    accent: index === 0,
+    sustainBeats: card.sustainBeats
   }));
 }

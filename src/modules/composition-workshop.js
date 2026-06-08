@@ -394,7 +394,11 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
         const card = getNotationCard(blockId);
         getPlaybackEvents(blockId, blockStartBeat).forEach((event) => {
           const timer = setTimeout(() => {
-            playInstrument(current.composition.instrument, { volume: current.settings.volume, accent: event.accent || blockIndex === 0 });
+            playInstrument(current.composition.instrument, {
+              volume: current.settings.volume,
+              accent: event.accent || blockIndex === 0,
+              sustainSeconds: event.sustainBeats * beatMs / 1000
+            });
           }, (barIndex * bar.capacity + event.beat) * beatMs);
           playbackTimers.push(timer);
         });

@@ -112,24 +112,30 @@ test("composition allows 3/4 completion with a dotted half note", () => {
 
 test("rhythm block playback expands internal hits", () => {
   assert.deepEqual(getPlaybackEvents("eighth-pair", 0), [
-    { beat: 0, accent: true },
-    { beat: 0.5, accent: false }
+    { beat: 0, accent: true, sustainBeats: 0.18 },
+    { beat: 0.5, accent: false, sustainBeats: 0.18 }
   ]);
   assert.deepEqual(getPlaybackEvents("sixteenth-run", 1), [
-    { beat: 1, accent: true },
-    { beat: 1.25, accent: false },
-    { beat: 1.5, accent: false },
-    { beat: 1.75, accent: false }
+    { beat: 1, accent: true, sustainBeats: 0.12 },
+    { beat: 1.25, accent: false, sustainBeats: 0.12 },
+    { beat: 1.5, accent: false, sustainBeats: 0.12 },
+    { beat: 1.75, accent: false, sustainBeats: 0.12 }
   ]);
   assert.deepEqual(getPlaybackEvents("eighth-sixteenth", 0), [
-    { beat: 0, accent: true },
-    { beat: 0.5, accent: false },
-    { beat: 0.75, accent: false }
+    { beat: 0, accent: true, sustainBeats: 0.16 },
+    { beat: 0.5, accent: false, sustainBeats: 0.16 },
+    { beat: 0.75, accent: false, sustainBeats: 0.16 }
   ]);
   assert.deepEqual(getPlaybackEvents("sixteenth-eighth", 0), [
-    { beat: 0, accent: true },
-    { beat: 0.25, accent: false },
-    { beat: 0.5, accent: false }
+    { beat: 0, accent: true, sustainBeats: 0.16 },
+    { beat: 0.25, accent: false, sustainBeats: 0.16 },
+    { beat: 0.5, accent: false, sustainBeats: 0.16 }
+  ]);
+  assert.deepEqual(getPlaybackEvents("half-note", 0), [
+    { beat: 0, accent: true, sustainBeats: 1.5 }
+  ]);
+  assert.deepEqual(getPlaybackEvents("dotted-half-note", 0), [
+    { beat: 0, accent: true, sustainBeats: 2.4 }
   ]);
 });
 
@@ -183,6 +189,11 @@ test("composition workshop edits bars without full rerender hooks", () => {
 
   assert.doesNotMatch(updateCompositionSource, /\brender\(\);/);
   assert.doesNotMatch(instrumentListenerSource, /\brender\(\);/);
+});
+
+test("composition playback passes note sustain to instruments", () => {
+  const source = readFileSync("src/modules/composition-workshop.js", "utf8");
+  assert.match(source, /sustainSeconds:\s*event\.sustainBeats \* beatMs \/ 1000/);
 });
 
 test("online classroom shell loads Phaser for the composition game stage", () => {

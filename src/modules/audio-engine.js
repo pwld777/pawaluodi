@@ -41,7 +41,7 @@ export async function preloadInstrument(instrumentId) {
   await Promise.all([...new Set(urls)].map((url) => loadSample(url)));
 }
 
-function playSample(context, instrument, { volume, start, accent }) {
+function playSample(context, instrument, { volume, start, accent, sustainSeconds }) {
   const sampleUrl = accent ? instrument.sample?.strong : instrument.sample?.weak;
   if (!sampleUrl) {
     return false;
@@ -54,37 +54,42 @@ function playSample(context, instrument, { volume, start, accent }) {
       const gain = context.createGain();
       source.buffer = buffer;
       source.playbackRate.setValueAtTime(instrument.sample.playbackRate ?? 1, safeStart);
+      const sampleDuration = buffer.duration / (instrument.sample.playbackRate ?? 1);
+      const noteDuration = sustainSeconds ?? instrument.sample.trimSeconds ?? 0.35;
+      const playDuration = Math.min(sampleDuration, noteDuration);
+      const releaseStart = Math.max(0.03, playDuration - 0.08);
       gain.gain.setValueAtTime(volume * (accent ? 0.95 : 0.62), safeStart);
-      gain.gain.exponentialRampToValueAtTime(0.001, safeStart + (instrument.sample.trimSeconds ?? 0.35));
+      gain.gain.setValueAtTime(volume * (accent ? 0.95 : 0.62), safeStart + releaseStart);
+      gain.gain.exponentialRampToValueAtTime(0.001, safeStart + playDuration);
       source.connect(gain);
       gain.connect(context.destination);
       source.start(safeStart);
-      source.stop(safeStart + (instrument.sample.trimSeconds ?? 0.35));
+      source.stop(safeStart + playDuration);
     })
     .catch(() => {
       if (instrument.sample?.realOnly) {
         return;
       }
-      playSynth(context, instrument, { volume, start, accent });
+      playSynth(context, instrument, { volume, start, accent, sustainSeconds });
     });
 
   return true;
 }
 
-export function playInstrument(instrumentId, { volume = 0.55, atTime, accent = false } = {}) {
+export function playInstrument(instrumentId, { volume = 0.55, atTime, accent = false, sustainSeconds } = {}) {
   const context = getContext();
   const instrument = getInstrument(instrumentId);
   const start = atTime ?? context.currentTime;
 
-  if (playSample(context, instrument, { volume, start, accent })) {
+  if (playSample(context, instrument, { volume, start, accent, sustainSeconds })) {
     return;
   }
 
-  playSynth(context, instrument, { volume, start, accent });
+  playSynth(context, instrument, { volume, start, accent, sustainSeconds });
 }
 
-function playSynth(context, instrument, { volume, start, accent }) {
-  const duration = instrument.tone.decay * (accent ? 1.2 : 1);
+function playSynth(context, instrument, { volume, start, accent, sustainSeconds }) {
+  const duration = Math.max(instrument.tone.decay * (accent ? 1.2 : 1), sustainSeconds ?? 0);
   const gain = context.createGain();
   const oscillator = context.createOscillator();
 
