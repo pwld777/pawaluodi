@@ -2545,3 +2545,136 @@ h3 {
     font-size: 1.02rem;
   }
 }
+
+@media (min-width: 921px) and (orientation: landscape) {
+  body[data-view="beat"] .app-shell {
+    padding: 14px 24px 24px;
+  }
+
+  body[data-view="beat"] .game-header {
+    max-width: min(1600px, calc(100vw - 72px));
+    min-height: 74px;
+    margin-bottom: 12px;
+  }
+
+  body[data-view="beat"] .game-header h1 {
+    font-size: clamp(2.2rem, 3vw, 3.4rem);
+  }
+
+  body[data-view="beat"] .score-board {
+    min-width: 82px;
+    padding: 9px 14px;
+    border-radius: 22px;
+  }
+
+  body[data-view="beat"] .bottom-nav {
+    display: none;
+  }
+
+  body[data-view="beat"] .view-root {
+    max-width: min(1600px, calc(100vw - 72px));
+  }
+
+  body[data-view="beat"] .beat-layout {
+    display: grid;
+    grid-template-columns: clamp(160px, 11vw, 210px) minmax(0, 1fr) clamp(160px, 11vw, 210px);
+    grid-template-areas: "task stage hint";
+    align-items: stretch;
+    gap: clamp(12px, 1vw, 18px);
+    max-width: none;
+    min-height: calc(100vh - 156px);
+  }
+
+  body[data-view="beat"] .beat-layout .task-rail,
+  body[data-view="beat"] .beat-layout .hint-panel {
+    display: grid;
+    padding: 18px 20px;
+    border-radius: 26px;
+  }
+
+  body[data-view="beat"] .beat-layout .task-rail {
+    grid-area: task;
+    grid-template-columns: 1fr;
+    align-content: start;
+    gap: 12px;
+  }
+
+  body[data-view="beat"] .beat-layout .hint-panel {
+    grid-area: hint;
+    align-content: start;
+  }
+
+  body[data-view="beat"] .beat-layout .task-rail .eyebrow {
+    display: block;
+  }
+
+  body[data-view="beat"] .beat-layout .task-rail h2 {
+    font-size: clamp(2rem, 2.8vw, 3rem);
+  }
+
+  body[data-view="beat"] .beat-layout .step-list {
+    display: grid;
+    gap: 8px;
+    padding-left: 18px;
+    margin: 0;
+  }
+
+  body[data-view="beat"] .beat-layout .step-list li {
+    display: list-item;
+    min-height: 40px;
+    padding: 8px 10px;
+  }
+
+  body[data-view="beat"] .beat-layout .mode-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+  }
+
+  body[data-view="beat"] .beat-layout .mode-buttons button {
+    min-height: 48px;
+    padding: 0 16px;
+  }
+
+  body[data-view="beat"] .beat-layout .drum-stage {
+    grid-area: stage;
+    min-height: calc(100vh - 156px);
+    padding: clamp(14px, 1.2vw, 22px) clamp(18px, 1.5vw, 30px) clamp(18px, 1.5vw, 28px);
+    gap: clamp(6px, 0.8vh, 10px);
+  }
+
+  body[data-view="beat"] .beat-layout .beat-stage-hud {
+    display: flex;
+  }
+
+  body[data-view="beat"] .beat-layout .round-label {
+    font-size: clamp(1.08rem, 1.25vw, 1.35rem);
+  }
+
+  body[data-view="beat"] .beat-layout .beat-dot {
+    width: clamp(46px, 3.3vw, 58px);
+    height: clamp(46px, 3.3vw, 58px);
+  }
+
+  body[data-view="beat"] .beat-layout .huagu {
+    width: min(760px, 78vw, calc((100vh - 312px) * 1.37));
+    max-height: none;
+  }
+
+  body[data-view="beat"] .beat-layout .feedback-pill {
+    width: min(900px, 96%);
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+
+  body[data-view="beat"] .beat-layout .control-row {
+    justify-content: center;
+    flex-wrap: nowrap;
+  }
+
+  body[data-view="beat"] .beat-layout .control-row button {
+    min-width: 108px;
+    min-height: 50px;
+    padding: 0 18px;
+  }
+}
