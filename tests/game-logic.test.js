@@ -4,11 +4,12 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 
 import { beatGame, evaluateBeatHit } from "../src/data/beat-patterns.js";
 import { compositionInstruments, instruments } from "../src/data/instrument-sounds.js";
-import { getAllowedBlocksForMeter, getPlaybackEvents } from "../src/data/notation-cards.js";
+import { getAllowedBlocksForMeter, getPlaybackEvents, notationCards } from "../src/data/notation-cards.js";
 import { rhythmQuestions, evaluateRhythmAnswer } from "../src/data/rhythm-questions.js";
 import { addBlockToBar, clearCompositionBar, createDefaultComposition, createInitialState, placeBlockInBar, serializeState, restoreState } from "../src/modules/game-logic.js";
 import { renderBeatGame } from "../src/modules/beat-game.js";
 import { renderCompositionWorkshop } from "../src/modules/composition-workshop.js";
+import { renderRhythmGame } from "../src/modules/rhythm-drag-game.js";
 
 test("beat patterns map 2/4 to strong-weak and 3/4 to strong-weak-weak", () => {
   assert.deepEqual(beatGame.sectionA.pattern, ["strong", "weak"]);
@@ -47,14 +48,56 @@ test("3/4 beat evaluation treats the third beat as weak", () => {
   assert.equal(evaluateBeatHit({ pattern: ["strong", "weak", "weak"], beatIndex: 2, zone: "center", offsetMs: 40 }).result, "wrong-third-beat");
 });
 
-test("rhythm question answers cover meter, density, and style prompts", () => {
-  assert.equal(rhythmQuestions.length, 6);
-  assert.equal(evaluateRhythmAnswer("meter-two-four", ["strong-weak"]).correct, true);
-  assert.equal(evaluateRhythmAnswer("meter-three-four", ["strong-weak-weak"]).correct, true);
+test("rhythm game asks only the two main section rhythm questions", () => {
+  const notationIds = new Set(notationCards.map((card) => card.id));
+
+  assert.deepEqual(rhythmQuestions.map((question) => question.id), ["section-a-main", "section-b-main"]);
   assert.equal(evaluateRhythmAnswer("section-a-main", ["sixteenth-run"]).correct, true);
   assert.equal(evaluateRhythmAnswer("section-b-main", ["half-note"]).correct, true);
-  assert.equal(evaluateRhythmAnswer("density-compare", ["dense-a", "open-b"]).correct, true);
-  assert.equal(evaluateRhythmAnswer("style-match", ["joyful-a", "lyrical-b"]).correct, true);
+
+  for (const question of rhythmQuestions) {
+    assert.equal(question.type, "single");
+    assert.ok(question.options.length >= 4);
+    assert.equal(new Set(question.options).size, question.options.length);
+    assert.ok(question.options.every((optionId) => notationIds.has(optionId)));
+    assert.ok(question.answer.every((optionId) => notationIds.has(optionId)));
+  }
+});
+
+test("rhythm game clamps old saved progress to the current two questions", () => {
+  const state = createInitialState();
+  state.rhythmGame = {
+    currentQuestionIndex: 5,
+    correctCount: 6,
+    completedAnswers: {}
+  };
+
+  const html = renderRhythmGame({ state });
+
+  assert.match(html, /第二乐段主节奏/);
+  assert.match(html, /第 2 \/ 2 题/);
+  assert.doesNotMatch(html, /第 6 \/ 2 题/);
+});
+
+test("saved rhythm progress is normalized to the current question set", () => {
+  const restored = restoreState(JSON.stringify({
+    currentView: "home",
+    rhythmGame: {
+      currentQuestionIndex: 5,
+      correctCount: 6,
+      completedAnswers: {
+        "section-a-main": ["sixteenth-run"],
+        "style-match": ["joyful-a", "lyrical-b"]
+      }
+    },
+    composition: createDefaultComposition()
+  }));
+
+  assert.equal(restored.rhythmGame.currentQuestionIndex, 1);
+  assert.equal(restored.rhythmGame.correctCount, rhythmQuestions.length);
+  assert.deepEqual(restored.rhythmGame.completedAnswers, {
+    "section-a-main": ["sixteenth-run"]
+  });
 });
 
 test("composition defaults to a four-bar student phrase", () => {

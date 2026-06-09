@@ -1,4 +1,5 @@
 import { getNotationCard } from "../data/notation-cards.js";
+import { rhythmQuestions } from "../data/rhythm-questions.js";
 
 const meterCapacity = {
   "2/4": 2,
@@ -164,6 +165,25 @@ function normalizeComposition(composition) {
   };
 }
 
+function normalizeRhythmGame(rhythmGame) {
+  const questionIds = new Set(rhythmQuestions.map((question) => question.id));
+  const currentQuestionIndex = Number.isInteger(rhythmGame?.currentQuestionIndex)
+    ? Math.min(Math.max(rhythmGame.currentQuestionIndex, 0), rhythmQuestions.length - 1)
+    : 0;
+  const correctCount = Number.isInteger(rhythmGame?.correctCount)
+    ? Math.min(Math.max(rhythmGame.correctCount, 0), rhythmQuestions.length)
+    : 0;
+  const completedAnswers = Object.fromEntries(
+    Object.entries(rhythmGame?.completedAnswers ?? {}).filter(([questionId]) => questionIds.has(questionId))
+  );
+
+  return {
+    currentQuestionIndex,
+    correctCount,
+    completedAnswers
+  };
+}
+
 export function serializeState(state) {
   return JSON.stringify(state);
 }
@@ -177,6 +197,7 @@ export function restoreState(serialized) {
     const parsed = JSON.parse(serialized);
     return {
       ...parsed,
+      rhythmGame: normalizeRhythmGame(parsed.rhythmGame),
       composition: normalizeComposition(parsed.composition)
     };
   } catch {

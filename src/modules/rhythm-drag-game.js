@@ -3,22 +3,19 @@ import { rhythmQuestions, evaluateRhythmAnswer } from "../data/rhythm-questions.
 import { announceFeedback } from "./feedback.js";
 import { renderRhythmMark } from "./rhythm-mark.js";
 
-const customOptionLabels = {
-  "dense-a": "更密 → 第一段",
-  "open-b": "更疏 → 第二段",
-  "open-a": "更疏 → 第一段",
-  "joyful-a": "欢快跳动 → 第一段",
-  "lyrical-b": "悠扬舒展 → 第二段",
-  "joyful-b": "欢快跳动 → 第二段",
-  "strong-weak": "强 弱",
-  "strong-weak-weak": "强 弱 弱",
-  "weak-strong": "弱 强",
-  "strong-strong-weak": "强 强 弱"
-};
+function clampRhythmIndex(index) {
+  return Math.min(Math.max(index ?? 0, 0), rhythmQuestions.length - 1);
+}
+
+function clampRhythmCount(count) {
+  return Math.min(Math.max(count ?? 0, 0), rhythmQuestions.length);
+}
 
 export function renderRhythmGame({ state }) {
   const rhythmState = state.rhythmGame;
-  const question = rhythmQuestions[rhythmState.currentQuestionIndex] ?? rhythmQuestions[0];
+  const questionIndex = clampRhythmIndex(rhythmState.currentQuestionIndex);
+  const correctCount = clampRhythmCount(rhythmState.correctCount);
+  const question = rhythmQuestions[questionIndex] ?? rhythmQuestions[0];
 
   return `
     <section class="game-layout rhythm-layout enter-view">
@@ -27,7 +24,7 @@ export function renderRhythmGame({ state }) {
         <h2>${question.title}</h2>
         <p class="large-prompt">${question.prompt}</p>
         <div class="rhythm-progress" aria-label="节奏题进度">
-          ${rhythmQuestions.map((_, index) => `<span class="${index < rhythmState.correctCount ? "is-done" : index === rhythmState.currentQuestionIndex ? "is-current" : ""}">${index + 1}</span>`).join("")}
+          ${rhythmQuestions.map((_, index) => `<span class="${index < correctCount ? "is-done" : index === questionIndex ? "is-current" : ""}">${index + 1}</span>`).join("")}
         </div>
         <div class="answer-zone flower-road" data-answer-zone>
           <span>拖进花篮</span>
@@ -35,7 +32,7 @@ export function renderRhythmGame({ state }) {
         <div class="control-row">
           <button type="button" data-reset-rhythm>重做</button>
         </div>
-        <p class="feedback-pill" id="rhythmFeedback" data-tone="info">节奏采花：第 ${rhythmState.currentQuestionIndex + 1} / ${rhythmQuestions.length} 题</p>
+        <p class="feedback-pill" id="rhythmFeedback" data-tone="info">节奏采花：第 ${questionIndex + 1} / ${rhythmQuestions.length} 题</p>
       </div>
 
       <div class="card-tray" aria-label="谱例卡">
@@ -48,12 +45,7 @@ export function renderRhythmGame({ state }) {
 function renderRhythmOption(optionId) {
   const card = notationCards.find((item) => item.id === optionId);
   if (!card) {
-    return `
-      <button class="notation-card word-card" data-rhythm-option="${optionId}" type="button">
-        <strong>${customOptionLabels[optionId]}</strong>
-        <small>风格判断</small>
-      </button>
-    `;
+    return "";
   }
 
   return `
@@ -68,7 +60,8 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
   const selected = new Set();
   const feedback = root.querySelector("#rhythmFeedback");
   const zone = root.querySelector("[data-answer-zone]");
-  const question = rhythmQuestions[state.get().rhythmGame.currentQuestionIndex] ?? rhythmQuestions[0];
+  const questionIndex = clampRhythmIndex(state.get().rhythmGame.currentQuestionIndex);
+  const question = rhythmQuestions[questionIndex] ?? rhythmQuestions[0];
 
   function submitOption(optionId, card) {
     selected.add(optionId);
@@ -90,8 +83,8 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
           ...current,
           rhythmGame: {
             ...current.rhythmGame,
-            correctCount: current.rhythmGame.correctCount + 1,
-            currentQuestionIndex: Math.min(rhythmQuestions.length - 1, current.rhythmGame.currentQuestionIndex + 1),
+            correctCount: clampRhythmCount(current.rhythmGame.correctCount + 1),
+            currentQuestionIndex: Math.min(rhythmQuestions.length - 1, questionIndex + 1),
             completedAnswers: {
               ...current.rhythmGame.completedAnswers,
               [question.id]: [...selected]
@@ -158,7 +151,7 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
 
 function labelForOption(optionId) {
   const card = notationCards.find((item) => item.id === optionId);
-  return card ? renderRhythmMark(card, "rhythm-mark-answer") : customOptionLabels[optionId] ?? optionId;
+  return card ? renderRhythmMark(card, "rhythm-mark-answer") : "";
 }
 
 function startDrag(event, element, target, onDrop, onTap) {
