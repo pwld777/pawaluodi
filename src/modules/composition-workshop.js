@@ -152,7 +152,7 @@ export function renderCompositionWorkshop({ state }) {
     <section class="compose-game-shell tablet-compose-layout ${composition.isComplete ? "compose-is-complete" : ""} enter-view">
       <div class="compose-arcade-stage compose-quiet-stage">
         <div class="compose-stage-canvas" data-compose-game-stage aria-label="小乐队闯关台动画舞台">
-          <img class="compose-stage-fallback" src="./assets/images/compose-stage-scene.png" alt="小乐队节奏闯关舞台">
+          <img class="compose-stage-fallback" src="./assets/images/compose-stage-scene.jpg?v=tablet-touch-14" alt="小乐队节奏闯关舞台">
         </div>
 
         <div class="compose-play-layer">
@@ -385,7 +385,14 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
     await unlockAudio();
     clearPlayback();
     const current = state.get();
-    await preloadInstrument(current.composition.instrument).catch(() => {});
+    announceFeedback(feedback, "音色加载中", "info");
+    try {
+      await preloadInstrument(current.composition.instrument);
+    } catch {
+      announceFeedback(feedback, "音色加载失败，再点一次", "warn");
+      return;
+    }
+    announceFeedback(feedback, "播放中", "info");
     const beatMs = current.composition.meter === "2/4" ? 625 : 830;
 
     current.composition.bars.forEach((bar, barIndex) => {

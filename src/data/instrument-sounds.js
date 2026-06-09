@@ -1,3 +1,9 @@
+const assetVersion = "tablet-touch-14";
+
+function versionedAsset(path) {
+  return `${path}?v=${assetVersion}`;
+}
+
 export const instruments = [
   {
     id: "hand-drum",
@@ -7,8 +13,8 @@ export const instruments = [
     imagePosition: "0% 0%",
     color: "#d9482b",
     sample: {
-      strong: "./assets/audio/percussion/hand-drum-strong.wav",
-      weak: "./assets/audio/percussion/hand-drum-rim.wav",
+      strong: versionedAsset("./assets/audio/percussion/hand-drum-strong.wav"),
+      weak: versionedAsset("./assets/audio/percussion/hand-drum-rim.wav"),
       playbackRate: 1,
       trimSeconds: 0.56
     }
@@ -21,8 +27,8 @@ export const instruments = [
     imagePosition: "50% 50%",
     color: "#d9482b",
     sample: {
-      strong: "./assets/audio/percussion/bass-drum-strong.wav",
-      weak: "./assets/audio/percussion/bass-drum-soft.wav",
+      strong: versionedAsset("./assets/audio/percussion/bass-drum-strong.wav"),
+      weak: versionedAsset("./assets/audio/percussion/bass-drum-soft.wav"),
       playbackRate: 1,
       trimSeconds: 1.15
     }
@@ -35,8 +41,8 @@ export const instruments = [
     imagePosition: "100% 0%",
     color: "#a66a2b",
     sample: {
-      strong: "./assets/audio/percussion/hand-drum-rim.wav",
-      weak: "./assets/audio/percussion/woodblock.wav",
+      strong: versionedAsset("./assets/audio/percussion/hand-drum-rim.wav"),
+      weak: versionedAsset("./assets/audio/percussion/woodblock.wav"),
       playbackRate: 1,
       trimSeconds: 0.28
     }
@@ -49,8 +55,8 @@ export const instruments = [
     imagePosition: "50% 50%",
     color: "#4f9bc3",
     sample: {
-      strong: "./assets/audio/percussion/triangle-strong.wav",
-      weak: "./assets/audio/percussion/triangle-soft.wav",
+      strong: versionedAsset("./assets/audio/percussion/triangle-strong.wav"),
+      weak: versionedAsset("./assets/audio/percussion/triangle-soft.wav"),
       playbackRate: 1,
       trimSeconds: 1.4
     }
@@ -63,8 +69,8 @@ export const instruments = [
     imagePosition: "0% 100%",
     color: "#e2a520",
     sample: {
-      strong: "./assets/audio/percussion/tambourine.wav",
-      weak: "./assets/audio/percussion/tambourine.wav",
+      strong: versionedAsset("./assets/audio/percussion/tambourine.wav"),
+      weak: versionedAsset("./assets/audio/percussion/tambourine.wav"),
       playbackRate: 1,
       trimSeconds: 0.33
     }
@@ -77,8 +83,8 @@ export const instruments = [
     imagePosition: "100% 100%",
     color: "#4f9b78",
     sample: {
-      strong: "./assets/audio/percussion/maracas.wav",
-      weak: "./assets/audio/percussion/shaker.wav",
+      strong: versionedAsset("./assets/audio/percussion/maracas.wav"),
+      weak: versionedAsset("./assets/audio/percussion/shaker.wav"),
       playbackRate: 1,
       trimSeconds: 0.28
     }

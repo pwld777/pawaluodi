@@ -33,7 +33,12 @@ async function loadSample(url) {
     sampleBuffers.set(url, bufferPromise);
   }
 
-  return sampleBuffers.get(url);
+  try {
+    return await sampleBuffers.get(url);
+  } catch (error) {
+    sampleBuffers.delete(url);
+    throw error;
+  }
 }
 
 export async function preloadInstrument(instrumentId) {

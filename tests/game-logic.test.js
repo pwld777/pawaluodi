@@ -11,6 +11,10 @@ import { renderBeatGame } from "../src/modules/beat-game.js";
 import { renderCompositionWorkshop } from "../src/modules/composition-workshop.js";
 import { renderRhythmGame } from "../src/modules/rhythm-drag-game.js";
 
+function localAssetPath(url) {
+  return url.replace("./", "").replace(/\?.*$/, "");
+}
+
 test("beat patterns map 2/4 to strong-weak and 3/4 to strong-weak-weak", () => {
   assert.deepEqual(beatGame.sectionA.pattern, ["strong", "weak"]);
   assert.deepEqual(beatGame.sectionB.pattern, ["strong", "weak", "weak"]);
@@ -242,6 +246,14 @@ test("composition playback passes note sustain to instruments", () => {
   assert.match(source, /sustainSeconds:\s*event\.sustainBeats \* beatMs \/ 1000/);
 });
 
+test("composition playback gives short tablet audio status feedback", () => {
+  const source = readFileSync("src/modules/composition-workshop.js", "utf8");
+
+  assert.match(source, /音色加载中/);
+  assert.match(source, /播放中/);
+  assert.match(source, /音色加载失败，再点一次/);
+});
+
 test("bottom navigation uses only page names", () => {
   const source = readFileSync("src/modules/navigation.js", "utf8");
   assert.doesNotMatch(source, /const icons|nav-icon|home:\s*"会"|beat:\s*"鼓"|rhythm:\s*"花"|compose:\s*"乐"|showcase:\s*"奖"/);
@@ -266,23 +278,82 @@ test("composition workshop exposes four classroom percussion instruments", () =>
 
 test("instrument sample files exist for classroom playback", () => {
   for (const instrument of instruments) {
-    assert.equal(existsSync(instrument.sample.strong.replace("./", "")), true, `${instrument.id} strong sample missing`);
-    assert.equal(existsSync(instrument.sample.weak.replace("./", "")), true, `${instrument.id} weak sample missing`);
+    assert.equal(existsSync(localAssetPath(instrument.sample.strong)), true, `${instrument.id} strong sample missing`);
+    assert.equal(existsSync(localAssetPath(instrument.sample.weak)), true, `${instrument.id} weak sample missing`);
   }
 });
 
-test("composition instruments use recorded samples for classroom playback", () => {
-  const bassDrum = instruments.find((instrument) => instrument.id === "bass-drum");
-  const triangle = instruments.find((instrument) => instrument.id === "triangle");
-  assert.ok(statSync(bassDrum.sample.strong.replace("./", "")).size > 1_000_000);
-  assert.ok(statSync(bassDrum.sample.weak.replace("./", "")).size > 1_000_000);
-  assert.ok(statSync(triangle.sample.strong.replace("./", "")).size > 1_000_000);
-  assert.ok(statSync(triangle.sample.weak.replace("./", "")).size > 1_000_000);
+test("tablet-critical media urls force fresh classroom assets", () => {
+  const beatHtml = renderBeatGame({
+    state: createInitialState(),
+    setState: () => {},
+    onReward: () => {}
+  });
+  const composeHtml = renderCompositionWorkshop({ state: createInitialState() });
+  const composeStageSource = readFileSync("src/modules/compose-game-stage.js", "utf8");
 
+  assert.match(beatHtml, /flower-drum-3d\.png\?v=tablet-touch-14/);
+  assert.match(composeHtml, /compose-stage-scene\.jpg\?v=tablet-touch-14/);
+  assert.match(composeStageSource, /compose-stage-scene\.jpg\?v=tablet-touch-14/);
+  for (const instrument of instruments) {
+    assert.match(instrument.sample.strong, /\?v=tablet-touch-14$/);
+    assert.match(instrument.sample.weak, /\?v=tablet-touch-14$/);
+  }
+});
+
+test("tablet-critical media assets stay lightweight enough for classroom loading", () => {
+  assert.ok(statSync("assets/images/flower-drum-3d.png").size < 1_200_000);
+  assert.ok(statSync("assets/images/qinghai-folk-background.jpg").size < 650_000);
+  assert.ok(statSync("assets/images/compose-stage-scene.jpg").size < 450_000);
+  assert.ok(statSync("assets/audio/percussion/bass-drum-strong.wav").size < 450_000);
+  assert.ok(statSync("assets/audio/percussion/bass-drum-soft.wav").size < 450_000);
+  assert.ok(statSync("assets/audio/percussion/triangle-strong.wav").size < 500_000);
+  assert.ok(statSync("assets/audio/percussion/triangle-soft.wav").size < 500_000);
+});
+
+test("composition instruments use recorded samples for classroom playback", () => {
   for (const instrument of instruments) {
     assert.equal(typeof instrument.sample.strong, "string", `${instrument.id} strong sample missing`);
     assert.equal(typeof instrument.sample.weak, "string", `${instrument.id} weak sample missing`);
     assert.equal("tone" in instrument, false, `${instrument.id} must not use synthesized tone config`);
+    assert.match(readFileSync(localAssetPath(instrument.sample.strong)).subarray(0, 12).toString("ascii"), /^RIFF....WAVE/s);
+    assert.match(readFileSync(localAssetPath(instrument.sample.weak)).subarray(0, 12).toString("ascii"), /^RIFF....WAVE/s);
+  }
+});
+
+test("audio sample loading retries after a failed tablet request", async () => {
+  const previousWindow = globalThis.window;
+  const previousFetch = globalThis.fetch;
+  const fetchCountByUrl = new Map();
+  const failedOnce = new Set();
+
+  class FakeAudioContext {
+    state = "running";
+    currentTime = 0;
+    async resume() {}
+    async decodeAudioData() {
+      return { duration: 1 };
+    }
+  }
+
+  globalThis.window = { AudioContext: FakeAudioContext };
+  globalThis.fetch = async (url) => {
+    fetchCountByUrl.set(url, (fetchCountByUrl.get(url) ?? 0) + 1);
+    if (!failedOnce.has(url)) {
+      failedOnce.add(url);
+      return { ok: false };
+    }
+    return { ok: true, arrayBuffer: async () => new ArrayBuffer(16) };
+  };
+
+  try {
+    const { preloadInstrument } = await import(`../src/modules/audio-engine.js?retry=${Date.now()}`);
+    await assert.rejects(() => preloadInstrument("bass-drum"), /无法加载音色/);
+    await preloadInstrument("bass-drum");
+    assert.equal([...fetchCountByUrl.values()].every((count) => count === 2), true);
+  } finally {
+    globalThis.window = previousWindow;
+    globalThis.fetch = previousFetch;
   }
 });
 
@@ -296,8 +367,8 @@ test("audio engine never falls back to synthesized instrument sounds", () => {
 
 test("flower drum uses separate center and surface hit samples", () => {
   const handDrum = instruments.find((instrument) => instrument.id === "hand-drum");
-  assert.equal(handDrum.sample.strong, "./assets/audio/percussion/hand-drum-strong.wav");
-  assert.equal(handDrum.sample.weak, "./assets/audio/percussion/hand-drum-rim.wav");
+  assert.equal(localAssetPath(handDrum.sample.strong), "assets/audio/percussion/hand-drum-strong.wav");
+  assert.equal(localAssetPath(handDrum.sample.weak), "assets/audio/percussion/hand-drum-rim.wav");
   assert.notEqual(handDrum.sample.strong, handDrum.sample.weak);
 });
 

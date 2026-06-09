@@ -33,7 +33,7 @@ body {
   overflow-x: hidden;
   background:
     linear-gradient(180deg, rgba(255, 250, 221, 0.12), rgba(221, 246, 213, 0.2)),
-    url("../../assets/images/qinghai-folk-background.png") 56% center / cover no-repeat fixed;
+    url("../../assets/images/qinghai-folk-background.jpg?v=tablet-touch-14") 56% center / cover no-repeat fixed;
 }
 
 button,
