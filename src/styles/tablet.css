@@ -97,18 +97,14 @@
   }
 
   .nav-tab {
-    grid-template-columns: 1fr;
     min-height: 54px;
     border-radius: 16px;
     font-size: 0.86rem;
-    gap: 2px;
     padding: 4px;
   }
 
   .nav-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 10px;
+    display: none;
   }
 
   .compose-control-floor {

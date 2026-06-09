@@ -199,6 +199,12 @@ test("composition playback passes note sustain to instruments", () => {
   assert.match(source, /sustainSeconds:\s*event\.sustainBeats \* beatMs \/ 1000/);
 });
 
+test("bottom navigation uses only page names", () => {
+  const source = readFileSync("src/modules/navigation.js", "utf8");
+  assert.doesNotMatch(source, /const icons|nav-icon|home:\s*"会"|beat:\s*"鼓"|rhythm:\s*"花"|compose:\s*"乐"|showcase:\s*"奖"/);
+  assert.match(source, /button\.textContent = labels\[view\]/);
+});
+
 test("online classroom shell loads Phaser for the composition game stage", () => {
   const html = readFileSync("index.html", "utf8");
   assert.match(html, /phaser@3\.90\.0/);

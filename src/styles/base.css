@@ -156,16 +156,6 @@ body[data-view="compose"] .enter-view {
 
 body[data-view="compose"] .bottom-nav {
   z-index: 2;
-  bottom: 8px;
-  width: min(540px, calc(100vw - 28px));
-  padding: 6px;
-  border-width: 3px;
-}
-
-body[data-view="compose"] .nav-tab {
-  min-height: 42px;
-  border-radius: 14px;
-  font-size: 0.82rem;
 }
 
 .eyebrow {
@@ -456,7 +446,6 @@ h3 {
 .nav-tab.is-active {
   color: #6f2b13;
   background: linear-gradient(180deg, #fff48d, #f2b33e);
-  transform: translateY(-8px) scale(1.05);
 }
 
 .game-layout {
@@ -1851,23 +1840,12 @@ h3 {
 
 .nav-tab {
   display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  justify-items: center;
-  gap: 6px;
+  place-items: center;
   padding: 0 10px;
 }
 
 .nav-icon {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 12px;
-  background: rgba(255, 247, 190, 0.16);
-  color: #ffe981;
-  font-size: 0.98rem;
+  display: none;
 }
 
 .nav-tab.is-active .nav-icon {
@@ -2243,8 +2221,7 @@ h3 {
   }
 
   .nav-icon {
-    width: 28px;
-    height: 28px;
+    display: none;
   }
 
   .beat-layout {
@@ -2361,8 +2338,7 @@ h3 {
   }
 
   body[data-view="compose"] .bottom-nav {
-    bottom: 6px;
-    width: min(500px, calc(100vw - 32px));
+    z-index: 2;
   }
 
   .tablet-compose-layout {
