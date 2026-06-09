@@ -4,7 +4,7 @@ import { renderCompositionWorkshop, bindCompositionWorkshop } from "./modules/co
 import { bindNavigation, updateNavigation } from "./modules/navigation.js";
 import { addStar } from "./modules/feedback.js";
 import { createInitialState, restoreState, serializeState } from "./modules/game-logic.js";
-import { primeAudio } from "./modules/audio-engine.js";
+import { primeAudio, unlockAudio } from "./modules/audio-engine.js";
 import { rhythmQuestions } from "./data/rhythm-questions.js";
 
 const storageKey = "huaer-yu-shaonian-state";
@@ -40,9 +40,17 @@ function primeClassroomAudio() {
   }
 
   audioPrimed = true;
-  void primeAudio(["hand-drum", "bass-drum", "triangle", "tambourine", "shaker"]).catch(() => {
-    audioPrimed = false;
-  });
+  void unlockAudio()
+    .then(() => {
+      window.setTimeout(() => {
+        void primeAudio(["hand-drum", "bass-drum", "triangle", "tambourine", "shaker"]).catch(() => {
+          audioPrimed = false;
+        });
+      }, 900);
+    })
+    .catch(() => {
+      audioPrimed = false;
+    });
 }
 
 function flyRewardStar(amount = 1) {

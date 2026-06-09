@@ -292,19 +292,32 @@ test("tablet-critical media urls force fresh classroom assets", () => {
   const composeHtml = renderCompositionWorkshop({ state: createInitialState() });
   const composeStageSource = readFileSync("src/modules/compose-game-stage.js", "utf8");
 
-  assert.match(beatHtml, /flower-drum-3d\.png\?v=tablet-touch-14/);
-  assert.match(composeHtml, /compose-stage-scene\.jpg\?v=tablet-touch-14/);
-  assert.match(composeStageSource, /compose-stage-scene\.jpg\?v=tablet-touch-14/);
+  assert.match(beatHtml, /flower-drum-3d\.png\?v=tablet-touch-15/);
+  assert.match(beatHtml, /fetchpriority="high"/);
+  assert.match(composeHtml, /compose-stage-scene\.jpg\?v=tablet-touch-15/);
+  assert.match(composeStageSource, /compose-stage-scene\.jpg\?v=tablet-touch-15/);
   for (const instrument of instruments) {
-    assert.match(instrument.sample.strong, /\?v=tablet-touch-14$/);
-    assert.match(instrument.sample.weak, /\?v=tablet-touch-14$/);
+    assert.match(instrument.sample.strong, /\?v=tablet-touch-15$/);
+    assert.match(instrument.sample.weak, /\?v=tablet-touch-15$/);
   }
 });
 
+test("tablet shell prioritizes drum image before delayed audio warmup", () => {
+  const html = readFileSync("index.html", "utf8");
+  const appSource = readFileSync("src/app.js", "utf8");
+
+  assert.match(html, /rel="preload" as="image" href="\.\/assets\/images\/flower-drum-3d\.png\?v=tablet-touch-15"/);
+  assert.match(appSource, /unlockAudio\(\)/);
+  assert.match(appSource, /setTimeout\(\(\) => \{/);
+  assert.match(appSource, /primeAudio/);
+});
+
 test("tablet-critical media assets stay lightweight enough for classroom loading", () => {
-  assert.ok(statSync("assets/images/flower-drum-3d.png").size < 1_200_000);
+  assert.ok(statSync("assets/images/flower-drum-3d.png").size < 750_000);
   assert.ok(statSync("assets/images/qinghai-folk-background.jpg").size < 650_000);
   assert.ok(statSync("assets/images/compose-stage-scene.jpg").size < 450_000);
+  assert.ok(statSync("assets/images/level-cards-sheet.jpg").size < 320_000);
+  assert.ok(statSync("assets/instruments/real-instruments-sheet.jpg").size < 120_000);
   assert.ok(statSync("assets/audio/percussion/bass-drum-strong.wav").size < 450_000);
   assert.ok(statSync("assets/audio/percussion/bass-drum-soft.wav").size < 450_000);
   assert.ok(statSync("assets/audio/percussion/triangle-strong.wav").size < 500_000);

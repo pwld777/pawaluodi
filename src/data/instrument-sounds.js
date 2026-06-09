@@ -1,4 +1,4 @@
-const assetVersion = "tablet-touch-14";
+const assetVersion = "tablet-touch-15";
 
 function versionedAsset(path) {
   return `${path}?v=${assetVersion}`;
@@ -9,7 +9,7 @@ export const instruments = [
     id: "hand-drum",
     name: "花鼓",
     symbol: "鼓",
-    image: "./assets/instruments/real-instruments-sheet.png",
+    image: "./assets/instruments/real-instruments-sheet.jpg?v=tablet-touch-15",
     imagePosition: "0% 0%",
     color: "#d9482b",
     sample: {
@@ -37,7 +37,7 @@ export const instruments = [
     id: "woodblock",
     name: "木鱼",
     symbol: "木",
-    image: "./assets/instruments/real-instruments-sheet.png",
+    image: "./assets/instruments/real-instruments-sheet.jpg?v=tablet-touch-15",
     imagePosition: "100% 0%",
     color: "#a66a2b",
     sample: {
@@ -65,7 +65,7 @@ export const instruments = [
     id: "tambourine",
     name: "铃鼓",
     symbol: "铃",
-    image: "./assets/instruments/real-instruments-sheet.png",
+    image: "./assets/instruments/real-instruments-sheet.jpg?v=tablet-touch-15",
     imagePosition: "0% 100%",
     color: "#e2a520",
     sample: {
@@ -79,7 +79,7 @@ export const instruments = [
     id: "shaker",
     name: "沙锤",
     symbol: "沙",
-    image: "./assets/instruments/real-instruments-sheet.png",
+    image: "./assets/instruments/real-instruments-sheet.jpg?v=tablet-touch-15",
     imagePosition: "100% 100%",
     color: "#4f9b78",
     sample: {
