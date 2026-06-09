@@ -254,15 +254,40 @@ test("composition playback gives short tablet audio status feedback", () => {
   assert.match(source, /音色加载失败，再点一次/);
 });
 
+test("composition playback warms tablet audio with a recorded sample in the tap handler", () => {
+  const workshopSource = readFileSync("src/modules/composition-workshop.js", "utf8");
+  const audioSource = readFileSync("src/modules/audio-engine.js", "utf8");
+  const playHandlerSource = workshopSource.match(/data-play-composition[\s\S]*?announceFeedback\(feedback, "播放中"/)?.[0] ?? "";
+
+  assert.match(audioSource, /export function warmAudioWithRecordedSample/);
+  assert.match(audioSource, /context\.createBufferSource/);
+  assert.match(workshopSource, /warmAudioWithRecordedSample/);
+  assert.match(playHandlerSource, /warmAudioWithRecordedSample\(current\.composition\.instrument\)/);
+  assert.ok(playHandlerSource.indexOf("warmAudioWithRecordedSample") < playHandlerSource.indexOf("await unlockAudio"));
+});
+
+test("tablet landscape keeps scenic images proportioned and touch controls visible", () => {
+  const tabletCss = readFileSync("src/styles/tablet.css", "utf8");
+
+  assert.match(tabletCss, /min-width:\s*921px\)\s*and\s*\(max-width:\s*1280px\)\s*and\s*\(orientation:\s*landscape\)/);
+  assert.match(tabletCss, /qinghai-folk-background\.jpg\?v=tablet-touch-15"\)\s*center top \/ cover no-repeat/);
+  assert.match(tabletCss, /\.compose-arcade-stage\s*\{[\s\S]*aspect-ratio:\s*16 \/ 9/);
+  assert.match(tabletCss, /\.compose-beat-pit,\s*\n\s*\.compose-rhythm-piece\s*\{[\s\S]*min-height:\s*118px/);
+  assert.match(tabletCss, /\.compose-main-tray\s*\{[\s\S]*overflow-x:\s*auto/);
+  assert.match(tabletCss, /\.huagu\s*\{[\s\S]*min-width:\s*500px/);
+});
+
 test("bottom navigation uses only page names", () => {
   const source = readFileSync("src/modules/navigation.js", "utf8");
   assert.doesNotMatch(source, /const icons|nav-icon|home:\s*"会"|beat:\s*"鼓"|rhythm:\s*"花"|compose:\s*"乐"|showcase:\s*"奖"/);
   assert.match(source, /button\.textContent = labels\[view\]/);
 });
 
-test("online classroom shell loads Phaser for the composition game stage", () => {
+test("classroom shell loads Phaser from a local classroom asset", () => {
   const html = readFileSync("index.html", "utf8");
-  assert.match(html, /phaser@3\.90\.0/);
+  assert.match(html, /"\.\/assets\/vendor\/phaser\.esm\.js\?v=tablet-touch-15"/);
+  assert.doesNotMatch(html, /cdn\.jsdelivr\.net|unpkg\.com|phaser@3\.90\.0/);
+  assert.equal(existsSync("assets/vendor/phaser.esm.js"), true);
 });
 
 test("app preserves the Phaser stage host when composition rerenders", () => {
@@ -368,6 +393,45 @@ test("audio sample loading retries after a failed tablet request", async () => {
     globalThis.window = previousWindow;
     globalThis.fetch = previousFetch;
   }
+});
+
+test("audio sample loading decodes embedded student data urls without fetch", async () => {
+  const previousWindow = globalThis.window;
+  const previousFetch = globalThis.fetch;
+  let fetchCalled = false;
+  let decodedBytes = 0;
+
+  class FakeAudioContext {
+    state = "running";
+    currentTime = 0;
+    async resume() {}
+    async decodeAudioData(arrayBuffer) {
+      decodedBytes = arrayBuffer.byteLength;
+      return { duration: 1 };
+    }
+  }
+
+  globalThis.window = { AudioContext: FakeAudioContext };
+  globalThis.fetch = async () => {
+    fetchCalled = true;
+    return { ok: false };
+  };
+
+  try {
+    const { __testOnlyLoadSample } = await import(`../src/modules/audio-engine.js?dataurl=${Date.now()}`);
+    await __testOnlyLoadSample("data:audio/wav;base64,UklGRg==");
+    assert.equal(fetchCalled, false);
+    assert.equal(decodedBytes, 4);
+  } finally {
+    globalThis.window = previousWindow;
+    globalThis.fetch = previousFetch;
+  }
+});
+
+test("instrument asset versioning leaves embedded student data urls intact", () => {
+  const instrumentSource = readFileSync("src/data/instrument-sounds.js", "utf8");
+  assert.match(instrumentSource, /path\.startsWith\("data:"\)/);
+  assert.match(instrumentSource, /return path;/);
 });
 
 test("audio engine never falls back to synthesized instrument sounds", () => {

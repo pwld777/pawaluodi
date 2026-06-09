@@ -122,6 +122,363 @@
   }
 }
 
+@media (min-width: 921px) and (max-width: 1280px) and (orientation: landscape) {
+  body {
+    background:
+      linear-gradient(180deg, rgba(255, 250, 221, 0.22), rgba(221, 246, 213, 0.28)),
+      url("../../assets/images/qinghai-folk-background.jpg?v=tablet-touch-15") center top / cover no-repeat;
+  }
+
+  .app-shell {
+    padding: 12px 18px 94px;
+  }
+
+  .game-header {
+    max-width: 1120px;
+    margin-bottom: 10px;
+  }
+
+  .view-root {
+    max-width: 1120px;
+  }
+
+  .bottom-nav {
+    bottom: 10px;
+    width: min(650px, calc(100vw - 32px));
+    padding: 8px;
+    border-width: 3px;
+    border-radius: 22px;
+  }
+
+  .nav-tab {
+    min-height: 54px;
+    border-radius: 16px;
+    font-size: 0.96rem;
+  }
+
+  .beat-layout {
+    grid-template-columns: 190px minmax(0, 1fr);
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .beat-layout .task-rail {
+    padding: 16px;
+    border-radius: 22px;
+  }
+
+  .beat-layout .task-rail .eyebrow,
+  .beat-layout .task-rail h2 {
+    display: none;
+  }
+
+  .beat-layout .step-list {
+    gap: 8px;
+    margin: 0 0 12px;
+    padding-left: 18px;
+  }
+
+  .beat-layout .step-list li {
+    padding: 8px 10px;
+  }
+
+  .beat-layout .mode-buttons {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .beat-layout .mode-buttons button {
+    min-height: 48px;
+    padding: 0 10px;
+  }
+
+  .drum-stage {
+    min-height: 0;
+    height: calc(100vh - 132px);
+    padding: 12px 18px 16px;
+    gap: 7px;
+    border-radius: 26px;
+  }
+
+  .beat-stage-hud {
+    min-height: 36px;
+    padding: 6px 14px;
+  }
+
+  .round-label {
+    font-size: 1.05rem;
+  }
+
+  .beat-track {
+    gap: 8px;
+  }
+
+  .beat-dot {
+    width: 44px;
+    height: 44px;
+  }
+
+  .huagu {
+    width: min(600px, 68vw, calc((100vh - 310px) * 1.38));
+    min-width: 500px;
+  }
+
+  .drum-stage .feedback-pill {
+    max-width: 520px;
+    min-height: 42px;
+    padding: 10px 16px;
+  }
+
+  .drum-stage .control-row {
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .drum-stage .control-row button {
+    min-width: 92px;
+    min-height: 46px;
+  }
+
+  body[data-view="compose"] .app-shell {
+    padding: 8px 16px 86px;
+  }
+
+  .tablet-compose-layout {
+    gap: 8px;
+  }
+
+  .compose-arcade-stage {
+    min-height: 0;
+    height: min(610px, calc(100vh - 196px));
+    aspect-ratio: 16 / 9;
+    max-width: 1120px;
+    margin: 0 auto;
+    border-width: 5px;
+    border-radius: 24px;
+  }
+
+  .compose-arcade-stage::before {
+    inset: 7px;
+    border-width: 2px;
+    border-radius: 18px;
+  }
+
+  .compose-stage-fallback,
+  .compose-stage-canvas canvas {
+    object-fit: cover;
+  }
+
+  .compose-play-layer {
+    inset: 12px;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .compose-top-strip {
+    justify-content: start;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 6px 8px;
+    border-width: 3px;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .compose-top-strip h2 {
+    font-size: 1.38rem;
+  }
+
+  .compose-top-strip strong {
+    padding: 6px 9px;
+    white-space: nowrap;
+  }
+
+  .compose-top-strip label {
+    gap: 4px;
+    white-space: nowrap;
+  }
+
+  .compose-top-strip select {
+    min-height: 34px;
+    padding: 0 8px;
+    border-width: 2px;
+  }
+
+  .compose-instrument-row {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 360px;
+    padding: 4px;
+    border-width: 2px;
+    gap: 5px;
+  }
+
+  .compose-instrument-row button {
+    grid-template-columns: 30px minmax(0, 1fr);
+    min-height: 40px;
+    padding: 4px 6px;
+    border-width: 2px;
+  }
+
+  .compose-instrument-row .instrument-photo {
+    width: 30px;
+    max-width: 30px;
+  }
+
+  .compose-instrument-row strong {
+    font-size: 0.84rem;
+  }
+
+  .compose-feedback-main {
+    min-height: 36px;
+    max-width: 360px;
+    padding: 8px 14px;
+    font-size: 1rem;
+  }
+
+  .four-bar-board {
+    gap: 10px;
+    width: min(100%, 1000px);
+  }
+
+  .compose-bar-stage {
+    min-height: 162px;
+    gap: 5px;
+    padding: 7px;
+    border-width: 4px;
+    border-radius: 18px;
+    box-shadow:
+      0 5px 0 #7a3718,
+      0 12px 22px rgba(73, 35, 16, 0.2),
+      inset 0 0 0 3px rgba(255, 212, 90, 0.22);
+  }
+
+  .compose-bar-header > span {
+    min-height: 28px;
+    padding: 0 10px;
+  }
+
+  .bar-clear-button {
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 0.82rem;
+  }
+
+  .compose-bar-fill {
+    min-height: 118px;
+  }
+
+  .compose-beat-pits,
+  .compose-rhythm-pieces {
+    gap: 7px;
+  }
+
+  .compose-beat-pit,
+  .compose-rhythm-piece {
+    min-height: 118px;
+    border-width: 4px;
+    border-radius: 16px;
+  }
+
+  .compose-beat-pit {
+    font-size: 2.5rem;
+  }
+
+  .compose-rhythm-piece .rhythm-mark-piece {
+    transform: scale(0.82);
+  }
+
+  .compose-control-floor {
+    grid-template-columns: minmax(0, 1fr) minmax(132px, 150px);
+    gap: 8px;
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+
+  .compose-main-tray,
+  .compose-action-dock {
+    padding: 6px;
+    border-width: 3px;
+    border-radius: 18px;
+    box-shadow: 0 5px 0 #5b2a14, 0 12px 24px rgba(86, 47, 12, 0.18);
+  }
+
+  .compose-main-tray {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+  }
+
+  .block-tray .notation-card {
+    flex: 0 0 132px;
+    min-height: 80px;
+    padding: 12px 10px 8px;
+    border-width: 2px;
+    border-radius: 16px;
+    scroll-snap-align: start;
+  }
+
+  .block-tray .notation-card[data-piece-beats="2"],
+  .block-tray .notation-card[data-piece-beats="3"] {
+    flex-basis: 150px;
+  }
+
+  .block-tray .card-tag {
+    top: 6px;
+    left: 6px;
+    padding: 3px 7px;
+    font-size: 0.7rem;
+  }
+
+  .block-tray .rhythm-mark-card {
+    min-height: 42px;
+    transform: scale(0.45);
+  }
+
+  .compose-action-dock {
+    gap: 7px;
+  }
+
+  .compose-action-dock button {
+    min-height: 40px;
+    border-radius: 14px;
+    font-size: 1rem;
+  }
+
+  body[data-view="beat"] .beat-layout .drum-stage {
+    min-height: 0;
+    height: calc(100vh - 132px);
+    padding: 10px 18px 12px;
+    gap: 4px;
+  }
+
+  body[data-view="beat"] .beat-layout .beat-dot {
+    width: 42px;
+    height: 42px;
+  }
+
+  body[data-view="beat"] .beat-layout .huagu {
+    width: min(540px, 64vw, calc((100vh - 340px) * 1.37));
+    min-width: 500px;
+    max-height: 392px;
+  }
+
+  body[data-view="beat"] .beat-layout .feedback-pill {
+    min-height: 38px;
+    padding: 8px 14px;
+  }
+
+  body[data-view="beat"] .beat-layout .control-row {
+    align-self: end;
+  }
+
+  body[data-view="beat"] .beat-layout .control-row button {
+    min-height: 44px;
+  }
+}
+
 @media (max-width: 620px) {
   .game-header {
     display: grid;

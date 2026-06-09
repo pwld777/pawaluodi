@@ -11,6 +11,19 @@ npm run serve
 
 然后打开 `http://localhost:4173`。
 
+## 学校网络不好时
+
+本项目的课堂资源已随项目本地携带，包括图片、采样音频和 Phaser 游戏库，不需要临时访问公网 CDN。
+
+如果学校访问 GitHub Pages、Vercel 或外网很慢，可以在教师电脑上运行：
+
+```bash
+npm run serve
+npm run lan:urls
+```
+
+让学生设备和教师电脑连接同一个 Wi-Fi 或手机热点，把 `npm run lan:urls` 输出的 `http://局域网IP:4173/` 做成临时二维码即可。不要直接双击 `index.html` 给学生扫码，也不要把二维码指向 `localhost` 或 `/Users/...` 本机路径。
+
 ## 课堂地址
 
 GitHub Pages 已部署：

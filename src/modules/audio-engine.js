@@ -18,18 +18,38 @@ export async function unlockAudio() {
   }
 }
 
+export function warmAudioWithRecordedSample(instrumentId, { volume = 0.04, accent = true } = {}) {
+  const context = getContext();
+  const instrument = getInstrument(instrumentId);
+  const sampleUrl = accent ? instrument.sample?.strong : instrument.sample?.weak;
+  const buffer = sampleBuffers.get(sampleUrl);
+  if (!sampleUrl || !buffer || typeof buffer.then === "function") {
+    return false;
+  }
+
+  const source = context.createBufferSource();
+  const gain = context.createGain();
+  const start = context.currentTime + 0.005;
+  source.buffer = buffer;
+  gain.gain.setValueAtTime(volume, start);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + 0.045);
+  source.connect(gain);
+  gain.connect(context.destination);
+  source.start(start);
+  source.stop(start + 0.05);
+  return true;
+}
+
 async function loadSample(url) {
   const context = getContext();
 
   if (!sampleBuffers.has(url)) {
-    const bufferPromise = fetch(url)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`无法加载音色：${url}`);
-        }
-        return response.arrayBuffer();
-      })
-      .then((arrayBuffer) => context.decodeAudioData(arrayBuffer));
+    const bufferPromise = loadSampleBytes(url)
+      .then((arrayBuffer) => context.decodeAudioData(arrayBuffer))
+      .then((buffer) => {
+        sampleBuffers.set(url, buffer);
+        return buffer;
+      });
     sampleBuffers.set(url, bufferPromise);
   }
 
@@ -40,6 +60,36 @@ async function loadSample(url) {
     throw error;
   }
 }
+
+function dataUrlToArrayBuffer(url) {
+  const base64Marker = ";base64,";
+  const markerIndex = url.indexOf(base64Marker);
+  if (!url.startsWith("data:") || markerIndex === -1) {
+    throw new Error(`无法加载音色：${url}`);
+  }
+
+  const base64 = url.slice(markerIndex + base64Marker.length);
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return bytes.buffer;
+}
+
+async function loadSampleBytes(url) {
+  if (url.startsWith("data:")) {
+    return dataUrlToArrayBuffer(url);
+  }
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`无法加载音色：${url}`);
+  }
+  return response.arrayBuffer();
+}
+
+export const __testOnlyLoadSample = loadSample;
 
 export async function preloadInstrument(instrumentId) {
   const instrument = getInstrument(instrumentId);

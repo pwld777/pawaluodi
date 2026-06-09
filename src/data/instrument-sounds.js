@@ -1,6 +1,9 @@
 const assetVersion = "tablet-touch-15";
 
 function versionedAsset(path) {
+  if (path.startsWith("data:")) {
+    return path;
+  }
   return `${path}?v=${assetVersion}`;
 }
 

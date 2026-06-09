@@ -1,7 +1,7 @@
 import { getAllowedBlocksForMeter, getNotationCard, getPlaybackEvents } from "../data/notation-cards.js";
 import { compositionInstruments } from "../data/instrument-sounds.js";
 import { clearCompositionBar, placeBlockInBar, resetComposition } from "./game-logic.js";
-import { playInstrument, preloadInstrument, unlockAudio } from "./audio-engine.js";
+import { playInstrument, preloadInstrument, unlockAudio, warmAudioWithRecordedSample } from "./audio-engine.js";
 import { announceFeedback } from "./feedback.js";
 import { renderRhythmMark } from "./rhythm-mark.js";
 
@@ -221,9 +221,11 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
   let selectedBlockId = null;
   const composition = state.get().composition;
   const blocks = getAllowedBlocksForMeter(composition.meter);
+  void preloadInstrument(composition.instrument).catch(() => {});
 
   function selectBlock(block) {
     selectedBlockId = block.dataset.blockId;
+    void preloadInstrument(state.get().composition.instrument).catch(() => {});
     root.querySelectorAll("[data-block-id]").forEach((candidate) => candidate.classList.toggle("is-selected", candidate === block));
     announceFeedback(feedback, "点小节", "info");
   }
@@ -276,6 +278,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
       });
       refreshInstrumentButtons(root, state.get().composition);
       unlockAudio()
+        .then(() => preloadInstrument(instrumentId))
         .then(() => playInstrument(instrumentId, { volume: current.settings.volume }))
         .catch(() => {
           // Browsers may deny audio until a trusted gesture; selection should still work.
@@ -337,6 +340,7 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
 
       try {
         const barIndex = Number(bar.dataset.barIndex);
+        void preloadInstrument(state.get().composition.instrument).catch(() => {});
         updateComposition({ root, state, setState, onReward, feedback, blockId: selectedBlockId, barIndex });
         selectedBlockId = null;
         root.querySelectorAll("[data-block-id]").forEach((candidate) => candidate.classList.remove("is-selected"));
@@ -382,9 +386,10 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
   });
 
   root.querySelector("[data-play-composition]")?.addEventListener("click", async () => {
-    await unlockAudio();
     clearPlayback();
     const current = state.get();
+    warmAudioWithRecordedSample(current.composition.instrument);
+    await unlockAudio();
     announceFeedback(feedback, "音色加载中", "info");
     try {
       await preloadInstrument(current.composition.instrument);
