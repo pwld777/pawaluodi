@@ -271,15 +271,27 @@ test("instrument sample files exist for classroom playback", () => {
   }
 });
 
-test("composition bass drum and triangle use real recorded samples only", () => {
+test("composition instruments use recorded samples for classroom playback", () => {
   const bassDrum = instruments.find((instrument) => instrument.id === "bass-drum");
   const triangle = instruments.find((instrument) => instrument.id === "triangle");
-  assert.equal(bassDrum.sample.realOnly, true);
-  assert.equal(triangle.sample.realOnly, true);
   assert.ok(statSync(bassDrum.sample.strong.replace("./", "")).size > 1_000_000);
   assert.ok(statSync(bassDrum.sample.weak.replace("./", "")).size > 1_000_000);
   assert.ok(statSync(triangle.sample.strong.replace("./", "")).size > 1_000_000);
   assert.ok(statSync(triangle.sample.weak.replace("./", "")).size > 1_000_000);
+
+  for (const instrument of instruments) {
+    assert.equal(typeof instrument.sample.strong, "string", `${instrument.id} strong sample missing`);
+    assert.equal(typeof instrument.sample.weak, "string", `${instrument.id} weak sample missing`);
+    assert.equal("tone" in instrument, false, `${instrument.id} must not use synthesized tone config`);
+  }
+});
+
+test("audio engine never falls back to synthesized instrument sounds", () => {
+  const audioSource = readFileSync("src/modules/audio-engine.js", "utf8");
+  const instrumentSource = readFileSync("src/data/instrument-sounds.js", "utf8");
+
+  assert.doesNotMatch(audioSource, /createOscillator|playSynth|playNoise/);
+  assert.doesNotMatch(instrumentSource, /\btone\s*:/);
 });
 
 test("flower drum uses separate center and surface hit samples", () => {
@@ -287,6 +299,19 @@ test("flower drum uses separate center and surface hit samples", () => {
   assert.equal(handDrum.sample.strong, "./assets/audio/percussion/hand-drum-strong.wav");
   assert.equal(handDrum.sample.weak, "./assets/audio/percussion/hand-drum-rim.wav");
   assert.notEqual(handDrum.sample.strong, handDrum.sample.weak);
+});
+
+test("tablet audio is unlocked and warmed from the first classroom gesture", () => {
+  const appSource = readFileSync("src/app.js", "utf8");
+  const audioSource = readFileSync("src/modules/audio-engine.js", "utf8");
+
+  assert.match(audioSource, /webkitAudioContext/);
+  assert.match(audioSource, /export async function primeAudio/);
+  assert.match(appSource, /primeAudio/);
+  assert.match(appSource, /"pointerdown"/);
+  assert.match(appSource, /"touchstart"/);
+  assert.match(appSource, /"click"/);
+  assert.match(appSource, /"keydown"/);
 });
 
 test("old composition instruments migrate to the new classroom set", () => {

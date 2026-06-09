@@ -4,6 +4,7 @@ import { renderCompositionWorkshop, bindCompositionWorkshop } from "./modules/co
 import { bindNavigation, updateNavigation } from "./modules/navigation.js";
 import { addStar } from "./modules/feedback.js";
 import { createInitialState, restoreState, serializeState } from "./modules/game-logic.js";
+import { primeAudio } from "./modules/audio-engine.js";
 import { rhythmQuestions } from "./data/rhythm-questions.js";
 
 const storageKey = "huaer-yu-shaonian-state";
@@ -13,6 +14,7 @@ const scoreBoard = document.querySelector(".score-board");
 const pageTitle = document.querySelector(".game-header h1");
 
 let appState = restoreState(localStorage.getItem(storageKey)) ?? createInitialState();
+let audioPrimed = false;
 
 const stateRef = {
   get: () => appState
@@ -30,6 +32,17 @@ function reward(amount) {
   starCount.classList.remove("pop");
   void starCount.offsetWidth;
   starCount.classList.add("pop");
+}
+
+function primeClassroomAudio() {
+  if (audioPrimed) {
+    return;
+  }
+
+  audioPrimed = true;
+  void primeAudio(["hand-drum", "bass-drum", "triangle", "tambourine", "shaker"]).catch(() => {
+    audioPrimed = false;
+  });
 }
 
 function flyRewardStar(amount = 1) {
@@ -206,4 +219,7 @@ function updateNavProgress() {
 }
 
 bindNavigation({ state: stateRef, setState, render });
+["pointerdown", "touchstart", "click", "keydown"].forEach((eventName) => {
+  window.addEventListener(eventName, primeClassroomAudio, { once: true, passive: true });
+});
 render();
