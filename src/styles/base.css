@@ -33,7 +33,7 @@ body {
   overflow-x: hidden;
   background:
     linear-gradient(180deg, rgba(255, 250, 221, 0.12), rgba(221, 246, 213, 0.2)),
-    url("../../assets/images/qinghai-folk-background.jpg?v=tablet-touch-15") 56% center / cover no-repeat fixed;
+    url("../../assets/images/qinghai-folk-background.jpg?v=tablet-safe-20") 56% center / cover no-repeat fixed;
 }
 
 button,
@@ -208,6 +208,21 @@ h3 {
   font-size: 2rem;
 }
 
+.classroom-version-marker {
+  position: fixed;
+  left: 8px;
+  bottom: 8px;
+  z-index: 80;
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(56, 25, 9, 0.62);
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  pointer-events: none;
+}
+
 .reward-star-flight {
   position: fixed;
   left: 0;
@@ -373,7 +388,7 @@ h3 {
   width: 100%;
   height: var(--level-art-height);
   border-radius: 24px 24px 18px 18px;
-  background-image: linear-gradient(180deg, transparent 58%, rgba(63, 31, 10, 0.38)), url("../../assets/images/level-cards-sheet.jpg?v=tablet-touch-15");
+  background-image: linear-gradient(180deg, transparent 58%, rgba(63, 31, 10, 0.38)), url("../../assets/images/level-cards-sheet.jpg?v=tablet-safe-20");
   background-repeat: no-repeat;
   background-size: 300% auto;
   background-position: left center;
@@ -2862,6 +2877,200 @@ body[data-view="compose"] .compose-main-tray .notation-card {
   border-width: 3px;
   border-radius: 14px;
   box-shadow: 0 5px 0 rgba(141, 74, 24, 0.78);
+}
+
+body[data-device="tablet"] {
+  --tablet-nav-height: 86px;
+}
+
+body[data-device="tablet"] .app-shell {
+  height: var(--safe-vh);
+  min-height: var(--safe-vh);
+  overflow: hidden;
+  padding: 10px 18px calc(var(--tablet-nav-height) + 18px);
+}
+
+body[data-device="tablet"] .bottom-nav {
+  --tablet-nav-height: 86px;
+  bottom: 10px;
+  height: var(--tablet-nav-height);
+  width: min(680px, calc(var(--safe-vw) - 32px));
+  padding: 8px;
+  border-width: 3px;
+  border-radius: 22px;
+}
+
+body[data-device="tablet"] .nav-tab {
+  min-height: 0;
+  height: 62px;
+  border-radius: 16px;
+  font-size: 0.96rem;
+}
+
+body[data-device="tablet"][data-view="beat"] .game-header,
+body[data-device="tablet"][data-view="compose"] .game-header {
+  display: none;
+}
+
+body[data-device="tablet"][data-view="beat"] .view-root,
+body[data-device="tablet"][data-view="compose"] .view-root {
+  max-width: min(1320px, calc(var(--safe-vw) - 48px));
+}
+
+body[data-device="tablet"][data-view="beat"] .beat-layout {
+  grid-template-columns: clamp(150px, 13vw, 190px) minmax(0, 1fr);
+  min-height: 0;
+  gap: 12px;
+}
+
+body[data-device="tablet"][data-view="beat"] .beat-layout .task-rail {
+  padding: 16px;
+  border-radius: 24px;
+}
+
+body[data-device="tablet"][data-view="beat"] .beat-layout .drum-stage {
+  min-height: 0;
+  height: calc(var(--safe-vh) - var(--tablet-nav-height) - 150px);
+  max-height: 640px;
+  padding: 10px 18px 12px;
+  gap: 5px;
+}
+
+body[data-device="tablet"][data-view="beat"] .beat-layout .beat-stage-hud {
+  min-height: 36px;
+  padding: 6px 14px;
+}
+
+body[data-device="tablet"][data-view="beat"] .beat-layout .beat-dot {
+  width: 42px;
+  height: 42px;
+}
+
+body[data-device="tablet"][data-view="beat"] .beat-layout .huagu {
+  width: min(460px, 54vw, calc((var(--safe-vh) - 470px) * 1.37));
+  min-width: 0;
+  max-height: 336px;
+}
+
+body[data-device="tablet"][data-view="beat"] .beat-layout .feedback-pill {
+  width: min(720px, 94%);
+  min-height: 38px;
+  padding: 8px 14px;
+}
+
+body[data-device="tablet"][data-view="beat"] .beat-layout .control-row {
+  justify-content: center;
+  flex-wrap: nowrap;
+  margin-bottom: 120px;
+}
+
+body[data-device="tablet"][data-view="beat"] .beat-layout .control-row button {
+  min-width: 104px;
+  min-height: 46px;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-game-shell {
+  max-width: min(1320px, calc(var(--safe-vw) - 48px));
+  margin: 0 auto;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-arcade-stage {
+  min-height: 0;
+  height: calc(var(--safe-vh) - var(--tablet-nav-height) - 330px);
+  max-height: 520px;
+  border-width: 5px;
+  border-radius: 22px;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-stage-canvas canvas {
+  display: none !important;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-stage-canvas .compose-stage-fallback {
+  display: block !important;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-play-layer {
+  inset: 10px;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 6px;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-top-strip {
+  display: grid;
+  grid-template-columns: auto auto auto auto minmax(240px, 1fr);
+  gap: 6px;
+  padding: 6px 8px;
+  overflow: hidden;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-top-strip h2 {
+  font-size: 1.35rem;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-instrument-row {
+  min-width: 0;
+  max-width: none;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-instrument-row button {
+  grid-template-columns: 28px minmax(0, 1fr);
+  min-height: 38px;
+  padding: 4px 6px;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-instrument-row .instrument-photo {
+  width: 28px;
+  max-width: 28px;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-feedback-main {
+  width: min(360px, 70%);
+  min-height: 34px;
+  padding: 6px 12px;
+}
+
+body[data-device="tablet"][data-view="compose"] .four-bar-board {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: min(100%, 1120px);
+  gap: 8px;
+  padding: 8px;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-bar-stage {
+  min-height: 116px;
+  padding: 6px;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-bar-fill {
+  min-height: 72px;
+  margin-top: 26px;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-beat-pit,
+body[data-device="tablet"][data-view="compose"] .compose-rhythm-piece {
+  min-height: 72px;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-control-floor {
+  width: min(1120px, calc(100% - 72px));
+  grid-template-columns: minmax(0, 1fr) minmax(116px, 136px);
+  gap: 8px;
+  margin-bottom: 120px;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-main-tray,
+body[data-device="tablet"][data-view="compose"] .compose-action-dock {
+  padding: 6px;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-main-tray .notation-card {
+  flex-basis: 108px;
+  min-height: 72px;
+}
+
+body[data-device="tablet"][data-view="compose"] .compose-action-dock button {
+  min-height: 46px;
 }
 
 body[data-view="compose"] .compose-main-tray .notation-card[data-piece-beats="2"] {

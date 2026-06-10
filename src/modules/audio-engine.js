@@ -1,6 +1,7 @@
-import { getInstrument } from "../data/instrument-sounds.js";
+import { getInstrument } from "../data/instrument-sounds.js?v=tablet-safe-20";
 
 let audioContext;
+let didWarmContext = false;
 const sampleBuffers = new Map();
 
 function getContext() {
@@ -16,6 +17,22 @@ export async function unlockAudio() {
   if (context.state === "suspended") {
     await context.resume();
   }
+  warmUnlockedContext(context);
+}
+
+function warmUnlockedContext(context) {
+  if (didWarmContext || context.state !== "running") {
+    return;
+  }
+
+  didWarmContext = true;
+  const source = context.createBufferSource();
+  const gain = context.createGain();
+  source.buffer = context.createBuffer(1, 1, context.sampleRate);
+  gain.gain.setValueAtTime(0.0001, context.currentTime);
+  source.connect(gain);
+  gain.connect(context.destination);
+  source.start();
 }
 
 export function warmAudioWithRecordedSample(instrumentId, { volume = 0.04, accent = true } = {}) {
@@ -94,7 +111,10 @@ export const __testOnlyLoadSample = loadSample;
 export async function preloadInstrument(instrumentId) {
   const instrument = getInstrument(instrumentId);
   const urls = [instrument.sample?.strong, instrument.sample?.weak].filter(Boolean);
-  await Promise.all([...new Set(urls)].map((url) => loadSample(url)));
+  const results = await Promise.allSettled([...new Set(urls)].map((url) => loadSample(url)));
+  if (results.length > 0 && results.every((result) => result.status === "rejected")) {
+    throw results[0].reason;
+  }
 }
 
 export async function primeAudio(instrumentIds) {
@@ -102,13 +122,31 @@ export async function primeAudio(instrumentIds) {
   await Promise.all(instrumentIds.map((instrumentId) => preloadInstrument(instrumentId).catch(() => {})));
 }
 
+function getSampleUrls(instrument, accent) {
+  const preferred = accent ? instrument.sample?.strong : instrument.sample?.weak;
+  const fallback = accent ? instrument.sample?.weak : instrument.sample?.strong;
+  return [...new Set([preferred, fallback].filter(Boolean))];
+}
+
+async function loadFirstAvailableSample(urls) {
+  let lastError;
+  for (const url of urls) {
+    try {
+      return await loadSample(url);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError ?? new Error("无法加载音色");
+}
+
 function playSample(context, instrument, { volume, start, accent, sustainSeconds }) {
-  const sampleUrl = accent ? instrument.sample?.strong : instrument.sample?.weak;
-  if (!sampleUrl) {
+  const sampleUrls = getSampleUrls(instrument, accent);
+  if (sampleUrls.length === 0) {
     return;
   }
 
-  loadSample(sampleUrl)
+  loadFirstAvailableSample(sampleUrls)
     .then((buffer) => {
       const safeStart = Math.max(start, context.currentTime + 0.005);
       const source = context.createBufferSource();

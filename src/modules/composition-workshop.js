@@ -114,6 +114,7 @@ function updateComposition({ root, state, setState, onReward, feedback, barIndex
     const nextComposition = action === "clear"
       ? clearCompositionBar(current.composition, barIndex)
       : placeBlockInBar(current.composition, barIndex, blockId);
+    const wasComplete = current.composition.isComplete || current.composition.bars.every((bar) => bar.status === "complete");
     const filled = nextComposition.bars[barIndex].status === "complete";
     const message = completionMessage(nextComposition, barIndex, action);
     setState({
@@ -124,8 +125,8 @@ function updateComposition({ root, state, setState, onReward, feedback, barIndex
       }
     });
     refreshCompositionView(root, nextComposition, feedback, message, filled ? "good" : "info");
-    if (nextComposition.isComplete) {
-      onReward(2);
+    if (!wasComplete && nextComposition.isComplete) {
+      onReward("compose");
     }
   } catch (error) {
     const message = shortFeedback(error.message);
@@ -142,6 +143,14 @@ function updateComposition({ root, state, setState, onReward, feedback, barIndex
   }
 }
 
+function shouldUseStaticComposeStage() {
+  if (typeof navigator === "undefined") {
+    return false;
+  }
+
+  return navigator.maxTouchPoints > 1;
+}
+
 export function renderCompositionWorkshop({ state }) {
   const composition = state.composition;
   const blocks = getAllowedBlocksForMeter(composition.meter);
@@ -152,7 +161,7 @@ export function renderCompositionWorkshop({ state }) {
     <section class="compose-game-shell tablet-compose-layout ${composition.isComplete ? "compose-is-complete" : ""} enter-view">
       <div class="compose-arcade-stage compose-quiet-stage">
         <div class="compose-stage-canvas" data-compose-game-stage aria-label="小乐队闯关台动画舞台">
-          <img class="compose-stage-fallback" src="./assets/images/compose-stage-scene.jpg?v=tablet-touch-15" alt="小乐队节奏闯关舞台">
+          <img class="compose-stage-fallback" src="./assets/images/compose-stage-scene.jpg?v=tablet-safe-20" alt="小乐队节奏闯关舞台">
         </div>
 
         <div class="compose-play-layer">
@@ -230,14 +239,21 @@ export function bindCompositionWorkshop({ root, state, setState, render, onRewar
     announceFeedback(feedback, "点小节", "info");
   }
 
-  if (typeof window !== "undefined") {
-    import("./compose-game-stage.js")
-      .then(({ renderComposeGameStage }) => renderComposeGameStage({ root, composition, blocks }))
-      .catch((error) => {
-        const stage = root.querySelector("[data-compose-game-stage]");
-        stage?.setAttribute("data-stage-status", "fallback");
-        stage?.setAttribute("data-stage-error", error.message);
-      });
+  if (shouldUseStaticComposeStage()) {
+    const stage = root.querySelector("[data-compose-game-stage]");
+    stage?.setAttribute("data-stage-status", "static-tablet");
+  }
+
+  if (!shouldUseStaticComposeStage()) {
+    if (typeof window !== "undefined") {
+      import("./compose-game-stage.js")
+        .then(({ renderComposeGameStage }) => renderComposeGameStage({ root, composition, blocks }))
+        .catch((error) => {
+          const stage = root.querySelector("[data-compose-game-stage]");
+          stage?.setAttribute("data-stage-status", "fallback");
+          stage?.setAttribute("data-stage-error", error.message);
+        });
+    }
   }
 
   root.querySelector("[data-compose-mode]")?.addEventListener("change", (event) => {

@@ -1,6 +1,7 @@
 import { networkInterfaces } from "node:os";
 
 const port = process.argv[2] ?? "4173";
+const urlSuffix = process.argv[3] ?? "";
 const urls = [];
 
 for (const interfaces of Object.values(networkInterfaces())) {
@@ -8,7 +9,7 @@ for (const interfaces of Object.values(networkInterfaces())) {
     if (item.family !== "IPv4" || item.internal) {
       continue;
     }
-    urls.push(`http://${item.address}:${port}/`);
+    urls.push(`http://${item.address}:${port}/${urlSuffix}`);
   }
 }
 

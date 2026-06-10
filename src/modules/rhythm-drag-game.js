@@ -76,14 +76,14 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
     if (result.correct) {
       zone.classList.add("is-collected");
       announceFeedback(feedback, result.summary, "good");
-      onReward(1);
       setTimeout(() => {
         const current = state.get();
+        const correctCount = clampRhythmCount(current.rhythmGame.correctCount + 1);
         setState({
           ...current,
           rhythmGame: {
             ...current.rhythmGame,
-            correctCount: clampRhythmCount(current.rhythmGame.correctCount + 1),
+            correctCount,
             currentQuestionIndex: Math.min(rhythmQuestions.length - 1, questionIndex + 1),
             completedAnswers: {
               ...current.rhythmGame.completedAnswers,
@@ -91,6 +91,9 @@ export function bindRhythmGame({ root, state, setState, render, onReward }) {
             }
           }
         });
+        if (correctCount >= rhythmQuestions.length) {
+          onReward("rhythm");
+        }
         render();
       }, 850);
       return;

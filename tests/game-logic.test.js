@@ -10,6 +10,7 @@ import { addBlockToBar, clearCompositionBar, createDefaultComposition, createIni
 import { renderBeatGame } from "../src/modules/beat-game.js";
 import { renderCompositionWorkshop } from "../src/modules/composition-workshop.js";
 import { renderRhythmGame } from "../src/modules/rhythm-drag-game.js";
+import { addLevelStar, addStar } from "../src/modules/feedback.js";
 
 function localAssetPath(url) {
   return url.replace("./", "").replace(/\?.*$/, "");
@@ -102,6 +103,132 @@ test("saved rhythm progress is normalized to the current question set", () => {
   assert.deepEqual(restored.rhythmGame.completedAnswers, {
     "section-a-main": ["sixteenth-run"]
   });
+});
+
+test("stars are capped at three and awarded once per completed level", () => {
+  let state = createInitialState();
+
+  state = addLevelStar(state, "beat");
+  state = addLevelStar(state, "beat");
+  state = addLevelStar(state, "rhythm");
+  state = addLevelStar(state, "compose");
+  state = addLevelStar(state, "bonus");
+
+  assert.equal(state.stars, 3);
+  assert.deepEqual(state.awardedLevelStars, {
+    beat: true,
+    rhythm: true,
+    compose: true
+  });
+  assert.equal(addStar(state, 10).stars, 3);
+});
+
+test("saved star progress is normalized to the three level stars", () => {
+  const completeComposition = createDefaultComposition();
+  completeComposition.isComplete = true;
+  completeComposition.bars = completeComposition.bars.map((bar) => ({
+    ...bar,
+    blocks: ["half-note"],
+    filledBeats: bar.capacity,
+    status: "complete"
+  }));
+
+  const restored = restoreState(JSON.stringify({
+    currentView: "home",
+    stars: 42,
+    awardedLevelStars: {
+      beat: true,
+      rhythm: true,
+      compose: true,
+      bonus: true
+    },
+    beatGame: {
+      currentStep: "practice",
+      currentMeter: "2/4",
+      score: 4,
+      streak: 4,
+      lastResult: "correct",
+      sequenceIndex: 0
+    },
+    rhythmGame: {
+      currentQuestionIndex: rhythmQuestions.length - 1,
+      correctCount: rhythmQuestions.length,
+      completedAnswers: {}
+    },
+    composition: completeComposition
+  }));
+
+  assert.equal(restored.stars, 3);
+  assert.deepEqual(restored.awardedLevelStars, {
+    beat: true,
+    rhythm: true,
+    compose: true
+  });
+});
+
+test("old partial-reward saves do not keep stars without completed levels", () => {
+  const restored = restoreState(JSON.stringify({
+    currentView: "home",
+    stars: 2,
+    beatGame: {
+      currentStep: "intro",
+      currentMeter: "2/4",
+      score: 0,
+      streak: 0,
+      lastResult: null,
+      sequenceIndex: 0
+    },
+    rhythmGame: {
+      currentQuestionIndex: 0,
+      correctCount: 0,
+      completedAnswers: {}
+    },
+    composition: createDefaultComposition()
+  }));
+
+  assert.equal(restored.stars, 0);
+  assert.deepEqual(restored.awardedLevelStars, {});
+});
+
+test("saved awarded stars are kept only for currently completed levels", () => {
+  const restored = restoreState(JSON.stringify({
+    currentView: "home",
+    stars: 2,
+    awardedLevelStars: {
+      beat: true,
+      rhythm: true
+    },
+    beatGame: {
+      currentStep: "intro",
+      currentMeter: "2/4",
+      score: 0,
+      streak: 0,
+      lastResult: null,
+      sequenceIndex: 0
+    },
+    rhythmGame: {
+      currentQuestionIndex: 0,
+      correctCount: 0,
+      completedAnswers: {}
+    },
+    composition: createDefaultComposition()
+  }));
+
+  assert.equal(restored.stars, 0);
+  assert.deepEqual(restored.awardedLevelStars, {});
+});
+
+test("game modules award stars only when a level is completed", () => {
+  const beatSource = readFileSync("src/modules/beat-game.js", "utf8");
+  const rhythmSource = readFileSync("src/modules/rhythm-drag-game.js", "utf8");
+  const compositionSource = readFileSync("src/modules/composition-workshop.js", "utf8");
+
+  assert.doesNotMatch(beatSource, /onReward\(\d/);
+  assert.doesNotMatch(rhythmSource, /onReward\(\d/);
+  assert.doesNotMatch(compositionSource, /onReward\(\d/);
+  assert.match(beatSource, /onReward\("beat"\)/);
+  assert.match(rhythmSource, /onReward\("rhythm"\)/);
+  assert.match(compositionSource, /onReward\("compose"\)/);
 });
 
 test("composition defaults to a four-bar student phrase", () => {
@@ -254,6 +381,34 @@ test("composition playback gives short tablet audio status feedback", () => {
   assert.match(source, /音色加载失败，再点一次/);
 });
 
+test("composition audio preload tolerates one failed tablet sample", async () => {
+  const previousWindow = globalThis.window;
+  const previousFetch = globalThis.fetch;
+
+  class FakeAudioContext {
+    state = "running";
+    currentTime = 0;
+    async resume() {}
+    async decodeAudioData() {
+      return { duration: 1 };
+    }
+  }
+
+  globalThis.window = { AudioContext: FakeAudioContext };
+  globalThis.fetch = async (url) => ({
+    ok: !String(url).includes("soft"),
+    arrayBuffer: async () => new ArrayBuffer(16)
+  });
+
+  try {
+    const { preloadInstrument } = await import(`../src/modules/audio-engine.js?partial=${Date.now()}`);
+    await preloadInstrument("bass-drum");
+  } finally {
+    globalThis.window = previousWindow;
+    globalThis.fetch = previousFetch;
+  }
+});
+
 test("composition playback warms tablet audio with a recorded sample in the tap handler", () => {
   const workshopSource = readFileSync("src/modules/composition-workshop.js", "utf8");
   const audioSource = readFileSync("src/modules/audio-engine.js", "utf8");
@@ -270,11 +425,48 @@ test("tablet landscape keeps scenic images proportioned and touch controls visib
   const tabletCss = readFileSync("src/styles/tablet.css", "utf8");
 
   assert.match(tabletCss, /min-width:\s*921px\)\s*and\s*\(max-width:\s*1280px\)\s*and\s*\(orientation:\s*landscape\)/);
-  assert.match(tabletCss, /qinghai-folk-background\.jpg\?v=tablet-touch-15"\)\s*center top \/ cover no-repeat/);
+  assert.match(tabletCss, /qinghai-folk-background\.jpg\?v=tablet-safe-20"\)\s*center top \/ cover no-repeat/);
   assert.match(tabletCss, /\.compose-arcade-stage\s*\{[\s\S]*aspect-ratio:\s*16 \/ 9/);
   assert.match(tabletCss, /\.compose-beat-pit,\s*\n\s*\.compose-rhythm-piece\s*\{[\s\S]*min-height:\s*118px/);
   assert.match(tabletCss, /\.compose-main-tray\s*\{[\s\S]*overflow-x:\s*auto/);
   assert.match(tabletCss, /\.huagu\s*\{[\s\S]*min-width:\s*500px/);
+});
+
+test("iPad landscape keeps game controls above the bottom navigation", () => {
+  const baseCss = readFileSync("src/styles/base.css", "utf8");
+
+  assert.match(baseCss, /body\[data-device="tablet"\]\s+\.app-shell\s*\{[\s\S]*height:\s*var\(--safe-vh\)/);
+  assert.match(baseCss, /body\[data-device="tablet"\]\s+\.bottom-nav\s*\{[\s\S]*--tablet-nav-height:\s*86px/);
+  assert.match(baseCss, /body\[data-device="tablet"\]\[data-view="beat"\]\s+\.beat-layout\s+\.drum-stage\s*\{[\s\S]*height:\s*calc\(var\(--safe-vh\) - var\(--tablet-nav-height\) - 150px\)/);
+  assert.match(baseCss, /body\[data-device="tablet"\]\[data-view="beat"\]\s+\.beat-layout\s+\.control-row\s*\{[\s\S]*margin-bottom:\s*120px/);
+  assert.match(baseCss, /body\[data-device="tablet"\]\[data-view="compose"\]\s+\.compose-control-floor\s*\{[\s\S]*margin-bottom:\s*120px/);
+  assert.match(baseCss, /body\[data-device="tablet"\]\[data-view="compose"\]\s+\.compose-stage-canvas canvas\s*\{[\s\S]*display:\s*none !important/);
+});
+
+test("tablet safe mode exposes a version marker and viewport variables", () => {
+  const appSource = readFileSync("src/app.js", "utf8");
+  const baseCss = readFileSync("src/styles/base.css", "utf8");
+
+  assert.match(appSource, /const classroomBuild = "tablet-safe-20"/);
+  assert.match(appSource, /navigator\.maxTouchPoints/);
+  assert.match(appSource, /visualViewport/);
+  assert.match(appSource, /longerSide >= 900 && shorterSide >= 520/);
+  assert.match(appSource, /document\.body\.dataset\.device = isTabletDevice \? "tablet" : "desktop"/);
+  assert.match(appSource, /document\.body\.dataset\.tabletSize = isCompactTablet \? "compact" : "regular"/);
+  assert.match(appSource, /className = "classroom-version-marker"/);
+  assert.match(appSource, /v20 tablet/);
+  assert.match(baseCss, /\.classroom-version-marker/);
+});
+
+test("compact iPad Safari layout removes the composition stage image layer", () => {
+  const tabletCss = readFileSync("src/styles/tablet.css", "utf8");
+
+  assert.match(tabletCss, /body\[data-device="tablet"\]\[data-tablet-size="compact"\]\[data-view="compose"\]\s+\.compose-stage-canvas\s*\{[\s\S]*display:\s*none !important/);
+  assert.match(tabletCss, /body\[data-device="tablet"\]\[data-tablet-size="compact"\]\s+\.bottom-nav\s*\{[\s\S]*--tablet-nav-height:\s*76px/);
+  assert.match(tabletCss, /body\[data-device="tablet"\]\[data-tablet-size="compact"\]\[data-view="compose"\]\s+\.compose-arcade-stage\s*\{[\s\S]*height:\s*100%/);
+  assert.match(tabletCss, /body\[data-device="tablet"\]\[data-tablet-size="compact"\]\[data-view="compose"\]\s+\.compose-arcade-stage\s*\{[\s\S]*max-height:\s*none/);
+  assert.match(tabletCss, /body\[data-device="tablet"\]\[data-tablet-size="compact"\]\[data-view="compose"\]\s+\.compose-control-floor\s*\{[\s\S]*margin:\s*0 auto/);
+  assert.match(tabletCss, /body\[data-device="tablet"\]\[data-tablet-size="compact"\]\[data-view="beat"\]\s+\.drum-stage\s*\{[\s\S]*height:\s*calc\(var\(--safe-vh\) - var\(--tablet-nav-height\) - 28px\)/);
 });
 
 test("bottom navigation uses only page names", () => {
@@ -285,7 +477,7 @@ test("bottom navigation uses only page names", () => {
 
 test("classroom shell loads Phaser from a local classroom asset", () => {
   const html = readFileSync("index.html", "utf8");
-  assert.match(html, /"\.\/assets\/vendor\/phaser\.esm\.js\?v=tablet-touch-15"/);
+  assert.match(html, /"\.\/assets\/vendor\/phaser\.esm\.js\?v=tablet-safe-20"/);
   assert.doesNotMatch(html, /cdn\.jsdelivr\.net|unpkg\.com|phaser@3\.90\.0/);
   assert.equal(existsSync("assets/vendor/phaser.esm.js"), true);
 });
@@ -294,6 +486,15 @@ test("app preserves the Phaser stage host when composition rerenders", () => {
   const appSource = readFileSync("src/app.js", "utf8");
   assert.match(appSource, /existingStage.*data-compose-game-stage/s);
   assert.match(appSource, /nextStage\.replaceWith\(existingStage\)/);
+});
+
+test("touch tablets keep composition on the static stage instead of Phaser canvas", () => {
+  const workshopSource = readFileSync("src/modules/composition-workshop.js", "utf8");
+
+  assert.match(workshopSource, /function shouldUseStaticComposeStage/);
+  assert.match(workshopSource, /navigator\.maxTouchPoints/);
+  assert.match(workshopSource, /data-stage-status", "static-tablet"/);
+  assert.match(workshopSource, /if \(!shouldUseStaticComposeStage\(\)\)/);
 });
 
 test("composition workshop exposes four classroom percussion instruments", () => {
@@ -317,13 +518,13 @@ test("tablet-critical media urls force fresh classroom assets", () => {
   const composeHtml = renderCompositionWorkshop({ state: createInitialState() });
   const composeStageSource = readFileSync("src/modules/compose-game-stage.js", "utf8");
 
-  assert.match(beatHtml, /flower-drum-3d\.png\?v=tablet-touch-15/);
+  assert.match(beatHtml, /flower-drum-3d\.png\?v=tablet-safe-20/);
   assert.match(beatHtml, /fetchpriority="high"/);
-  assert.match(composeHtml, /compose-stage-scene\.jpg\?v=tablet-touch-15/);
-  assert.match(composeStageSource, /compose-stage-scene\.jpg\?v=tablet-touch-15/);
+  assert.match(composeHtml, /compose-stage-scene\.jpg\?v=tablet-safe-20/);
+  assert.match(composeStageSource, /compose-stage-scene\.jpg\?v=tablet-safe-20/);
   for (const instrument of instruments) {
-    assert.match(instrument.sample.strong, /\?v=tablet-touch-15$/);
-    assert.match(instrument.sample.weak, /\?v=tablet-touch-15$/);
+    assert.match(instrument.sample.strong, /\?v=tablet-safe-20$/);
+    assert.match(instrument.sample.weak, /\?v=tablet-safe-20$/);
   }
 });
 
@@ -331,10 +532,33 @@ test("tablet shell prioritizes drum image before delayed audio warmup", () => {
   const html = readFileSync("index.html", "utf8");
   const appSource = readFileSync("src/app.js", "utf8");
 
-  assert.match(html, /rel="preload" as="image" href="\.\/assets\/images\/flower-drum-3d\.png\?v=tablet-touch-15"/);
+  assert.match(html, /rel="preload" as="image" href="\.\/assets\/images\/flower-drum-3d\.png\?v=tablet-safe-20"/);
   assert.match(appSource, /unlockAudio\(\)/);
   assert.match(appSource, /setTimeout\(\(\) => \{/);
   assert.match(appSource, /primeAudio/);
+});
+
+test("classroom entrypoint cache-busts updated game modules", () => {
+  const appSource = readFileSync("src/app.js", "utf8");
+  const gameLogicSource = readFileSync("src/modules/game-logic.js", "utf8");
+  const audioSource = readFileSync("src/modules/audio-engine.js", "utf8");
+
+  assert.match(appSource, /\.\/modules\/beat-game\.js\?v=tablet-safe-20/);
+  assert.match(appSource, /\.\/modules\/feedback\.js\?v=tablet-safe-20/);
+  assert.match(appSource, /\.\/modules\/game-logic\.js\?v=tablet-safe-20/);
+  assert.match(gameLogicSource, /\.\/feedback\.js\?v=tablet-safe-20/);
+  assert.match(audioSource, /\.\.\/data\/instrument-sounds\.js\?v=tablet-safe-20/);
+});
+
+test("classroom no-cache server is available for iPad Safari", () => {
+  const packageJson = readFileSync("package.json", "utf8");
+  const serverSource = readFileSync("scripts/serve-classroom-no-cache.mjs", "utf8");
+
+  assert.match(packageJson, /"serve:classroom":\s*"node scripts\/serve-classroom-no-cache\.mjs 4188"/);
+  assert.match(serverSource, /Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate"/);
+  assert.match(serverSource, /Pragma", "no-cache"/);
+  assert.match(serverSource, /Expires", "0"/);
+  assert.match(serverSource, /tablet-safe-20/);
 });
 
 test("tablet-critical media assets stay lightweight enough for classroom loading", () => {

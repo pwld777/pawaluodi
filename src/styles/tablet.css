@@ -126,7 +126,7 @@
   body {
     background:
       linear-gradient(180deg, rgba(255, 250, 221, 0.22), rgba(221, 246, 213, 0.28)),
-      url("../../assets/images/qinghai-folk-background.jpg?v=tablet-touch-15") center top / cover no-repeat;
+      url("../../assets/images/qinghai-folk-background.jpg?v=tablet-safe-20") center top / cover no-repeat;
   }
 
   .app-shell {
@@ -606,4 +606,219 @@
   .block-tray .notation-card[data-piece-beats="3"] {
     flex-basis: 138px;
   }
+}
+
+body[data-device="tablet"][data-tablet-size="compact"] {
+  --tablet-nav-height: 76px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"] .app-shell {
+  height: var(--safe-vh);
+  min-height: var(--safe-vh);
+  padding: 8px 14px calc(var(--tablet-nav-height) + 10px);
+  overflow: hidden;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"] .bottom-nav {
+  --tablet-nav-height: 76px;
+  bottom: 6px;
+  width: min(620px, calc(var(--safe-vw) - 28px));
+  height: var(--tablet-nav-height);
+  padding: 7px;
+  border-width: 3px;
+  border-radius: 20px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"] .nav-tab {
+  height: 56px;
+  min-height: 0;
+  border-radius: 15px;
+  font-size: 0.9rem;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="beat"] .view-root,
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .view-root {
+  max-width: calc(var(--safe-vw) - 28px);
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="beat"] .beat-layout {
+  grid-template-columns: clamp(128px, 14vw, 150px) minmax(0, 1fr);
+  height: calc(var(--safe-vh) - var(--tablet-nav-height) - 28px);
+  gap: 10px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="beat"] .task-rail {
+  padding: 12px;
+  border-radius: 20px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="beat"] .step-list {
+  gap: 6px;
+  margin-bottom: 10px;
+  padding-left: 14px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="beat"] .step-list li {
+  padding: 6px 8px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="beat"] .mode-buttons {
+  gap: 7px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="beat"] .mode-buttons button {
+  min-height: 42px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="beat"] .drum-stage {
+  height: calc(var(--safe-vh) - var(--tablet-nav-height) - 28px);
+  padding: 8px 14px 10px;
+  gap: 4px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="beat"] .round-label {
+  display: none;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="beat"] .beat-stage-hud {
+  min-height: 34px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="beat"] .beat-dot {
+  width: 40px;
+  height: 40px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="beat"] .huagu {
+  width: min(430px, 48vw);
+  min-width: 0;
+  max-height: 300px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="beat"] .feedback-pill {
+  min-height: 36px;
+  padding: 7px 12px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="beat"] .control-row {
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin-bottom: 96px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="beat"] .control-row button {
+  min-width: 92px;
+  min-height: 44px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-game-shell {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 8px;
+  height: calc(var(--safe-vh) - var(--tablet-nav-height) - 28px);
+  max-width: calc(var(--safe-vw) - 28px);
+  margin: 0 auto;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-arcade-stage {
+  width: min(960px, 100%);
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: auto;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-arcade-stage::before,
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-stage-canvas {
+  display: none !important;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-play-layer {
+  position: static;
+  inset: auto;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  height: 100%;
+  gap: 6px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-top-strip {
+  display: grid;
+  grid-template-columns: auto auto auto auto minmax(260px, 1fr);
+  gap: 6px;
+  padding: 6px 8px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-top-strip h2 {
+  font-size: 1.15rem;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-top-strip strong,
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-top-strip label {
+  font-size: 0.92rem;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-instrument-row {
+  min-width: 260px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-instrument-row button {
+  min-height: 34px;
+  grid-template-columns: 26px minmax(0, 1fr);
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-instrument-row .instrument-photo {
+  width: 26px;
+  max-width: 26px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-feedback-main {
+  min-height: 32px;
+  padding: 6px 12px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .four-bar-board {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  padding: 7px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-bar-stage {
+  min-height: 96px;
+  padding: 5px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-bar-fill {
+  min-height: 58px;
+  margin-top: 22px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-beat-pit,
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-rhythm-piece {
+  min-height: 58px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-control-floor {
+  width: min(960px, 100%);
+  grid-template-columns: minmax(0, 1fr) 126px;
+  gap: 8px;
+  margin: 0 auto;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-main-tray .notation-card {
+  flex-basis: 116px;
+  min-height: 72px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-main-tray .notation-card[data-piece-beats="2"],
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-main-tray .notation-card[data-piece-beats="3"] {
+  flex-basis: 136px;
+}
+
+body[data-device="tablet"][data-tablet-size="compact"][data-view="compose"] .compose-action-dock button {
+  min-height: 44px;
 }

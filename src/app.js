@@ -1,12 +1,13 @@
-import { renderBeatGame, bindBeatGame } from "./modules/beat-game.js";
-import { renderRhythmGame, bindRhythmGame } from "./modules/rhythm-drag-game.js";
-import { renderCompositionWorkshop, bindCompositionWorkshop } from "./modules/composition-workshop.js";
-import { bindNavigation, updateNavigation } from "./modules/navigation.js";
-import { addStar } from "./modules/feedback.js";
-import { createInitialState, restoreState, serializeState } from "./modules/game-logic.js";
-import { primeAudio, unlockAudio } from "./modules/audio-engine.js";
-import { rhythmQuestions } from "./data/rhythm-questions.js";
+import { renderBeatGame, bindBeatGame } from "./modules/beat-game.js?v=tablet-safe-20";
+import { renderRhythmGame, bindRhythmGame } from "./modules/rhythm-drag-game.js?v=tablet-safe-20";
+import { renderCompositionWorkshop, bindCompositionWorkshop } from "./modules/composition-workshop.js?v=tablet-safe-20";
+import { bindNavigation, updateNavigation } from "./modules/navigation.js?v=tablet-safe-20";
+import { addLevelStar } from "./modules/feedback.js?v=tablet-safe-20";
+import { createInitialState, normalizeProgressStars, restoreState, serializeState } from "./modules/game-logic.js?v=tablet-safe-20";
+import { primeAudio, unlockAudio } from "./modules/audio-engine.js?v=tablet-safe-20";
+import { rhythmQuestions } from "./data/rhythm-questions.js?v=tablet-safe-20";
 
+const classroomBuild = "tablet-safe-20";
 const storageKey = "huaer-yu-shaonian-state";
 const viewRoot = document.querySelector("#viewRoot");
 const starCount = document.querySelector("#starCount");
@@ -20,15 +21,61 @@ const stateRef = {
   get: () => appState
 };
 
+function getViewportSize() {
+  const viewport = window.visualViewport;
+  return {
+    width: Math.round(viewport?.width ?? window.innerWidth),
+    height: Math.round(viewport?.height ?? window.innerHeight)
+  };
+}
+
+function syncClassroomViewport() {
+  const size = getViewportSize();
+  const shorterSide = Math.min(size.width, size.height);
+  const longerSide = Math.max(size.width, size.height);
+  const isTabletDevice = navigator.maxTouchPoints > 1 && longerSide >= 900 && shorterSide >= 520;
+  const isCompactTablet = isTabletDevice && size.height <= 740;
+
+  document.body.dataset.device = isTabletDevice ? "tablet" : "desktop";
+  document.body.dataset.tabletSize = isCompactTablet ? "compact" : "regular";
+  document.documentElement.style.setProperty("--safe-vw", `${size.width}px`);
+  document.documentElement.style.setProperty("--safe-vh", `${size.height}px`);
+  document.documentElement.style.setProperty("--classroom-build", `"${classroomBuild}"`);
+  updateClassroomVersionMarker(size, isTabletDevice);
+}
+
+function updateClassroomVersionMarker(size, isTabletDevice) {
+  let marker = document.querySelector(".classroom-version-marker");
+  if (!marker) {
+    marker = document.createElement("span");
+    marker.className = "classroom-version-marker";
+    marker.setAttribute("aria-hidden", "true");
+    document.body.append(marker);
+  }
+
+  const markerPrefix = isTabletDevice ? "v20 tablet" : "v20 desktop";
+  marker.textContent = `${markerPrefix} ${size.width}x${size.height}`;
+}
+
 function setState(nextState) {
-  appState = nextState;
+  appState = normalizeProgressStars(nextState);
   localStorage.setItem(storageKey, serializeState(appState));
   starCount.textContent = String(appState.stars);
 }
 
-function reward(amount) {
-  flyRewardStar(amount);
-  setState(addStar(appState, amount));
+function reward(levelId) {
+  const previousStars = appState.stars;
+  const nextState = addLevelStar(appState, levelId);
+  if (nextState === appState) {
+    return;
+  }
+
+  setState(nextState);
+  if (nextState.stars <= previousStars) {
+    return;
+  }
+
+  flyRewardStar(1);
   starCount.classList.remove("pop");
   void starCount.offsetWidth;
   starCount.classList.add("pop");
@@ -227,6 +274,11 @@ function updateNavProgress() {
 }
 
 bindNavigation({ state: stateRef, setState, render });
+syncClassroomViewport();
+window.visualViewport?.addEventListener("resize", syncClassroomViewport);
+window.visualViewport?.addEventListener("scroll", syncClassroomViewport);
+window.addEventListener("resize", syncClassroomViewport);
+window.addEventListener("orientationchange", syncClassroomViewport);
 ["pointerdown", "touchstart", "click", "keydown"].forEach((eventName) => {
   window.addEventListener(eventName, primeClassroomAudio, { once: true, passive: true });
 });

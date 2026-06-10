@@ -9,7 +9,9 @@
     "verify": "npm run check && npm test",
     "check:url": "node scripts/validate-classroom-url.mjs",
     "lan:urls": "node scripts/print-lan-urls.mjs",
+    "lan:classroom": "node scripts/print-lan-urls.mjs 4188 '?classroom=tablet-safe-20'",
     "package:classroom": "npm run verify && node scripts/package-classroom.mjs",
-    "serve": "python3 -m http.server 4173"
+    "serve": "python3 -m http.server 4173",
+    "serve:classroom": "node scripts/serve-classroom-no-cache.mjs 4188"
   }
 }

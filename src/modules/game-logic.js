@@ -1,5 +1,6 @@
 import { getNotationCard } from "../data/notation-cards.js";
 import { rhythmQuestions } from "../data/rhythm-questions.js";
+import { maxStars, starLevelIds } from "./feedback.js?v=tablet-safe-20";
 
 const meterCapacity = {
   "2/4": 2,
@@ -184,6 +185,48 @@ function normalizeRhythmGame(rhythmGame) {
   };
 }
 
+function normalizeStarCount(stars) {
+  return Math.min(maxStars, Math.max(0, Number.isFinite(stars) ? Math.trunc(stars) : 0));
+}
+
+function normalizeAwardedLevelStars(awardedLevelStars) {
+  return Object.fromEntries(
+    starLevelIds
+      .filter((levelId) => awardedLevelStars?.[levelId])
+      .map((levelId) => [levelId, true])
+  );
+}
+
+function completedLevelStarsFromProgress({ beatGame, rhythmGame, composition }) {
+  return Object.fromEntries([
+    beatGame?.score >= 4 ? ["beat", true] : null,
+    rhythmGame?.correctCount >= rhythmQuestions.length ? ["rhythm", true] : null,
+    composition?.isComplete || composition?.bars?.every((bar) => bar.status === "complete") ? ["compose", true] : null
+  ].filter(Boolean));
+}
+
+function keepOnlyCompletedLevelStars(awardedLevelStars, completedLevelStars) {
+  return Object.fromEntries(
+    starLevelIds
+      .filter((levelId) => awardedLevelStars[levelId] && completedLevelStars[levelId])
+      .map((levelId) => [levelId, true])
+  );
+}
+
+export function normalizeProgressStars(state) {
+  const completedLevelStars = completedLevelStarsFromProgress(state);
+  const awardedLevelStars = keepOnlyCompletedLevelStars(
+    normalizeAwardedLevelStars(state.awardedLevelStars),
+    completedLevelStars
+  );
+
+  return {
+    ...state,
+    stars: normalizeStarCount(Object.keys(awardedLevelStars).length),
+    awardedLevelStars
+  };
+}
+
 export function serializeState(state) {
   return JSON.stringify(state);
 }
@@ -195,10 +238,21 @@ export function restoreState(serialized) {
 
   try {
     const parsed = JSON.parse(serialized);
+    const rhythmGame = normalizeRhythmGame(parsed.rhythmGame);
+    const composition = normalizeComposition(parsed.composition);
+    const hasAwardedLevelStars = Object.prototype.hasOwnProperty.call(parsed, "awardedLevelStars");
+    const completedLevelStars = completedLevelStarsFromProgress({ beatGame: parsed.beatGame, rhythmGame, composition });
+    const awardedLevelStars = hasAwardedLevelStars
+      ? normalizeAwardedLevelStars(parsed.awardedLevelStars)
+      : completedLevelStars;
+    const completedAwardedLevelStars = keepOnlyCompletedLevelStars(awardedLevelStars, completedLevelStars);
+
     return {
       ...parsed,
-      rhythmGame: normalizeRhythmGame(parsed.rhythmGame),
-      composition: normalizeComposition(parsed.composition)
+      stars: normalizeStarCount(Object.keys(completedAwardedLevelStars).length),
+      awardedLevelStars: completedAwardedLevelStars,
+      rhythmGame,
+      composition
     };
   } catch {
     return null;
@@ -209,6 +263,7 @@ export function createInitialState() {
   return {
     currentView: "home",
     stars: 0,
+    awardedLevelStars: {},
     beatGame: {
       currentStep: "intro",
       currentMeter: "2/4",

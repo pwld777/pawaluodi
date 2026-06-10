@@ -7,10 +7,10 @@ let session = null;
 
 const drumHeadGeometry = {
   centerX: 0.5,
-  centerY: 0.31,
+  centerY: 0.42,
   radiusX: 0.39,
-  radiusY: 0.27,
-  centerThreshold: 0.42
+  radiusY: 0.32,
+  centerThreshold: 0.52
 };
 
 export function classifyDrumHit({ x, y, width, height }) {
@@ -77,7 +77,7 @@ export function renderBeatGame({ state, setState, onReward }) {
           ${patternConfig.pattern.map((beat, index) => `<span class="beat-dot ${beat}" data-beat-dot="${index}" aria-label="第 ${index + 1} 拍">${index + 1}</span>`).join("")}
         </div>
         <div class="huagu" role="group" aria-label="可点击花鼓">
-          <img class="huagu-image" src="./assets/images/flower-drum-3d.png?v=tablet-touch-15" alt="红色大花鼓，鼓面朝上，鼓身贴有花纹" loading="eager" fetchpriority="high" decoding="async">
+          <img class="huagu-image" src="./assets/images/flower-drum-3d.png?v=tablet-safe-20" alt="红色大花鼓，鼓面朝上，鼓身贴有花纹" loading="eager" fetchpriority="high" decoding="async">
           <button class="drum-zone drum-hit-surface" data-drum-surface type="button" aria-label="敲花鼓"><span>敲花鼓</span></button>
         </div>
         <p class="feedback-pill" id="beatFeedback" data-tone="info">先听，再敲。</p>
@@ -199,9 +199,6 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
       if (current.beatGame.currentStep === "intro") {
         const expectedZone = current.beatGame.currentStep === "intro" && isCenterHit;
         announceFeedback(feedback, expectedZone ? "对了！" : "不对，再听一次。", expectedZone ? "good" : "warn");
-        if (expectedZone) {
-          onReward(1);
-        }
         return;
       }
 
@@ -215,12 +212,13 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
 
       if (result.result === "correct") {
         const streak = current.beatGame.streak + 1;
+        const score = current.beatGame.score + 1;
         const nextSequenceIndex = (sequenceIndex + 1) % patternConfig.pattern.length;
         setState({
           ...current,
           beatGame: {
             ...current.beatGame,
-            score: current.beatGame.score + 1,
+            score,
             streak,
             lastResult: result.result,
             sequenceIndex: nextSequenceIndex
@@ -228,8 +226,8 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
         });
         highlightExpectedBeat(root, patternConfig.pattern, nextSequenceIndex);
         announceFeedback(feedback, nextSequenceIndex === 0 ? "这一组对了！继续。" : "对了！", "good");
-        if (streak === 4) {
-          onReward(2);
+        if (score >= 4) {
+          onReward("beat");
         }
       } else {
         setState({
@@ -256,7 +254,6 @@ export function bindBeatGame({ root, state, setState, render, onReward }) {
       announceFeedback(feedback, "先点开始，再练节拍转换。", "warn");
       return;
     }
-    onReward(2);
     setState({
       ...state.get(),
       beatGame: {
