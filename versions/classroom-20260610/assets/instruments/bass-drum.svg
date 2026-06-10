@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" role="img" aria-label="大鼓">
+  <defs>
+    <linearGradient id="shell" x1="35" x2="185" y1="50" y2="170" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d23d2f"/>
+      <stop offset="0.52" stop-color="#b82824"/>
+      <stop offset="1" stop-color="#7a261d"/>
+    </linearGradient>
+    <radialGradient id="head" cx="48%" cy="43%" r="58%">
+      <stop offset="0" stop-color="#fff9cf"/>
+      <stop offset="0.72" stop-color="#f6d978"/>
+      <stop offset="1" stop-color="#b77c31"/>
+    </radialGradient>
+    <linearGradient id="rim" x1="60" x2="170" y1="46" y2="170" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffe68a"/>
+      <stop offset="1" stop-color="#b06926"/>
+    </linearGradient>
+  </defs>
+  <rect width="220" height="220" fill="none"/>
+  <path d="M45 170c16 18 111 18 130 0" fill="none" stroke="#6b371e" stroke-width="12" stroke-linecap="round"/>
+  <path d="M62 70h96c19 0 34 17 34 39v22c0 23-15 40-34 40H62c-19 0-34-17-34-40v-22c0-22 15-39 34-39Z" fill="url(#shell)" stroke="#6b2c17" stroke-width="8"/>
+  <ellipse cx="110" cy="119" rx="75" ry="61" fill="url(#head)" stroke="url(#rim)" stroke-width="10"/>
+  <ellipse cx="110" cy="119" rx="52" ry="41" fill="none" stroke="#f4be4a" stroke-width="5" opacity=".9"/>
+  <g fill="#ffe78f" stroke="#78301a" stroke-width="3">
+    <circle cx="51" cy="92" r="7"/>
+    <circle cx="169" cy="92" r="7"/>
+    <circle cx="42" cy="130" r="7"/>
+    <circle cx="178" cy="130" r="7"/>
+    <circle cx="73" cy="162" r="7"/>
+    <circle cx="147" cy="162" r="7"/>
+  </g>
+  <path d="M146 57 185 30" stroke="#6b371e" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="190" cy="27" r="13" fill="#ffdd78" stroke="#6b371e" stroke-width="5"/>
+  <path d="M74 57 35 30" stroke="#6b371e" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="30" cy="27" r="13" fill="#ffdd78" stroke="#6b371e" stroke-width="5"/>
+</svg>

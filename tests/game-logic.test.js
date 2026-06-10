@@ -378,7 +378,7 @@ test("composition playback gives short tablet audio status feedback", () => {
 
   assert.match(source, /音色加载中/);
   assert.match(source, /播放中/);
-  assert.match(source, /音色加载失败，再点一次/);
+  assert.doesNotMatch(source, /音色加载失败/);
 });
 
 test("composition audio preload tolerates one failed tablet sample", async () => {
@@ -409,6 +409,78 @@ test("composition audio preload tolerates one failed tablet sample", async () =>
   }
 });
 
+test("audio sample loading supports callback-only Safari decoding", async () => {
+  const previousWindow = globalThis.window;
+  const previousFetch = globalThis.fetch;
+
+  class CallbackAudioContext {
+    state = "running";
+    sampleRate = 44100;
+    currentTime = 0;
+    async resume() {}
+    decodeAudioData(arrayBuffer, resolve) {
+      assert.equal(arrayBuffer.byteLength, 16);
+      setTimeout(() => resolve({ duration: 1 }), 0);
+      return undefined;
+    }
+  }
+
+  globalThis.window = { AudioContext: CallbackAudioContext };
+  globalThis.fetch = async () => ({
+    ok: true,
+    arrayBuffer: async () => new ArrayBuffer(16)
+  });
+
+  try {
+    const { preloadInstrument } = await import(`../src/modules/audio-engine.js?callback=${Date.now()}`);
+    await preloadInstrument("bass-drum");
+  } finally {
+    globalThis.window = previousWindow;
+    globalThis.fetch = previousFetch;
+  }
+});
+
+test("tablet composition supports tap-to-place without drag", () => {
+  const source = readFileSync("src/modules/composition-workshop.js", "utf8");
+
+  assert.match(source, /function shouldUseTabletTapToPlace/);
+  assert.match(source, /placeBlockFromTap/);
+  assert.match(source, /current\.composition\.activeBarIndex/);
+  assert.match(source, /event\.preventDefault\(\);[\s\S]*placeBlockFromTap\(block\);[\s\S]*return;/);
+});
+
+test("QQ browser uses touchend-safe taps for critical game controls", () => {
+  const appSource = readFileSync("src/app.js", "utf8");
+  const navigationSource = readFileSync("src/modules/navigation.js", "utf8");
+  const beatSource = readFileSync("src/modules/beat-game.js", "utf8");
+  const rhythmSource = readFileSync("src/modules/rhythm-drag-game.js", "utf8");
+  const workshopSource = readFileSync("src/modules/composition-workshop.js", "utf8");
+  const safeTapSource = readFileSync("src/modules/safe-tap.js", "utf8");
+
+  assert.match(safeTapSource, /export function addSafeTapListener/);
+  assert.match(safeTapSource, /"touchend"/);
+  assert.match(safeTapSource, /passive:\s*false/);
+  assert.match(appSource, /detectQQBrowser/);
+  assert.match(appSource, /document\.body\.dataset\.browser = isQQBrowser \? "qq" : "standard"/);
+  assert.match(appSource, /addSafeTapListener\(button/);
+  assert.match(navigationSource, /addSafeTapListener/);
+  assert.match(beatSource, /"touchend"/);
+  assert.match(rhythmSource, /addSafeTapListener\(card/);
+  assert.match(workshopSource, /addSafeTapListener\(block/);
+  assert.match(workshopSource, /addSafeTapListener\(root\.querySelector\("\[data-play-composition\]"\)/);
+});
+
+test("audio engine exposes an HTMLAudio warm path for strict mobile browsers", () => {
+  const audioSource = readFileSync("src/modules/audio-engine.js", "utf8");
+  const workshopSource = readFileSync("src/modules/composition-workshop.js", "utf8");
+  const beatSource = readFileSync("src/modules/beat-game.js", "utf8");
+
+  assert.match(audioSource, /export function warmHtmlAudioFallback/);
+  assert.match(audioSource, /new AudioConstructor\(sampleUrl\)/);
+  assert.match(workshopSource, /warmHtmlAudioFallback\(current\.composition\.instrument\)/);
+  assert.match(beatSource, /warmHtmlAudioFallback\("hand-drum"/);
+});
+
 test("composition playback warms tablet audio with a recorded sample in the tap handler", () => {
   const workshopSource = readFileSync("src/modules/composition-workshop.js", "utf8");
   const audioSource = readFileSync("src/modules/audio-engine.js", "utf8");
@@ -425,7 +497,7 @@ test("tablet landscape keeps scenic images proportioned and touch controls visib
   const tabletCss = readFileSync("src/styles/tablet.css", "utf8");
 
   assert.match(tabletCss, /min-width:\s*921px\)\s*and\s*\(max-width:\s*1280px\)\s*and\s*\(orientation:\s*landscape\)/);
-  assert.match(tabletCss, /qinghai-folk-background\.jpg\?v=tablet-safe-21"\)\s*center top \/ cover no-repeat/);
+  assert.match(tabletCss, /qinghai-folk-background\.jpg\?v=qq-safe-25"\)\s*center top \/ cover no-repeat/);
   assert.match(tabletCss, /\.compose-arcade-stage\s*\{[\s\S]*aspect-ratio:\s*16 \/ 9/);
   assert.match(tabletCss, /\.compose-beat-pit,\s*\n\s*\.compose-rhythm-piece\s*\{[\s\S]*min-height:\s*118px/);
   assert.match(tabletCss, /\.compose-main-tray\s*\{[\s\S]*overflow-x:\s*auto/);
@@ -447,7 +519,7 @@ test("tablet safe mode exposes a version marker and viewport variables", () => {
   const appSource = readFileSync("src/app.js", "utf8");
   const baseCss = readFileSync("src/styles/base.css", "utf8");
 
-  assert.match(appSource, /const classroomBuild = "tablet-safe-21"/);
+  assert.match(appSource, /const classroomBuild = "qq-safe-25"/);
   assert.match(appSource, /navigator\.maxTouchPoints/);
   assert.match(appSource, /navigator\.maxTouchPoints >= 1/);
   assert.match(appSource, /pointer:\s*coarse/);
@@ -457,7 +529,7 @@ test("tablet safe mode exposes a version marker and viewport variables", () => {
   assert.match(appSource, /document\.body\.dataset\.device = isTabletDevice \? "tablet" : "desktop"/);
   assert.match(appSource, /document\.body\.dataset\.tabletSize = isCompactTablet \? "compact" : "regular"/);
   assert.match(appSource, /className = "classroom-version-marker"/);
-  assert.match(appSource, /v21 tablet/);
+  assert.match(appSource, /v25 tablet/);
   assert.match(baseCss, /\.classroom-version-marker/);
 });
 
@@ -472,6 +544,42 @@ test("compact iPad Safari layout removes the composition stage image layer", () 
   assert.match(tabletCss, /body\[data-device="tablet"\]\[data-tablet-size="compact"\]\[data-view="beat"\]\s+\.drum-stage\s*\{[\s\S]*height:\s*calc\(var\(--safe-vh\) - var\(--tablet-nav-height\) - 28px\)/);
 });
 
+test("compact tablet keeps a CSS fallback drum large and touchable", () => {
+  const baseCss = readFileSync("src/styles/base.css", "utf8");
+  const tabletCss = readFileSync("src/styles/tablet.css", "utf8");
+
+  assert.match(baseCss, /\.huagu::before/);
+  assert.match(baseCss, /\.huagu::after/);
+  assert.match(tabletCss, /body\[data-device="tablet"\]\[data-tablet-size="compact"\]\[data-view="beat"\]\s+\.huagu\s*\{[\s\S]*width:\s*min\(390px,\s*42vw\)/);
+  assert.match(tabletCss, /body\[data-device="tablet"\]\[data-tablet-size="compact"\]\[data-view="beat"\]\s+\.huagu-image\s*\{[\s\S]*transform:\s*scale\(1\.05\)/);
+  assert.match(tabletCss, /body\[data-device="tablet"\]\[data-tablet-size="compact"\]\[data-view="beat"\]\s+\.drum-hit-surface\s*\{[\s\S]*inset:\s*-8%/);
+});
+
+test("compact tablet composition aligns pits, pieces, cards, and instrument labels", () => {
+  const tabletCss = readFileSync("src/styles/tablet.css", "utf8");
+  const workshopHtml = renderCompositionWorkshop({ state: createInitialState() });
+
+  assert.match(workshopHtml, /class="instrument-symbol"/);
+  assert.match(tabletCss, /body\[data-device="tablet"\]\[data-tablet-size="compact"\]\[data-view="compose"\]\s+\.compose-instrument-row strong\s*\{[\s\S]*display:\s*block/);
+  assert.match(tabletCss, /body\[data-device="tablet"\]\[data-tablet-size="compact"\]\[data-view="compose"\]\s+\.compose-beat-pit,\s*\nbody\[data-device="tablet"\]\[data-tablet-size="compact"\]\[data-view="compose"\]\s+\.compose-rhythm-piece,\s*\nbody\[data-device="tablet"\]\[data-tablet-size="compact"\]\[data-view="compose"\]\s+\.compose-main-tray \.notation-card\s*\{[\s\S]*min-height:\s*86px/);
+  assert.match(tabletCss, /--compose-cell:\s*clamp\(190px,\s*21\.4vw,\s*224px\)/);
+  assert.match(tabletCss, /body\[data-device="tablet"\]\[data-tablet-size="compact"\]\[data-view="compose"\]\s+\.compose-main-tray \.notation-card\[data-piece-beats="1"\]\s*\{[\s\S]*flex-basis:\s*var\(--compose-cell\)/);
+  assert.match(tabletCss, /body\[data-device="tablet"\]\[data-tablet-size="compact"\]\[data-view="compose"\]\s+\.compose-main-tray \.notation-card\[data-piece-beats="2"\]/);
+});
+
+test("flower drum uses a lightweight tablet image for downloaded QQ browser files", () => {
+  const beatHtml = renderBeatGame({
+    state: createInitialState(),
+    setState: () => {},
+    onReward: () => {}
+  });
+  const packagerSource = readFileSync("scripts/package-offline-html.mjs", "utf8");
+
+  assert.match(beatHtml, /flower-drum-tablet\.png\?v=qq-safe-25/);
+  assert.match(packagerSource, /assets\/images\/flower-drum-tablet\.png/);
+  assert.ok(statSync("assets/images/flower-drum-tablet.png").size < 400_000);
+});
+
 test("bottom navigation uses only page names", () => {
   const source = readFileSync("src/modules/navigation.js", "utf8");
   assert.doesNotMatch(source, /const icons|nav-icon|home:\s*"会"|beat:\s*"鼓"|rhythm:\s*"花"|compose:\s*"乐"|showcase:\s*"奖"/);
@@ -480,7 +588,7 @@ test("bottom navigation uses only page names", () => {
 
 test("classroom shell loads Phaser from a local classroom asset", () => {
   const html = readFileSync("index.html", "utf8");
-  assert.match(html, /"\.\/assets\/vendor\/phaser\.esm\.js\?v=tablet-safe-21"/);
+  assert.match(html, /"\.\/assets\/vendor\/phaser\.esm\.js\?v=qq-safe-25"/);
   assert.doesNotMatch(html, /cdn\.jsdelivr\.net|unpkg\.com|phaser@3\.90\.0/);
   assert.equal(existsSync("assets/vendor/phaser.esm.js"), true);
 });
@@ -521,13 +629,13 @@ test("tablet-critical media urls force fresh classroom assets", () => {
   const composeHtml = renderCompositionWorkshop({ state: createInitialState() });
   const composeStageSource = readFileSync("src/modules/compose-game-stage.js", "utf8");
 
-  assert.match(beatHtml, /flower-drum-3d\.png\?v=tablet-safe-21/);
+  assert.match(beatHtml, /flower-drum-tablet\.png\?v=qq-safe-25/);
   assert.match(beatHtml, /fetchpriority="high"/);
-  assert.match(composeHtml, /compose-stage-scene\.jpg\?v=tablet-safe-21/);
-  assert.match(composeStageSource, /compose-stage-scene\.jpg\?v=tablet-safe-21/);
+  assert.match(composeHtml, /compose-stage-scene\.jpg\?v=qq-safe-25/);
+  assert.match(composeStageSource, /compose-stage-scene\.jpg\?v=qq-safe-25/);
   for (const instrument of instruments) {
-    assert.match(instrument.sample.strong, /\?v=tablet-safe-21$/);
-    assert.match(instrument.sample.weak, /\?v=tablet-safe-21$/);
+    assert.match(instrument.sample.strong, /\?v=qq-safe-25$/);
+    assert.match(instrument.sample.weak, /\?v=qq-safe-25$/);
   }
 });
 
@@ -535,7 +643,7 @@ test("tablet shell prioritizes drum image before delayed audio warmup", () => {
   const html = readFileSync("index.html", "utf8");
   const appSource = readFileSync("src/app.js", "utf8");
 
-  assert.match(html, /rel="preload" as="image" href="\.\/assets\/images\/flower-drum-3d\.png\?v=tablet-safe-21"/);
+  assert.match(html, /rel="preload" as="image" href="\.\/assets\/images\/flower-drum-tablet\.png\?v=qq-safe-25"/);
   assert.match(appSource, /unlockAudio\(\)/);
   assert.match(appSource, /setTimeout\(\(\) => \{/);
   assert.match(appSource, /primeAudio/);
@@ -546,11 +654,11 @@ test("classroom entrypoint cache-busts updated game modules", () => {
   const gameLogicSource = readFileSync("src/modules/game-logic.js", "utf8");
   const audioSource = readFileSync("src/modules/audio-engine.js", "utf8");
 
-  assert.match(appSource, /\.\/modules\/beat-game\.js\?v=tablet-safe-21/);
-  assert.match(appSource, /\.\/modules\/feedback\.js\?v=tablet-safe-21/);
-  assert.match(appSource, /\.\/modules\/game-logic\.js\?v=tablet-safe-21/);
-  assert.match(gameLogicSource, /\.\/feedback\.js\?v=tablet-safe-21/);
-  assert.match(audioSource, /\.\.\/data\/instrument-sounds\.js\?v=tablet-safe-21/);
+  assert.match(appSource, /\.\/modules\/beat-game\.js\?v=qq-safe-25/);
+  assert.match(appSource, /\.\/modules\/feedback\.js\?v=qq-safe-25/);
+  assert.match(appSource, /\.\/modules\/game-logic\.js\?v=qq-safe-25/);
+  assert.match(gameLogicSource, /\.\/feedback\.js\?v=qq-safe-25/);
+  assert.match(audioSource, /\.\.\/data\/instrument-sounds\.js\?v=qq-safe-25/);
 });
 
 test("classroom no-cache server is available for iPad Safari", () => {
@@ -561,11 +669,12 @@ test("classroom no-cache server is available for iPad Safari", () => {
   assert.match(serverSource, /Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate"/);
   assert.match(serverSource, /Pragma", "no-cache"/);
   assert.match(serverSource, /Expires", "0"/);
-  assert.match(serverSource, /tablet-safe-21/);
+  assert.match(serverSource, /qq-safe-25/);
 });
 
 test("tablet-critical media assets stay lightweight enough for classroom loading", () => {
   assert.ok(statSync("assets/images/flower-drum-3d.png").size < 750_000);
+  assert.ok(statSync("assets/images/flower-drum-tablet.png").size < 400_000);
   assert.ok(statSync("assets/images/qinghai-folk-background.jpg").size < 650_000);
   assert.ok(statSync("assets/images/compose-stage-scene.jpg").size < 450_000);
   assert.ok(statSync("assets/images/level-cards-sheet.jpg").size < 320_000);
