@@ -161,7 +161,7 @@ export function renderCompositionWorkshop({ state }) {
     <section class="compose-game-shell tablet-compose-layout ${composition.isComplete ? "compose-is-complete" : ""} enter-view">
       <div class="compose-arcade-stage compose-quiet-stage">
         <div class="compose-stage-canvas" data-compose-game-stage aria-label="小乐队闯关台动画舞台">
-          <img class="compose-stage-fallback" src="./assets/images/compose-stage-scene.jpg?v=tablet-safe-20" alt="小乐队节奏闯关舞台">
+          <img class="compose-stage-fallback" src="./assets/images/compose-stage-scene.jpg?v=tablet-safe-21" alt="小乐队节奏闯关舞台">
         </div>
 
         <div class="compose-play-layer">

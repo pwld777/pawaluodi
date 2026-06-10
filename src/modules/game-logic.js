@@ -1,6 +1,6 @@
 import { getNotationCard } from "../data/notation-cards.js";
 import { rhythmQuestions } from "../data/rhythm-questions.js";
-import { maxStars, starLevelIds } from "./feedback.js?v=tablet-safe-20";
+import { maxStars, starLevelIds } from "./feedback.js?v=tablet-safe-21";
 
 const meterCapacity = {
   "2/4": 2,

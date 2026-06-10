@@ -425,7 +425,7 @@ test("tablet landscape keeps scenic images proportioned and touch controls visib
   const tabletCss = readFileSync("src/styles/tablet.css", "utf8");
 
   assert.match(tabletCss, /min-width:\s*921px\)\s*and\s*\(max-width:\s*1280px\)\s*and\s*\(orientation:\s*landscape\)/);
-  assert.match(tabletCss, /qinghai-folk-background\.jpg\?v=tablet-safe-20"\)\s*center top \/ cover no-repeat/);
+  assert.match(tabletCss, /qinghai-folk-background\.jpg\?v=tablet-safe-21"\)\s*center top \/ cover no-repeat/);
   assert.match(tabletCss, /\.compose-arcade-stage\s*\{[\s\S]*aspect-ratio:\s*16 \/ 9/);
   assert.match(tabletCss, /\.compose-beat-pit,\s*\n\s*\.compose-rhythm-piece\s*\{[\s\S]*min-height:\s*118px/);
   assert.match(tabletCss, /\.compose-main-tray\s*\{[\s\S]*overflow-x:\s*auto/);
@@ -447,14 +447,17 @@ test("tablet safe mode exposes a version marker and viewport variables", () => {
   const appSource = readFileSync("src/app.js", "utf8");
   const baseCss = readFileSync("src/styles/base.css", "utf8");
 
-  assert.match(appSource, /const classroomBuild = "tablet-safe-20"/);
+  assert.match(appSource, /const classroomBuild = "tablet-safe-21"/);
   assert.match(appSource, /navigator\.maxTouchPoints/);
+  assert.match(appSource, /navigator\.maxTouchPoints >= 1/);
+  assert.match(appSource, /pointer:\s*coarse/);
+  assert.match(appSource, /iPad|Macintosh/);
   assert.match(appSource, /visualViewport/);
   assert.match(appSource, /longerSide >= 900 && shorterSide >= 520/);
   assert.match(appSource, /document\.body\.dataset\.device = isTabletDevice \? "tablet" : "desktop"/);
   assert.match(appSource, /document\.body\.dataset\.tabletSize = isCompactTablet \? "compact" : "regular"/);
   assert.match(appSource, /className = "classroom-version-marker"/);
-  assert.match(appSource, /v20 tablet/);
+  assert.match(appSource, /v21 tablet/);
   assert.match(baseCss, /\.classroom-version-marker/);
 });
 
@@ -477,7 +480,7 @@ test("bottom navigation uses only page names", () => {
 
 test("classroom shell loads Phaser from a local classroom asset", () => {
   const html = readFileSync("index.html", "utf8");
-  assert.match(html, /"\.\/assets\/vendor\/phaser\.esm\.js\?v=tablet-safe-20"/);
+  assert.match(html, /"\.\/assets\/vendor\/phaser\.esm\.js\?v=tablet-safe-21"/);
   assert.doesNotMatch(html, /cdn\.jsdelivr\.net|unpkg\.com|phaser@3\.90\.0/);
   assert.equal(existsSync("assets/vendor/phaser.esm.js"), true);
 });
@@ -518,13 +521,13 @@ test("tablet-critical media urls force fresh classroom assets", () => {
   const composeHtml = renderCompositionWorkshop({ state: createInitialState() });
   const composeStageSource = readFileSync("src/modules/compose-game-stage.js", "utf8");
 
-  assert.match(beatHtml, /flower-drum-3d\.png\?v=tablet-safe-20/);
+  assert.match(beatHtml, /flower-drum-3d\.png\?v=tablet-safe-21/);
   assert.match(beatHtml, /fetchpriority="high"/);
-  assert.match(composeHtml, /compose-stage-scene\.jpg\?v=tablet-safe-20/);
-  assert.match(composeStageSource, /compose-stage-scene\.jpg\?v=tablet-safe-20/);
+  assert.match(composeHtml, /compose-stage-scene\.jpg\?v=tablet-safe-21/);
+  assert.match(composeStageSource, /compose-stage-scene\.jpg\?v=tablet-safe-21/);
   for (const instrument of instruments) {
-    assert.match(instrument.sample.strong, /\?v=tablet-safe-20$/);
-    assert.match(instrument.sample.weak, /\?v=tablet-safe-20$/);
+    assert.match(instrument.sample.strong, /\?v=tablet-safe-21$/);
+    assert.match(instrument.sample.weak, /\?v=tablet-safe-21$/);
   }
 });
 
@@ -532,7 +535,7 @@ test("tablet shell prioritizes drum image before delayed audio warmup", () => {
   const html = readFileSync("index.html", "utf8");
   const appSource = readFileSync("src/app.js", "utf8");
 
-  assert.match(html, /rel="preload" as="image" href="\.\/assets\/images\/flower-drum-3d\.png\?v=tablet-safe-20"/);
+  assert.match(html, /rel="preload" as="image" href="\.\/assets\/images\/flower-drum-3d\.png\?v=tablet-safe-21"/);
   assert.match(appSource, /unlockAudio\(\)/);
   assert.match(appSource, /setTimeout\(\(\) => \{/);
   assert.match(appSource, /primeAudio/);
@@ -543,11 +546,11 @@ test("classroom entrypoint cache-busts updated game modules", () => {
   const gameLogicSource = readFileSync("src/modules/game-logic.js", "utf8");
   const audioSource = readFileSync("src/modules/audio-engine.js", "utf8");
 
-  assert.match(appSource, /\.\/modules\/beat-game\.js\?v=tablet-safe-20/);
-  assert.match(appSource, /\.\/modules\/feedback\.js\?v=tablet-safe-20/);
-  assert.match(appSource, /\.\/modules\/game-logic\.js\?v=tablet-safe-20/);
-  assert.match(gameLogicSource, /\.\/feedback\.js\?v=tablet-safe-20/);
-  assert.match(audioSource, /\.\.\/data\/instrument-sounds\.js\?v=tablet-safe-20/);
+  assert.match(appSource, /\.\/modules\/beat-game\.js\?v=tablet-safe-21/);
+  assert.match(appSource, /\.\/modules\/feedback\.js\?v=tablet-safe-21/);
+  assert.match(appSource, /\.\/modules\/game-logic\.js\?v=tablet-safe-21/);
+  assert.match(gameLogicSource, /\.\/feedback\.js\?v=tablet-safe-21/);
+  assert.match(audioSource, /\.\.\/data\/instrument-sounds\.js\?v=tablet-safe-21/);
 });
 
 test("classroom no-cache server is available for iPad Safari", () => {
@@ -558,7 +561,7 @@ test("classroom no-cache server is available for iPad Safari", () => {
   assert.match(serverSource, /Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate"/);
   assert.match(serverSource, /Pragma", "no-cache"/);
   assert.match(serverSource, /Expires", "0"/);
-  assert.match(serverSource, /tablet-safe-20/);
+  assert.match(serverSource, /tablet-safe-21/);
 });
 
 test("tablet-critical media assets stay lightweight enough for classroom loading", () => {

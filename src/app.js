@@ -1,13 +1,13 @@
-import { renderBeatGame, bindBeatGame } from "./modules/beat-game.js?v=tablet-safe-20";
-import { renderRhythmGame, bindRhythmGame } from "./modules/rhythm-drag-game.js?v=tablet-safe-20";
-import { renderCompositionWorkshop, bindCompositionWorkshop } from "./modules/composition-workshop.js?v=tablet-safe-20";
-import { bindNavigation, updateNavigation } from "./modules/navigation.js?v=tablet-safe-20";
-import { addLevelStar } from "./modules/feedback.js?v=tablet-safe-20";
-import { createInitialState, normalizeProgressStars, restoreState, serializeState } from "./modules/game-logic.js?v=tablet-safe-20";
-import { primeAudio, unlockAudio } from "./modules/audio-engine.js?v=tablet-safe-20";
-import { rhythmQuestions } from "./data/rhythm-questions.js?v=tablet-safe-20";
+import { renderBeatGame, bindBeatGame } from "./modules/beat-game.js?v=tablet-safe-21";
+import { renderRhythmGame, bindRhythmGame } from "./modules/rhythm-drag-game.js?v=tablet-safe-21";
+import { renderCompositionWorkshop, bindCompositionWorkshop } from "./modules/composition-workshop.js?v=tablet-safe-21";
+import { bindNavigation, updateNavigation } from "./modules/navigation.js?v=tablet-safe-21";
+import { addLevelStar } from "./modules/feedback.js?v=tablet-safe-21";
+import { createInitialState, normalizeProgressStars, restoreState, serializeState } from "./modules/game-logic.js?v=tablet-safe-21";
+import { primeAudio, unlockAudio } from "./modules/audio-engine.js?v=tablet-safe-21";
+import { rhythmQuestions } from "./data/rhythm-questions.js?v=tablet-safe-21";
 
-const classroomBuild = "tablet-safe-20";
+const classroomBuild = "tablet-safe-21";
 const storageKey = "huaer-yu-shaonian-state";
 const viewRoot = document.querySelector("#viewRoot");
 const starCount = document.querySelector("#starCount");
@@ -33,7 +33,9 @@ function syncClassroomViewport() {
   const size = getViewportSize();
   const shorterSide = Math.min(size.width, size.height);
   const longerSide = Math.max(size.width, size.height);
-  const isTabletDevice = navigator.maxTouchPoints > 1 && longerSide >= 900 && shorterSide >= 520;
+  const hasTouchInput = navigator.maxTouchPoints >= 1 || window.matchMedia("(pointer: coarse)").matches;
+  const isIPadLike = /iPad|Macintosh/.test(navigator.userAgent) && hasTouchInput;
+  const isTabletDevice = (hasTouchInput || isIPadLike) && longerSide >= 900 && shorterSide >= 520;
   const isCompactTablet = isTabletDevice && size.height <= 740;
 
   document.body.dataset.device = isTabletDevice ? "tablet" : "desktop";
@@ -53,7 +55,7 @@ function updateClassroomVersionMarker(size, isTabletDevice) {
     document.body.append(marker);
   }
 
-  const markerPrefix = isTabletDevice ? "v20 tablet" : "v20 desktop";
+  const markerPrefix = isTabletDevice ? "v21 tablet" : "v21 desktop";
   marker.textContent = `${markerPrefix} ${size.width}x${size.height}`;
 }
 

@@ -33,7 +33,7 @@ body {
   overflow-x: hidden;
   background:
     linear-gradient(180deg, rgba(255, 250, 221, 0.12), rgba(221, 246, 213, 0.2)),
-    url("../../assets/images/qinghai-folk-background.jpg?v=tablet-safe-20") 56% center / cover no-repeat fixed;
+    url("../../assets/images/qinghai-folk-background.jpg?v=tablet-safe-21") 56% center / cover no-repeat fixed;
 }
 
 button,
@@ -388,7 +388,7 @@ h3 {
   width: 100%;
   height: var(--level-art-height);
   border-radius: 24px 24px 18px 18px;
-  background-image: linear-gradient(180deg, transparent 58%, rgba(63, 31, 10, 0.38)), url("../../assets/images/level-cards-sheet.jpg?v=tablet-safe-20");
+  background-image: linear-gradient(180deg, transparent 58%, rgba(63, 31, 10, 0.38)), url("../../assets/images/level-cards-sheet.jpg?v=tablet-safe-21");
   background-repeat: no-repeat;
   background-size: 300% auto;
   background-position: left center;

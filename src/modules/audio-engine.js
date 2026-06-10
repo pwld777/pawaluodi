@@ -1,4 +1,4 @@
-import { getInstrument } from "../data/instrument-sounds.js?v=tablet-safe-20";
+import { getInstrument } from "../data/instrument-sounds.js?v=tablet-safe-21";
 
 let audioContext;
 let didWarmContext = false;

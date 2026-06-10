@@ -77,7 +77,7 @@ export function renderBeatGame({ state, setState, onReward }) {
           ${patternConfig.pattern.map((beat, index) => `<span class="beat-dot ${beat}" data-beat-dot="${index}" aria-label="第 ${index + 1} 拍">${index + 1}</span>`).join("")}
         </div>
         <div class="huagu" role="group" aria-label="可点击花鼓">
-          <img class="huagu-image" src="./assets/images/flower-drum-3d.png?v=tablet-safe-20" alt="红色大花鼓，鼓面朝上，鼓身贴有花纹" loading="eager" fetchpriority="high" decoding="async">
+          <img class="huagu-image" src="./assets/images/flower-drum-3d.png?v=tablet-safe-21" alt="红色大花鼓，鼓面朝上，鼓身贴有花纹" loading="eager" fetchpriority="high" decoding="async">
           <button class="drum-zone drum-hit-surface" data-drum-surface type="button" aria-label="敲花鼓"><span>敲花鼓</span></button>
         </div>
         <p class="feedback-pill" id="beatFeedback" data-tone="info">先听，再敲。</p>

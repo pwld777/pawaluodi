@@ -5,7 +5,7 @@ import { networkInterfaces } from "node:os";
 
 const root = resolve(".");
 const port = Number(process.argv[2] ?? 4188);
-const classroomQuery = "?classroom=tablet-safe-20";
+const classroomQuery = "?classroom=tablet-safe-21";
 
 const contentTypes = {
   ".css": "text/css; charset=utf-8",

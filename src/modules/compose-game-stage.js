@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-const sceneAsset = "./assets/images/compose-stage-scene.jpg?v=tablet-safe-20";
+const sceneAsset = "./assets/images/compose-stage-scene.jpg?v=tablet-safe-21";
 
 let game = null;
 let activeContainer = null;
