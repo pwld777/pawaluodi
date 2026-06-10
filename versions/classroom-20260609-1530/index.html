@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>花儿与少年音乐课堂游戏</title>
+    <link rel="stylesheet" href="./src/styles/base.css?v=tablet-touch-12">
+    <link rel="stylesheet" href="./src/styles/animations.css?v=tablet-touch-12">
+    <link rel="stylesheet" href="./src/styles/tablet.css?v=tablet-touch-12">
+    <script type="importmap">
+      {
+        "imports": {
+          "phaser": "https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="sky-orchestra" aria-hidden="true">
+      <span class="sun-medal"></span>
+      <span class="ribbon ribbon-one"></span>
+      <span class="ribbon ribbon-two"></span>
+      <span class="mountain mountain-back"></span>
+      <span class="mountain mountain-front"></span>
+    </div>
+
+    <div id="app" class="app-shell">
+      <header class="game-header">
+        <div>
+          <p class="eyebrow">四年级音乐课堂</p>
+          <h1>《花儿与少年》音乐闯关</h1>
+        </div>
+        <div class="score-board" aria-live="polite">
+          <span>星星</span>
+          <strong id="starCount">0</strong>
+        </div>
+      </header>
+
+      <main id="viewRoot" class="view-root" tabindex="-1"></main>
+
+      <nav class="bottom-nav" aria-label="课堂游戏导航">
+        <button class="nav-tab" data-view="home" type="button">首页</button>
+        <button class="nav-tab" data-view="beat" type="button">花鼓</button>
+        <button class="nav-tab" data-view="rhythm" type="button">节奏</button>
+        <button class="nav-tab" data-view="compose" type="button">创编</button>
+        <button class="nav-tab" data-view="showcase" type="button">展示</button>
+      </nav>
+    </div>
+
+    <script type="module" src="./src/app.js?v=tablet-touch-12"></script>
+  </body>
+</html>

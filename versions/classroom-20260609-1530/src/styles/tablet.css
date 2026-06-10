@@ -1,0 +1,252 @@
+@media (max-width: 920px) {
+  .app-shell {
+    padding: 16px 14px 96px;
+  }
+
+  .game-header {
+    align-items: start;
+  }
+
+  .hero-card,
+  .game-layout,
+  .rhythm-layout,
+  .compose-grid,
+  .compose-control-deck,
+  .compose-game-hud,
+  .compose-top-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-card {
+    padding: 26px;
+  }
+
+  .hero-scene {
+    min-height: 260px;
+  }
+
+  .level-grid,
+  .quest-map,
+  .card-tray,
+  .block-tray {
+    grid-template-columns: 1fr;
+  }
+
+  .quest-map {
+    padding: 16px;
+  }
+
+  .quest-path {
+    left: 50%;
+    right: auto;
+    top: 8%;
+    bottom: 8%;
+    width: 14px;
+    height: auto;
+    transform: translateX(-50%);
+  }
+
+  .festival-hud {
+    align-items: stretch;
+    display: grid;
+  }
+
+  .task-rail,
+  .hint-panel {
+    padding: 20px;
+  }
+
+  .mode-buttons,
+  .control-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bar-row {
+    grid-template-columns: 1fr;
+  }
+
+  .compose-arcade-stage {
+    min-height: min(630px, calc(100vh - 198px));
+  }
+
+  .compose-game-hud {
+    align-items: stretch;
+  }
+
+  .compose-play-layer {
+    inset: 14px;
+    gap: 8px;
+  }
+
+  .current-bar-stage {
+    padding: 16px;
+  }
+
+  .current-beat-pit,
+  .current-rhythm-piece,
+  .compose-beat-pit,
+  .compose-rhythm-piece {
+    min-height: 128px;
+  }
+
+  .bottom-nav {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    padding: 7px;
+  }
+
+  .nav-tab {
+    min-height: 54px;
+    border-radius: 16px;
+    font-size: 0.86rem;
+    padding: 4px;
+  }
+
+  .nav-icon {
+    display: none;
+  }
+
+  .compose-control-floor {
+    grid-template-columns: minmax(0, 1fr) minmax(132px, 160px);
+    gap: 10px;
+  }
+
+  .compose-action-dock {
+    padding: 8px;
+  }
+
+  .compose-action-dock button {
+    min-height: 44px;
+    font-size: 1.05rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .game-header {
+    display: grid;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .hero-scene {
+    min-height: 220px;
+  }
+
+  .score-board {
+    justify-self: start;
+  }
+
+  .hud-badges,
+  .stage-hud,
+  .finale-actions {
+    flex-wrap: wrap;
+  }
+
+  .quest-map .level-card {
+    min-height: 260px;
+  }
+
+  .drum-callout {
+    min-width: 70px;
+    min-height: 36px;
+    font-size: 0.88rem;
+  }
+
+  .compose-award {
+    right: 12px;
+    top: 102px;
+    width: 66px;
+    height: 66px;
+    border-radius: 20px;
+  }
+
+  .compose-arcade-stage {
+    min-height: 980px;
+    border-width: 6px;
+  }
+
+  .compose-game-hud,
+  .compose-play-layer {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+  }
+
+  .compose-play-layer {
+    top: 14px;
+  }
+
+  .hud-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .compose-top-strip {
+    justify-content: start;
+  }
+
+  .current-bar-header {
+    display: grid;
+  }
+
+  .current-beat-pits,
+  .current-rhythm-pieces,
+  .compose-beat-pits,
+  .compose-rhythm-pieces {
+    gap: 8px;
+  }
+
+  .current-beat-pit,
+  .current-rhythm-piece,
+  .compose-beat-pit,
+  .compose-rhythm-piece {
+    min-height: 150px;
+    border-radius: 20px;
+  }
+
+  .four-bar-board {
+    grid-template-columns: 1fr;
+  }
+
+  .compose-bar-stage {
+    min-height: 220px;
+  }
+
+  .compose-instrument-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  .compose-instrument-row button {
+    grid-template-columns: 30px minmax(0, 1fr);
+    min-height: 44px;
+    padding: 5px 6px;
+  }
+
+  .compose-instrument-row .instrument-photo {
+    width: 30px;
+    max-width: 30px;
+  }
+
+  .compose-instrument-row strong {
+    font-size: 0.84rem;
+  }
+
+  .compose-control-floor {
+    grid-template-columns: 1fr;
+  }
+
+  .compose-action-dock {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: none;
+  }
+
+  .block-tray .notation-card,
+  .block-tray .notation-card[data-piece-beats="2"],
+  .block-tray .notation-card[data-piece-beats="3"] {
+    flex-basis: 138px;
+  }
+}
